@@ -5,7 +5,7 @@
 <h4>Plan for 30.06.24 (DONE)</h4> 
 <ol>
   <li>Rewrite server in cpp oop style, get rid off read, printf, puts, perror</li>
-  <li>Improve the client we already have (still need to do)</li>
+  <li>Improve the client we already have <b>(still need to do)</b></li>
   <li>Write a Makefile</li>
 </ol>
 
