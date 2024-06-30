@@ -2,6 +2,10 @@
 <p>https://www.geeksforgeeks.org/socket-programming-in-cpp/</p>
 <h3>Socket Programming in C/C++: Handling multiple clients on server without multi threading :</h3>
 <p>https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/</p>
+<h3>Official documentation for IRC</h3>
+<p>https://www.rfc-editor.org/rfc/rfc1459</p>
+<h3>Could be needed for file transfers (bonus part)</h3>
+<p>https://en.wikipedia.org/wiki/Direct_Client-to-Client</p>
 <h4>Plan for 30.06.24 (DONE)</h4> 
 <ol>
   <li>Rewrite server in cpp oop style, get rid off read, printf, puts, perror</li>
