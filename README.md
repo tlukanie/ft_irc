@@ -24,6 +24,12 @@
 <ol>
   <li>Rewrite server to let user set port/password as args</li>
   <li>Find workable ft_irc for test with chosen irssi (Tanya)</li>
+</ol>
+
+<h4>Plan for 06.07.24 (13:00-16:00 Prague time)</h4>
+<ol>
+  <li>Proceed with the article: mode message 4.2.3</li>
+  <li>Rewrite server to let user set port/password as args</li>
   <li>Remove getpeername function</li>
   <li>Fix errors with irssi and our server</li>
 </ol>
@@ -32,5 +38,4 @@
 <ol>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Update client to test prefix, server validation of messages</li>
-  <li>Proceed with the article: mode message 4.2.3</li>
 </ol>
