@@ -31,4 +31,6 @@
 <h4>Plan for an unscheduled future</h4>
 <ol>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
+  <li>Update client to test prefix, server validation of messages</li>
+  <li>Proceed with the article: mode message 4.2.3</li>
 </ol>
