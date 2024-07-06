@@ -22,20 +22,28 @@
 
 <h4>Plan for 05.07.24 (9:00-11:00, 14:00-18:00 Prague time)</h4>
 <ol>
-  <li>Rewrite server to let user set port/password as args</li>
   <li>Find workable ft_irc for test with chosen irssi (Tanya)</li>
 </ol>
 
 <h4>Plan for 06.07.24 (13:00-16:00 Prague time)</h4>
 <ol>
   <li>Proceed with the article: mode message 4.2.3</li>
-  <li>Rewrite server to let user set port/password as args</li>
+</ol>
+
+<h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
+<ol>
+  <li>Proceed with the article: mode message 4.2.3</li>
   <li>Remove getpeername function</li>
-  <li>Fix errors with irssi and our server</li>
+  <li>buffer for every connection?</li>
+  <li>class? for every connection?</li>
+  <li>Extract message from the buffer 2.3.1</li>
+  <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
+  <li>Free buffer and discard invalid commands</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Update client to test prefix, server validation of messages</li>
+  <li>Make a container of commands, check if they exist</li>
 </ol>

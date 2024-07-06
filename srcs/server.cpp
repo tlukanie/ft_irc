@@ -2,6 +2,7 @@
 //Handle multiple socket connections with select and fd_set on Linux 
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
 #include <cstring>
 #include <string.h> //strlen 
 #include <stdlib.h> 
@@ -23,6 +24,8 @@
 #define MESSAGE "ECHO Daemon v1.0 \r\n"
 
 typedef struct s_server {
+	std::string password;
+	int	port;
 	int	opt;
 	int	addrlen;
 	int	master_socket;
@@ -151,11 +154,11 @@ void	server_loop(t_server ts)
 					if (DEBUG)
 						std::cout << "before send " << i << std::endl;
 					//MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
-					if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
-					{
-						if (DEBUG)
-							std::cerr << "send failed" << i << std::endl;
-					}
+					// if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
+					// {
+					// 	if (DEBUG)
+					// 		std::cerr << "send failed" << i << std::endl;
+					// }
 				}
 			} 
 		} 
@@ -164,9 +167,8 @@ void	server_loop(t_server ts)
 		std::cout << "Main while lopp ended ???? " << std::endl;
 }
 
-void	init_server(int port)
+void	init_server(t_server ts)
 {
-	t_server	ts;
 	ts.opt = TRUE;
 	ts.max_clients = 5;
 	//set of socket descriptors 
@@ -198,7 +200,7 @@ void	init_server(int port)
 	//type of socket created 
 	ts.address.sin_family = AF_INET; 
 	ts.address.sin_addr.s_addr = INADDR_ANY; 
-	ts.address.sin_port = htons( port ); 
+	ts.address.sin_port = htons(ts.port); 
 		
 	//bind the socket to localhost port 8888 
 	if (bind(ts.master_socket, (struct sockaddr *)&ts.address, sizeof(ts.address))<0) 
@@ -206,7 +208,7 @@ void	init_server(int port)
 		std::cerr << "bind failed" << std::endl;
 		exit(EXIT_FAILURE); 
 	} 
-	std::cout << "Listener on port " << port << std::endl; 
+	std::cout << "Listener on port " << ts.port << std::endl; 
 		
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(ts.master_socket, 3) < 0) 
@@ -223,11 +225,41 @@ void	init_server(int port)
 	server_loop(ts);
 }
 
-int main(int argc , char *argv[]) 
+int	ft_usage(void)
 {
-	(void)argc;
-	(void)argv;
-	int port = 8888;
-	init_server(port);
+	std::cerr << "Usage:" << std::endl
+		<< "./ircserv <port> <password>" << std::endl;
+	return (1);
+}
+
+int	ft_usage_port(void)
+{
+	std::cerr << "Invalid port:" << std::endl
+		<< "port has to be in the range of 1-65535" << std::endl;
+	return (2);
+}
+
+static int	ok_strtoi(std::string str)
+{
+	std::stringstream	temp;
+	int					num;
+
+	temp << str;
+	temp >> num;
+	return (num);
+}
+
+int	main(int argc , char *argv[]) 
+{
+	if (argc != 3)
+		return (ft_usage());
+	//check argv1
+	//check argv2?
+	t_server	ts;
+	ts.port = ok_strtoi(argv[1]);
+	if (ts.port <=0 || ts.port > 65535)
+		return (ft_usage_port());
+	ts.password = argv[2];
+	init_server(ts);
 	return 0; 
 } 
