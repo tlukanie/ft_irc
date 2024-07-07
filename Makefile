@@ -6,20 +6,20 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/07/07 14:41:44 by okraus           ###   ########.fr        #
+#    Updated: 2024/07/07 16:20:45 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	ircserv
 SRC_DIR	=	srcs/
-FILES	=	server.cpp
+FILES	=	server.cpp colours.cpp
 SRCS	=	$(addprefix $(SRC_DIR), $(FILES))
 OBJ_DIR	=	objs/
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:%.cpp=%.o))
 CLIENT	=	client
 C_SRCS	=	TestingClient1.cpp
 C_OBJS	=	TestingClient1.o
-HEADERS	=	srcs/server.hpp
+HEADERS	=	srcs/server.hpp srcs/colours.hpp
 CPP		=	c++
 FLAGS	=	-g -Wall -Wextra -Werror -std=c++98
 

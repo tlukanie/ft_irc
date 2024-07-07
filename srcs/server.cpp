@@ -2,16 +2,21 @@
 //Handle multiple socket connections with select and fd_set on Linux 
 
 #include "server.hpp"
+#include "colours.hpp"
 
 void	server_loop(t_server ts)
 {
 	//set of socket descriptors 
 	fd_set readfds;
 	fd_set writefds;
+	//CHECK IF NEEDED TO DO EVERY LOOP BECAUSE OF SELECT
+	FD_ZERO(&readfds);
+	FD_ZERO(&writefds); 
+	FD_SET(ts.master_socket, &readfds);
 	while(TRUE) 
 	{
 		if (DEBUG)
-			std::cout << "While loop start" << MYENDL;
+			std::cout << WHITE_COLOUR "While loop start" NO_COLOUR << MYENDL;
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
@@ -19,7 +24,10 @@ void	server_loop(t_server ts)
 		FD_SET(ts.master_socket, &readfds); 
 		ts.max_sd = ts.master_socket; 
 			
-		//add child sockets to set 
+		//add child sockets to set
+
+		//ITERATE OVER CONNECTIONS
+		//MAYBE CHANGE LOGIC
 		for (int i = 0 ; i < ts.max_clients ; i++) 
 		{ 
 			if (DEBUG)
@@ -27,7 +35,9 @@ void	server_loop(t_server ts)
 			//socket descriptor 
 			ts.sd = ts.client_socket[i]; 
 				
-			//if valid socket descriptor then add to read list 
+			//if valid socket descriptor then add to read list
+
+			// IF WE NEED SEND MESSAGE ADD TO WRITE FDS
 			if(ts.sd > 0) 
 				FD_SET(ts.sd , &readfds); 
 				
@@ -46,11 +56,11 @@ void	server_loop(t_server ts)
 		//check later if allowed
 		if ((ts.activity < 0) && (errno!=EINTR)) 
 		{ 
-			std::cerr << "select error" << std::endl; 
+			std::cerr << ERROR_COLOUR "select error" NO_COLOUR << std::endl; 
 		}
-
-		// if select returns 0 because of timeout we can just continue???
-
+		// IF SELECT RETURNS 0  MAYBE CONTINUE ???
+		else if (!ts.activity)
+			continue ;
 		//If something happened on the master socket , 
 		//then its an incoming connection 
 		if (FD_ISSET(ts.master_socket, &readfds)) 
@@ -76,26 +86,33 @@ void	server_loop(t_server ts)
 			// std::cout << "Welcome message sent successfully" << std::endl;
 				
 			//add new socket to array of sockets 
+
+			//ITERATE OVER CONNECTIONS
 			for (int i = 0; i < ts.max_clients; i++) 
 			{ 
 				if (DEBUG)
-					std::cout << "Second for loop " << i << std::endl;
+					std::cout << YELLOW_COLOUR "Second for loop " << i << NO_COLOUR << std::endl;
 				//if position is empty 
 				if( ts.client_socket[i] == 0 ) 
 				{ 
 					ts.client_socket[i] = ts.new_socket; 
 					std::cout << "Adding to list of sockets as " << i << std::endl;
-					break; 
+					break ; 
 				} 
-			} 
+			}
+			//CREATE NEW CONNECTION
+			//FILL IT WITH DATA (IP ADDRESS, PORT, ...)
 		} 
 			
-		//else its some IO operation on some other socket 
+		//else its some IO operation on some other socket
+
+		//ITERATE OVER CONNECTIONS
 		for (int i = 0; i < ts.max_clients; i++) 
 		{
 			if (DEBUG)
 				std::cout << "Third for loop " << i << std::endl;
-			ts.sd = ts.client_socket[i]; 	
+			ts.sd = ts.client_socket[i]; 
+			//READ FROM READING FDS
 			if (FD_ISSET(ts.sd , &readfds)) 
 			{ 
 				//Check if it was for closing , and also read the 
@@ -109,7 +126,7 @@ void	server_loop(t_server ts)
 					//Close the socket and mark as 0 in list for reuse
 					if (DEBUG)
 						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
-					close(ts.sd); 
+					close(ts.sd);
 					ts.client_socket[i] = 0; 
 				} 
 					
@@ -120,7 +137,7 @@ void	server_loop(t_server ts)
 					//of the data read
 					ts.buffer[ts.valread] = '\0';
 					std::cout << "Received data" << std::endl;
-					std::cout << "Buffer " << i << " [" << ts.buffer << "]" << std::endl;
+					std::cout << "Buffer " << i << " [" CYAN_COLOUR << ts.buffer << NO_COLOUR "]" << std::endl;
 					// if (DEBUG)
 					// 	std::cout << "before send " << i << std::endl;
 					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
@@ -130,7 +147,9 @@ void	server_loop(t_server ts)
 					// 		std::cerr << "send failed" << i << std::endl;
 					// }
 				}
-			} 
+			}
+			// SEND TO WRITING FDS
+			// SEND WITH YELLOW COLOUR
 		} 
 	}
 	if (DEBUG)
@@ -197,15 +216,15 @@ void	init_server(t_server ts)
 
 int	ft_usage(void)
 {
-	std::cerr << "Usage:" << std::endl
-		<< "./ircserv <port> <password>" << std::endl;
+	std::cerr << ERROR_COLOUR "Usage:" NO_COLOUR << std::endl
+		<< REDBG_COLOUR "./ircserv <port> <password>" NO_COLOUR << std::endl;
 	return (1);
 }
 
 int	ft_usage_port(void)
 {
-	std::cerr << "Invalid port:" << std::endl
-		<< "port has to be in the range of 1-65535" << std::endl;
+	std::cerr << ERROR_COLOUR "Invalid port:" NO_COLOUR << std::endl
+		<< REDBG_COLOUR "port has to be in the range of 1-65535" NO_COLOUR << std::endl;
 	return (2);
 }
 

@@ -34,7 +34,7 @@
 <h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
 <ol>
   <li><s>Remove getpeername function</s></li>
-  <li>Add colours to messages</li>
+  <li><s>Add colours to messages</s></li>
   <li>Write pseudocode</li>
 </ol>
 
