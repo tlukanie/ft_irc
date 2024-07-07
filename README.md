@@ -34,19 +34,20 @@
 <h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
 <ol>
   <li><s>Remove getpeername function</s></li>
+  <li>Add colours to messages</li>
+  <li>Write pseudocode</li>
+</ol>
+
+<h4>Plan for 09.07.24 (10:00-16:00 Prague time) and the rest of the week</h4>
+<ol>
+  <li>Handle Ctrl+C and exit cleanly</li>
+  <li>Fix memory leaks and free everything that needs freeing</li>
   <li>buffer for every connection?</li>
   <li>class? for every connection?</li>
   <li>map of class connections (sd-connection class)</li>
   <li>Extract message from the buffer 2.3.1</li>
   <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
   <li>Free buffer and discard invalid commands</li>
-</ol>
-
-<h4>Plan for 09.07.24 (10:00-16:00 Prague time)</h4>
-<ol>
-  <li>Add colours to messages</li>
-  <li>Handle Ctrl+C and exit cleanly</li>
-  <li>Fix memory leaks and free everything that needs freeing</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
