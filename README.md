@@ -33,7 +33,7 @@
 
 <h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
 <ol>
-  <li>~~Remove getpeername function~~</li>
+  <li><s>Remove getpeername function</s></li>
   <li>buffer for every connection?</li>
   <li>class? for every connection?</li>
   <li>map of class connections (sd-connection class)</li>
