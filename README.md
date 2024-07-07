@@ -8,16 +8,16 @@
 <p>https://en.wikipedia.org/wiki/Direct_Client-to-Client</p>
 <h4>Plan for 30.06.24 (DONE)</h4> 
 <ol>
-  <li>Rewrite server in cpp oop style, get rid off read, printf, puts, perror</li>
+  <li><s>Rewrite server in cpp oop style, get rid off read, printf, puts, perror</s></li>
   <li>Improve the client we already have <b>(still need to do)</b></li>
-  <li>Write a Makefile</li>
+  <li><s>Write a Makefile</s></li>
 </ol>
 
 <h4>Plan for 03.07.24</h4>
 <ol>
-  <li>Select reference client (real irc client) (Done)</li>
+  <li><s>Select reference client (real irc client)</s> (Done)</li>
   <li>Undertsand the communication between the client and the server : format of the messages</li>
-  <li>Install irc server/client to learn about the behaviour that we need to recreate</li>
+  <li><s>Install irc server/client to learn about the behaviour that we need to recreate</s></li>
 </ol>
 
 <h4>Plan for 05.07.24 (9:00-11:00, 14:00-18:00 Prague time)</h4>
@@ -27,8 +27,8 @@
 
 <h4>Plan for 06.07.24 (13:00-16:00 Prague time)</h4>
 <ol>
-  <li>Proceed with the article: mode message 4.2.3</li>
-  <li>Check for port and password as program parameters</li>
+  <li><s>Proceed with the article: mode message 4.2.3</s></li>
+  <li><s>Check for port and password as program parameters</s></li>
 </ol>
 
 <h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
