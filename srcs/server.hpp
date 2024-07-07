@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/07 15:24:39 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/07 17:29:54 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <iostream>
 # include <sstream>
 # include <cstring>
+# include <csignal>
 # include <string.h> //strlen 
 # include <stdlib.h> 
 # include <errno.h> 

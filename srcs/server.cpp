@@ -4,6 +4,14 @@
 #include "server.hpp"
 #include "colours.hpp"
 
+static bool		g_server_alive = true;
+
+void signal_handler(int signal_num) 
+{
+	if (signal_num == SIGINT)
+		g_server_alive = false;
+} 
+
 void	server_loop(t_server ts)
 {
 	//set of socket descriptors 
@@ -13,7 +21,7 @@ void	server_loop(t_server ts)
 	FD_ZERO(&readfds);
 	FD_ZERO(&writefds); 
 	FD_SET(ts.master_socket, &readfds);
-	while(TRUE) 
+	while(g_server_alive) 
 	{
 		if (DEBUG)
 			std::cout << WHITE_COLOUR "While loop start" NO_COLOUR << MYENDL;
@@ -23,7 +31,7 @@ void	server_loop(t_server ts)
 		//add master socket to set 
 		FD_SET(ts.master_socket, &readfds); 
 		ts.max_sd = ts.master_socket; 
-			
+
 		//add child sockets to set
 
 		//ITERATE OVER CONNECTIONS
@@ -51,14 +59,17 @@ void	server_loop(t_server ts)
 		//timeout set for 15 s 0 ms
 		ts.timeout.tv_sec = 15;
 		ts.timeout.tv_usec = 0;
+		std::cout << "before select" << std::endl;
 		ts.activity = select(ts.max_sd + 1 , &readfds , &writefds , NULL , &ts.timeout); 
-	
+		std::cout << "after select "<< ts.activity << std::endl;
 		//check later if allowed
-		if ((ts.activity < 0) && (errno!=EINTR)) 
+		if (ts.activity < 0) 
 		{ 
-			std::cerr << ERROR_COLOUR "select error" NO_COLOUR << std::endl; 
+			std::cerr << ERROR_COLOUR "select error" NO_COLOUR << std::endl;
+			continue ;
 		}
 		// IF SELECT RETURNS 0  MAYBE CONTINUE ???
+		// NEED TO CHECK THAT NO UNPROCESSED MESSAGES IN BUFFER
 		else if (!ts.activity)
 			continue ;
 		//If something happened on the master socket , 
@@ -148,12 +159,13 @@ void	server_loop(t_server ts)
 					// }
 				}
 			}
+			// READ FROM BUFFER STRING
 			// SEND TO WRITING FDS
 			// SEND WITH YELLOW COLOUR
 		} 
 	}
 	if (DEBUG)
-		std::cout << "Main while lopp ended ???? " << std::endl;
+		std::cout << "Main while loop ended ???? " << std::endl;
 }
 
 void	init_server(t_server ts)
@@ -244,6 +256,7 @@ int	main(int argc , char *argv[])
 		return (ft_usage());
 	//check argv1
 	//check argv2?
+	signal(SIGINT, signal_handler); 
 	t_server	ts;
 	ts.port = ok_strtoi(argv[1]);
 	if (ts.port <=0 || ts.port > 65535)

@@ -4,6 +4,8 @@
 <p>https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/</p>
 <h3>Official documentation for IRC</h3>
 <p>https://www.rfc-editor.org/rfc/rfc1459</p>
+<h3>Modern IRC</h3>
+<p>https://modern.ircdocs.horse/</p>
 <h3>Could be needed for file transfers (bonus part)</h3>
 <p>https://en.wikipedia.org/wiki/Direct_Client-to-Client</p>
 <h4>Plan for 30.06.24 (DONE)</h4> 
@@ -35,13 +37,12 @@
 <ol>
   <li><s>Remove getpeername function</s></li>
   <li><s>Add colours to messages</s></li>
-  <li>Write pseudocode</li>
+  <li><s>Write pseudocode</s></li>
+  <li><s>Handle Ctrl+C and exit cleanly</s></li>
 </ol>
 
 <h4>Plan for 09.07.24 (10:00-16:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li>Handle Ctrl+C and exit cleanly</li>
-  <li>Fix memory leaks and free everything that needs freeing</li>
   <li>buffer for every connection?</li>
   <li>class? for every connection?</li>
   <li>map of class connections (sd-connection class)</li>
@@ -52,6 +53,8 @@
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
+  <li>Fix memory leaks and free everything that needs freeing</li>
+  <li>Read through the modern irc specification</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Update client to test prefix, server validation of messages</li>
   <li>Make a container of commands, check if they exist</li>
