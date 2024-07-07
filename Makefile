@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/06/30 11:07:02 by okraus           ###   ########.fr        #
+#    Updated: 2024/07/07 14:41:44 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:%.cpp=%.o))
 CLIENT	=	client
 C_SRCS	=	TestingClient1.cpp
 C_OBJS	=	TestingClient1.o
+HEADERS	=	srcs/server.hpp
 CPP		=	c++
 FLAGS	=	-g -Wall -Wextra -Werror -std=c++98
 
@@ -30,7 +31,7 @@ $(NAME): $(OBJS)
 $(CLIENT): $(C_OBJS)
 	$(CPP) $(FLAGS) $(C_OBJS) -o $(CLIENT)
 
-%.o: %.cpp
+%.o: %.cpp $(HEADERS)
 	$(CPP) $(FLAGS) -c $< -o $@
 
 objs/%.o: srcs/%.cpp | objdir

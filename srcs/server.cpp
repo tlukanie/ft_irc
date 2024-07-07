@@ -1,55 +1,20 @@
 //Example code: A simple server side code, which echos back the received message. 
 //Handle multiple socket connections with select and fd_set on Linux 
-#include <stdio.h>
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <string.h> //strlen 
-#include <stdlib.h> 
-#include <errno.h> 
-#include <unistd.h> //close 
-#include <arpa/inet.h> //close 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <netinet/in.h> 
-#include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
-	
-#define TRUE 1 
-#define FALSE 0
 
-#ifndef DEBUG
-# define DEBUG 1
-#endif
-
-#define MESSAGE "ECHO Daemon v1.0 \r\n"
-
-typedef struct s_server {
-	std::string password;
-	int	port;
-	int	opt;
-	int	addrlen;
-	int	master_socket;
-	int	new_socket;
-	int	client_socket[30];
-	int	max_clients;
-	int	activity;
-	int	valread;
-	int	sd; 
-	int	max_sd; 
-	struct sockaddr_in address; 
-	char buffer[1025]; //data buffer of 1K 
-}	t_server;
+#include "server.hpp"
 
 void	server_loop(t_server ts)
 {
 	//set of socket descriptors 
 	fd_set readfds;
+	fd_set writefds;
 	while(TRUE) 
 	{
 		if (DEBUG)
-			std::cout << "While loop start" << std::endl;
+			std::cout << "While loop start" << MYENDL;
 		//clear the socket set 
-		FD_ZERO(&readfds); 
+		FD_ZERO(&readfds);
+		FD_ZERO(&writefds); 
 		//add master socket to set 
 		FD_SET(ts.master_socket, &readfds); 
 		ts.max_sd = ts.master_socket; 
@@ -71,16 +36,21 @@ void	server_loop(t_server ts)
 				ts.max_sd = ts.sd; 
 		} 
 	
-		//wait for an activity on one of the sockets , timeout is NULL , 
-		//so wait indefinitely 
-		ts.activity = select(ts.max_sd + 1 , &readfds , NULL , NULL , NULL); 
+		//wait for an activity on one of the sockets , timeout is not NULL
+		// so it is non blocking
+		//timeout set for 15 s 0 ms
+		ts.timeout.tv_sec = 15;
+		ts.timeout.tv_usec = 0;
+		ts.activity = select(ts.max_sd + 1 , &readfds , &writefds , NULL , &ts.timeout); 
 	
 		//check later if allowed
 		if ((ts.activity < 0) && (errno!=EINTR)) 
 		{ 
 			std::cerr << "select error" << std::endl; 
-		} 
-			
+		}
+
+		// if select returns 0 because of timeout we can just continue???
+
 		//If something happened on the master socket , 
 		//then its an incoming connection 
 		if (FD_ISSET(ts.master_socket, &readfds)) 
@@ -88,7 +58,7 @@ void	server_loop(t_server ts)
 			if ((ts.new_socket = accept(ts.master_socket, 
 					(struct sockaddr *)&ts.address, (socklen_t*)&ts.addrlen))<0) 
 			{ 
-				std::cerr << "accept" << std::endl;
+				std::cerr << "accept failed" << std::endl;
 				exit(EXIT_FAILURE); 
 			} 
 			
@@ -98,12 +68,12 @@ void	server_loop(t_server ts)
 				<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
 		
 			//send new connection greeting message 
-			if(send(ts.new_socket, MESSAGE, strlen(MESSAGE), 0) != (ssize_t)strlen(MESSAGE) ) 
-			{ 
-				std::cerr << "send" << std::endl;
-			} 
+			// if(send(ts.new_socket, MESSAGE, std::strlen(MESSAGE), 0) != (ssize_t)std::strlen(MESSAGE) ) 
+			// { 
+			// 	std::cerr << "send failed" << std::endl;
+			// } 
 				
-			std::cout << "Welcome message sent successfully" << std::endl;
+			// std::cout << "Welcome message sent successfully" << std::endl;
 				
 			//add new socket to array of sockets 
 			for (int i = 0; i < ts.max_clients; i++) 
@@ -114,8 +84,7 @@ void	server_loop(t_server ts)
 				if( ts.client_socket[i] == 0 ) 
 				{ 
 					ts.client_socket[i] = ts.new_socket; 
-					std::cout << "Adding to list of sockets as " << i << std::endl; 
-						
+					std::cout << "Adding to list of sockets as " << i << std::endl;
 					break; 
 				} 
 			} 
@@ -123,8 +92,7 @@ void	server_loop(t_server ts)
 			
 		//else its some IO operation on some other socket 
 		for (int i = 0; i < ts.max_clients; i++) 
-		{ 
-
+		{
 			if (DEBUG)
 				std::cout << "Third for loop " << i << std::endl;
 			ts.sd = ts.client_socket[i]; 	
@@ -135,10 +103,12 @@ void	server_loop(t_server ts)
 				if ((ts.valread = recv( ts.sd , ts.buffer, 1024, MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
-					getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
-					std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
-						<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
-					//Close the socket and mark as 0 in list for reuse 
+					// getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
+					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
+					// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
+					//Close the socket and mark as 0 in list for reuse
+					if (DEBUG)
+						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
 					close(ts.sd); 
 					ts.client_socket[i] = 0; 
 				} 
@@ -151,9 +121,9 @@ void	server_loop(t_server ts)
 					ts.buffer[ts.valread] = '\0';
 					std::cout << "Received data" << std::endl;
 					std::cout << "Buffer " << i << " [" << ts.buffer << "]" << std::endl;
-					if (DEBUG)
-						std::cout << "before send " << i << std::endl;
-					//MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
+					// if (DEBUG)
+					// 	std::cout << "before send " << i << std::endl;
+					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
 					// if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
 					// {
 					// 	if (DEBUG)

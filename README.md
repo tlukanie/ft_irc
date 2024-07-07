@@ -28,17 +28,25 @@
 <h4>Plan for 06.07.24 (13:00-16:00 Prague time)</h4>
 <ol>
   <li>Proceed with the article: mode message 4.2.3</li>
+  <li>Check for port and password as program parameters</li>
 </ol>
 
 <h4>Plan for 07.07.24 (14:00-16:00 Prague time)</h4>
 <ol>
-  <li>Proceed with the article: mode message 4.2.3</li>
-  <li>Remove getpeername function</li>
+  <li>~~Remove getpeername function~~</li>
   <li>buffer for every connection?</li>
   <li>class? for every connection?</li>
+  <li>map of class connections (sd-connection class)</li>
   <li>Extract message from the buffer 2.3.1</li>
   <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
   <li>Free buffer and discard invalid commands</li>
+</ol>
+
+<h4>Plan for 09.07.24 (10:00-16:00 Prague time)</h4>
+<ol>
+  <li>Add colours to messages</li>
+  <li>Handle Ctrl+C and exit cleanly</li>
+  <li>Fix memory leaks and free everything that needs freeing</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
