@@ -41,7 +41,7 @@
   <li><s>Handle Ctrl+C and exit cleanly</s></li>
 </ol>
 
-<h4>Plan for 09.07.24 (10:00-16:00 Prague time) and the rest of the week</h4>
+<h4>Plan for 09.07.24 (13:30-16:00 Prague time) and the rest of the week</h4>
 <ol>
   <li>buffer for every connection?</li>
   <li>class? for every connection?</li>
