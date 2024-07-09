@@ -41,11 +41,21 @@
   <li><s>Handle Ctrl+C and exit cleanly</s></li>
 </ol>
 
-<h4>Plan for 09.07.24 (13:30-16:00 Prague time) and the rest of the week</h4>
+<h4>Plan for 09.07.24 (17:00-19:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li>buffer for every connection?</li>
-  <li>class? for every connection?</li>
-  <li>map of class connections (sd-connection class)</li>
+  <li><s>buffer for every connection?</s></li>
+  <li><s>class? for every connection?</s></li>
+  <li><s>map of class connections (sd-connection class)</s></li>
+</ol>
+
+<h4>Plan for 10.07.24 (14:00-19:00 Prague time) and the rest of the week</h4>
+<ol>
+  <li>Use connections in the main server loop</li>
+  <li>Create message class</li>
+</ol>
+
+<h4>Plan for 11.07.24 (10:30-12:00 && 15:30-17:30 Prague time) and the rest of the week</h4>
+<ol>
   <li>Extract message from the buffer 2.3.1</li>
   <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
   <li>Free buffer and discard invalid commands</li>

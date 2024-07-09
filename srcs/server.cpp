@@ -36,6 +36,7 @@ void	server_loop(t_server ts)
 
 		//ITERATE OVER CONNECTIONS
 		//MAYBE CHANGE LOGIC
+		//ADD CONNECTIONS TO SETS LOOP
 		for (int i = 0 ; i < ts.max_clients ; i++) 
 		{ 
 			if (DEBUG)
@@ -60,7 +61,13 @@ void	server_loop(t_server ts)
 		ts.timeout.tv_sec = 15;
 		ts.timeout.tv_usec = 0;
 		std::cout << "before select" << std::endl;
-		ts.activity = select(ts.max_sd + 1 , &readfds , &writefds , NULL , &ts.timeout); 
+		//function to find nfds goes here
+		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
+		// nfds   This argument should be set to the highest-numbered file 
+		// descriptor in any of the three sets, plus 1. The indicated file
+		// descriptors in each set are checked, up to this limit (but see
+		// BUGS).
+		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout); 
 		std::cout << "after select "<< ts.activity << std::endl;
 		//check later if allowed
 		if (ts.activity < 0) 
@@ -99,6 +106,7 @@ void	server_loop(t_server ts)
 			//add new socket to array of sockets 
 
 			//ITERATE OVER CONNECTIONS
+			//ADDING NEW CONNECTION LOOP
 			for (int i = 0; i < ts.max_clients; i++) 
 			{ 
 				if (DEBUG)
@@ -118,6 +126,7 @@ void	server_loop(t_server ts)
 		//else its some IO operation on some other socket
 
 		//ITERATE OVER CONNECTIONS
+		// READING AND SENDING LOOP
 		for (int i = 0; i < ts.max_clients; i++) 
 		{
 			if (DEBUG)
@@ -138,10 +147,11 @@ void	server_loop(t_server ts)
 					if (DEBUG)
 						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
 					close(ts.sd);
+					//REMOVE CONNECTION FROM MAP
 					ts.client_socket[i] = 0; 
 				} 
 					
-				//Echo back the message that came in 
+				//Print the message that came in 
 				else
 				{
 					//set the string terminating NULL byte on the end 
@@ -161,11 +171,15 @@ void	server_loop(t_server ts)
 			}
 			// READ FROM BUFFER STRING
 			// SEND TO WRITING FDS
+			// else if (FD_ISSET(ts.sd , &writefds))
+			// {
+			// 	/**/
+			// }
 			// SEND WITH YELLOW COLOUR
 		} 
 	}
 	if (DEBUG)
-		std::cout << "Main while loop ended ???? " << std::endl;
+		std::cout << "Main while loop ended..." << std::endl;
 }
 
 void	init_server(t_server ts)

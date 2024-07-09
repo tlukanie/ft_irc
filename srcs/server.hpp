@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/07 17:29:54 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/09 18:17:15 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,11 @@
 # include <sys/types.h> 
 # include <sys/socket.h> 
 # include <netinet/in.h> 
-# include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
+# include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
+# include <map>
+# include <algorithm>
+
+# include "Connection.hpp"
 
 # define TRUE 1 
 # define FALSE 0
@@ -50,11 +54,12 @@ typedef struct s_server {
 	int	max_clients;
 	int	activity;
 	int	valread;
-	int	sd; 
-	int	max_sd; 
+	int	sd;
+	int	max_sd;
 	struct sockaddr_in	address;
 	struct timeval		timeout;
-	char buffer[1025]; //data buffer of 1K 
+	char buffer[1025]; //data buffer of 1K
+	std::map<int, Connection>	connections;
 }	t_server;
 
 #endif
