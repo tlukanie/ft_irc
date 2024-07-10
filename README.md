@@ -51,19 +51,20 @@
 <h4>Plan for 10.07.24 (14:15-15:45 16:30-19:00 Prague time) and the rest of the week</h4>
 <ol>
   <li><s>Use connections in the main server loop</s></li>
-  <li>Use connection buffer</li>
-  <li>Create message class</li>
+  <li><s>Use connection buffer (vector _data)</s></li>
+  <li><s>Create message class</s></li>
 </ol>
 
 <h4>Plan for 11.07.24 (10:30-12:00 && 15:30-17:30 Prague time) and the rest of the week</h4>
 <ol>
   <li>Extract message from the buffer 2.3.1</li>
   <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
-  <li>Free buffer and discard invalid commands</li>
+  <li>Free data and discard invalid commands</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
+  <li>map container "(string command, pointer to function to process message)"</li>
   <li>Fix memory leaks and free everything that needs freeing</li>
   <li>Read through the modern irc specification</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>

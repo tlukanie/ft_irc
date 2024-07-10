@@ -1,91 +1,85 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.cpp                                     :+:      :+:    :+:   */
+/*   Message.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 18:02:43 by okraus           ###   ########.fr       */
+/*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
+/*   Updated: 2024/07/10 18:58:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Connection.hpp"
+#include "Message.hpp"
 
-Connection::Connection(void)
+Message::Message(void)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Default constructor of the Connection class called.";
+	std::cout << "Default constructor of the Message class called.";
 	ft_uncolorize();
 	this->_sd = 0;
-	this->_port = 0;
-	this->_ip = "";
-	this->_reading_flag = true;
-	this->_data_overflow_flag = false;
 	std::cout << std::endl;
 }
 
-Connection::Connection(const Connection& copy)
+Message::Message(const Message& copy)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Copy constructor of the Connection class called.";
+	std::cout << "Copy constructor of the Message class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
 	*this = copy;
 }
 
-Connection &Connection::operator = (const Connection &src)
+Message &Message::operator = (const Message &src)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Assigment operator of the Connection class called.";
+	std::cout << "Assigment operator of the Message class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
 	(void)src;
 	return (*this);
 }
 
-Connection::~Connection(void)
+Message::~Message(void)
 {
 	if (DEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Destructor of the Connection class called.";
+		std::cout << "Destructor of the Message class called.";
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
 }
 
-Connection::Connection(unsigned short sd, unsigned short port, std::string ip)
+// validate message during construction, if invalid throw exception
+
+Message::Message(unsigned short sd, std::vector<uint8_t> data)
 {
 	if (DEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Overriden constructor of the Connection class called.";
+		std::cout << "Overriden constructor of the Message class called.";
 		ft_uncolorize();
 		std::cout << std::endl;
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "SD: " << sd;
-		std::cout << ", port: " << port;
-		std::cout << ", ip: " << ip;
+		std::cout << ", data: [";
+		for (unsigned int i = 0; i < data.size(); i++)
+			std::cout << data[i];
+		std::cout << "]";
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
-	this->_sd = sd;
-	this->_port = port;
-	this->_ip = ip;
-	this->_reading_flag = true;
-	this->_data_overflow_flag = false;
-
 }
 
-unsigned short	Connection::getPort(void)
-{
-	return (this->_port);
-}
+// unsigned short	Message::getPort(void)
+// {
+// 	return (this->_port);
+// }
 
-std::string	Connection::getIP(void)
-{
-	return (this->_ip);
-}
+// std::string	Message::getIP(void)
+// {
+// 	return (this->_ip);
+// }
 
 

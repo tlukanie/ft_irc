@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 15:33:43 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/10 17:13:20 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include <algorithm>
 
 # include "Connection.hpp"
+# include "Message.hpp"
 
 # define TRUE 1 
 # define FALSE 0
@@ -56,8 +57,9 @@ typedef struct s_server {
 	int	max_sd;
 	struct sockaddr_in	address;
 	struct timeval		timeout;
-	char buffer[1025]; //data buffer of 1K
+	char buffer[512]; //irc message is up to 512
 	std::map<int, Connection*>	connections;
+	//std::multimap<int, Message*>	connections;
 }	t_server;
 
 #endif

@@ -1,18 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.hpp                                     :+:      :+:    :+:   */
+/*   Message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 18:02:50 by okraus           ###   ########.fr       */
+/*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
+/*   Updated: 2024/07/10 18:59:45 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+// uint8_t			_buffer[512];
+// int 				size;
+
+// loop 0
+// waiting on any activity
+// if activity -> go to loop 1
+// loop 1
+// server reads data from connections
+// extract messages from the data and save valid ones in multimap
+// if valid message go to loop 2
+// loop 2
+// process messages in multimap (and empty it)
+// and send response to connections
+// if all messages processed go to loop 0
+
+//for accessing function pointer in map of commands
+//https://www.geeksforgeeks.org/inserting-elements-in-stdmap-insert-emplace-and-operator/
+
 #pragma once
-#ifndef CONNECTION_HPP
-# define CONNECTION_HPP
+#ifndef MESSAGE_HPP
+# define MESSAGE_HPP
 
 //# include <cstddef>
 # include <iostream>
@@ -22,9 +40,8 @@
 // # include <sstream>
 // # include <ctime>
 // # include <cstring>
-
-# include "Message.hpp"
 # include "colours.hpp"
+
 
 # define RECEIVING true
 # define SENDING false
@@ -33,19 +50,17 @@
 #  define DEBUG 1
 # endif
 
-class Connection
+class Message
 {
 	public:
-		Connection(void);
-		Connection(const Connection& copy);
-		Connection &operator	= (const Connection &src);
-		~Connection(void);
+		Message(void);
+		Message(const Message& copy);
+		Message &operator	= (const Message &src);
+		~Message(void);
 	
-		Connection(unsigned short sd, unsigned short port, std::string ip);
+		Message(unsigned short sd, std::vector<uint8_t>data);
 		
 		// getters and setters? for mode
-		unsigned short	getPort(void);
-		std::string		getIP(void);
 
 		//methods
 		//extract message
@@ -53,27 +68,19 @@ class Connection
 		
 		// buffer string (octet string? vector?)
 
-		std::vector<uint8_t>	_data;
 	private:
 		// ??? number of connections?
 		//static int	connections;
 		// socket descriptor
 		unsigned short	_sd;
-		// port
-		unsigned short	_port;
-		// ip address
-		std::string	_ip;
-		// reading or writing mode
-		bool	_reading_flag;
-		// flag for invalid buffer (too much data without separator)
-		bool	_data_overflow_flag;
-		// strike count for number of invalid messages in a row???
-		//int	strikecount;
-		//nick
-		//username
-		//host?
-		//realname
-		//...
+		// data
+		std::vector<uint8_t>	_data;
+
+		// more stuff will come here
+		//<message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
+		//prefix string
+		//command string
+		//vector of params strings
 };
 
 #endif

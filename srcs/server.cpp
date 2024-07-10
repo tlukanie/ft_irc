@@ -105,6 +105,7 @@ void	server_loop(t_server ts)
 		// READING AND SENDING LOOP
 		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
 		{
+			//it++ and temp here;
 			ts.sd = it->first; 
 			if (DEBUG)
 				std::cout << BLUE_COLOUR "Second for loop. SD: " << ts.sd << NO_COLOUR << std::endl;
@@ -114,7 +115,7 @@ void	server_loop(t_server ts)
 				std::cout << YELLOW_COLOUR "sd is set: " << ts.sd << NO_COLOUR << MYENDL;
 				//Check if it was for closing , and also read the 
 				//incoming message 
-				if ((ts.valread = recv( ts.sd , ts.buffer, 1024, MSG_NOSIGNAL)) <= 0) 
+				if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
 					// getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
@@ -133,11 +134,14 @@ void	server_loop(t_server ts)
 				//Print the message that came in 
 				else
 				{
-					//set the string terminating NULL byte on the end 
-					//of the data read
-					ts.buffer[ts.valread] = '\0';
 					std::cout << "Received data" << std::endl;
-					std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR << ts.buffer << NO_COLOUR "]" << std::endl;
+					std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR;
+					for (int i = 0; i < ts.valread; i++)
+					{
+						std::cout << ts.buffer[i];
+						it->second->_data.push_back(ts.buffer[i]);
+					}
+					std::cout << NO_COLOUR "]" << std::endl;
 					// if (DEBUG)
 					// 	std::cout << "before send " << i << std::endl;
 					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
@@ -181,6 +185,7 @@ void	server_loop(t_server ts)
 	}
 }
 
+// create map of commands and pointers to functions to process them
 void	init_server(t_server ts)
 {
 	ts.opt = TRUE;
