@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/09 18:30:53 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/10 15:12:56 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@
 # define RECEIVING true
 # define SENDING false
 
+# ifndef DEBUG
+#  define DEBUG 1
+# endif
+
 class Connection
 {
 	public:
@@ -35,6 +39,8 @@ class Connection
 	
 		Connection(unsigned short sd, unsigned short port, std::string ip);
 		// getters and setters? for mode
+		unsigned short	getPort(void);
+		std::string		getIP(void);
 	private:
 		// ??? number of connections?
 		//static int	connections;

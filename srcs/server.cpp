@@ -24,7 +24,7 @@ void	server_loop(t_server ts)
 	while(g_server_alive) 
 	{
 		if (DEBUG)
-			std::cout << WHITE_COLOUR "While loop start" NO_COLOUR << MYENDL;
+			std::cout << WHITEBG_COLOUR "While loop start" NO_COLOUR << MYENDL;
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
@@ -32,24 +32,20 @@ void	server_loop(t_server ts)
 		FD_SET(ts.master_socket, &readfds); 
 		ts.max_sd = ts.master_socket; 
 
-		//add child sockets to set
-
-		//ITERATE OVER CONNECTIONS
-		//MAYBE CHANGE LOGIC
-		//ADD CONNECTIONS TO SETS LOOP
-		for (int i = 0 ; i < ts.max_clients ; i++) 
-		{ 
+		//add connection sockets to set
+		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
+		{
+			//socket descriptor
+			ts.sd = it->first;
 			if (DEBUG)
-				std::cout << "First for loop " << i << std::endl;
-			//socket descriptor 
-			ts.sd = ts.client_socket[i]; 
-				
+				std::cout << BLUE_COLOUR "First for loop sd" << ts.sd << NO_COLOUR << std::endl;
 			//if valid socket descriptor then add to read list
-
+			if(ts.sd > 0)
+			{
+				FD_SET(ts.sd , &readfds);
+				std::cout << YELLOW_COLOUR "setting sd: " << ts.sd << NO_COLOUR << MYENDL;
+			}
 			// IF WE NEED SEND MESSAGE ADD TO WRITE FDS
-			if(ts.sd > 0) 
-				FD_SET(ts.sd , &readfds); 
-				
 			//highest file descriptor number, need it for the select function 
 			if(ts.sd > ts.max_sd) 
 				ts.max_sd = ts.sd; 
@@ -68,7 +64,7 @@ void	server_loop(t_server ts)
 		// descriptors in each set are checked, up to this limit (but see
 		// BUGS).
 		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout); 
-		std::cout << "after select "<< ts.activity << std::endl;
+		std::cout << WHITE_COLOUR "after select "<< ts.activity << NO_COLOUR << MYENDL;
 		//check later if allowed
 		if (ts.activity < 0) 
 		{ 
@@ -87,14 +83,13 @@ void	server_loop(t_server ts)
 					(struct sockaddr *)&ts.address, (socklen_t*)&ts.addrlen))<0) 
 			{ 
 				std::cerr << "accept failed" << std::endl;
+				// PROPER_EXIT
 				exit(EXIT_FAILURE); 
 			} 
 			
 			//inform user of socket number - used in send and receive commands 
-			std::cout << "New connection , socket fd is " << ts.new_socket
-				<< ", ip is : " << inet_ntoa(ts.address.sin_addr)
-				<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
-		
+			//Information in constructor
+			ts.connections.insert(std::pair<int, Connection*>(ts.new_socket, new Connection(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
 			//send new connection greeting message 
 			// if(send(ts.new_socket, MESSAGE, std::strlen(MESSAGE), 0) != (ssize_t)std::strlen(MESSAGE) ) 
 			// { 
@@ -102,39 +97,21 @@ void	server_loop(t_server ts)
 			// } 
 				
 			// std::cout << "Welcome message sent successfully" << std::endl;
-				
-			//add new socket to array of sockets 
-
-			//ITERATE OVER CONNECTIONS
-			//ADDING NEW CONNECTION LOOP
-			for (int i = 0; i < ts.max_clients; i++) 
-			{ 
-				if (DEBUG)
-					std::cout << YELLOW_COLOUR "Second for loop " << i << NO_COLOUR << std::endl;
-				//if position is empty 
-				if( ts.client_socket[i] == 0 ) 
-				{ 
-					ts.client_socket[i] = ts.new_socket; 
-					std::cout << "Adding to list of sockets as " << i << std::endl;
-					break ; 
-				} 
-			}
-			//CREATE NEW CONNECTION
-			//FILL IT WITH DATA (IP ADDRESS, PORT, ...)
 		} 
 			
 		//else its some IO operation on some other socket
 
 		//ITERATE OVER CONNECTIONS
 		// READING AND SENDING LOOP
-		for (int i = 0; i < ts.max_clients; i++) 
+		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
 		{
+			ts.sd = it->first; 
 			if (DEBUG)
-				std::cout << "Third for loop " << i << std::endl;
-			ts.sd = ts.client_socket[i]; 
+				std::cout << BLUE_COLOUR "Second for loop. SD: " << ts.sd << NO_COLOUR << std::endl;
 			//READ FROM READING FDS
 			if (FD_ISSET(ts.sd , &readfds)) 
-			{ 
+			{
+				std::cout << YELLOW_COLOUR "sd is set: " << ts.sd << NO_COLOUR << MYENDL;
 				//Check if it was for closing , and also read the 
 				//incoming message 
 				if ((ts.valread = recv( ts.sd , ts.buffer, 1024, MSG_NOSIGNAL)) <= 0) 
@@ -148,9 +125,11 @@ void	server_loop(t_server ts)
 						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
 					close(ts.sd);
 					//REMOVE CONNECTION FROM MAP
-					ts.client_socket[i] = 0; 
+					delete it->second;
+					std::map<int, Connection *>::iterator temp = it;
+					it++;
+					ts.connections.erase(temp);
 				} 
-					
 				//Print the message that came in 
 				else
 				{
@@ -158,7 +137,7 @@ void	server_loop(t_server ts)
 					//of the data read
 					ts.buffer[ts.valread] = '\0';
 					std::cout << "Received data" << std::endl;
-					std::cout << "Buffer " << i << " [" CYAN_COLOUR << ts.buffer << NO_COLOUR "]" << std::endl;
+					std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR << ts.buffer << NO_COLOUR "]" << std::endl;
 					// if (DEBUG)
 					// 	std::cout << "before send " << i << std::endl;
 					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
@@ -167,35 +146,44 @@ void	server_loop(t_server ts)
 					// 	if (DEBUG)
 					// 		std::cerr << "send failed" << i << std::endl;
 					// }
+					it++;
 				}
 			}
-			// READ FROM BUFFER STRING
-			// SEND TO WRITING FDS
-			// else if (FD_ISSET(ts.sd , &writefds))
-			// {
-			// 	/**/
-			// }
-			// SEND WITH YELLOW COLOUR
+			else if (FD_ISSET(ts.sd , &writefds))
+			{
+				// SEND TO WRITING FDS
+				// SEND WITH YELLOW COLOUR
+				it++;
+			}
+			else
+			{
+				// READ FROM BUFFER STRING IF IT EXISTS
+				it++;
+			}
 		} 
 	}
 	if (DEBUG)
 		std::cout << "Main while loop ended..." << std::endl;
+	// ITERATE OVER MAP AND DELETE EVERYTHING
+	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
+	{
+		if (DEBUG)
+		{
+			std::cout << MAGENTA_COLOUR "Removing connection on sd: " << it->first
+			<< ". IP: " << it->second->getIP()
+			<< ", port: " << it->second->getPort()
+			<< NO_COLOUR << std::endl;
+		}
+		delete it->second;
+		std::map<int, Connection *>::iterator temp = it;
+		it++;
+		ts.connections.erase(temp);
+	}
 }
 
 void	init_server(t_server ts)
 {
 	ts.opt = TRUE;
-	ts.max_clients = 5;
-	//set of socket descriptors 
-
-	
-	
-	//initialise all client_socket[] to 0 so not checked 
-	for (int i = 0; i < ts.max_clients; i++) 
-	{ 
-		ts.client_socket[i] = 0; 
-	} 
-		
 	//create a master socket 
 	if( (ts.master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
 	{ 

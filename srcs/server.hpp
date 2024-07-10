@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/09 18:17:15 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/10 15:33:43 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ typedef struct s_server {
 	int	addrlen;
 	int	master_socket;
 	int	new_socket;
-	int	client_socket[30];
-	int	max_clients;
 	int	activity;
 	int	valread;
 	int	sd;
@@ -59,7 +57,7 @@ typedef struct s_server {
 	struct sockaddr_in	address;
 	struct timeval		timeout;
 	char buffer[1025]; //data buffer of 1K
-	std::map<int, Connection>	connections;
+	std::map<int, Connection*>	connections;
 }	t_server;
 
 #endif

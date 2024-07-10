@@ -48,9 +48,10 @@
   <li><s>map of class connections (sd-connection class)</s></li>
 </ol>
 
-<h4>Plan for 10.07.24 (14:00-19:00 Prague time) and the rest of the week</h4>
+<h4>Plan for 10.07.24 (14:15-15:45 16:30-19:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li>Use connections in the main server loop</li>
+  <li><s>Use connections in the main server loop</s></li>
+  <li>Use connection buffer</li>
   <li>Create message class</li>
 </ol>
 
