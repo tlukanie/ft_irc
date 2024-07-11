@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 18:02:43 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/11 12:00:01 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@ Connection::Connection(void)
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
 	std::cout << "Default constructor of the Connection class called.";
 	ft_uncolorize();
+	std::cout << std::endl;
 	this->_sd = 0;
 	this->_port = 0;
 	this->_ip = "";
 	this->_reading_flag = true;
 	this->_data_overflow_flag = false;
-	std::cout << std::endl;
+	this->_strikecount = 0;
 }
 
 Connection::Connection(const Connection& copy)
@@ -75,7 +76,7 @@ Connection::Connection(unsigned short sd, unsigned short port, std::string ip)
 	this->_ip = ip;
 	this->_reading_flag = true;
 	this->_data_overflow_flag = false;
-
+	this->_strikecount = 0;
 }
 
 unsigned short	Connection::getPort(void)
@@ -86,6 +87,21 @@ unsigned short	Connection::getPort(void)
 std::string	Connection::getIP(void)
 {
 	return (this->_ip);
+}
+
+bool	Connection::getOverflowFlag(void)
+{
+	return (this->_data_overflow_flag);
+}
+
+void	Connection::setOverflowFlag(void)
+{
+	this->_data_overflow_flag = true;
+}
+
+void	Connection::unsetOverflowFlag(void)
+{
+	this->_data_overflow_flag = false;
 }
 
 

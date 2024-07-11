@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 18:59:45 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/11 15:44:38 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ class Message
 		Message &operator	= (const Message &src);
 		~Message(void);
 	
-		Message(unsigned short sd, std::vector<uint8_t>data);
+		Message(unsigned short sd, std::string msg);
 		
 		// getters and setters? for mode
 
@@ -67,20 +67,25 @@ class Message
 		//store in buffer
 		
 		// buffer string (octet string? vector?)
+		// class InvalidMessageException : public std::exception
+		// {
+		// 	public:
+		// 		const char*		what() const throw();
+		// };
 
 	private:
 		// ??? number of connections?
 		//static int	connections;
 		// socket descriptor
-		unsigned short	_sd;
-		// data
-		std::vector<uint8_t>	_data;
-
+		unsigned short				_sd;
 		// more stuff will come here
 		//<message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
 		//prefix string
+		std::string					_prefix;
 		//command string
+		std::string					_command;
 		//vector of params strings
+		std::vector<std::string>	_params;
 };
 
 #endif

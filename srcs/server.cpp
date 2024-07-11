@@ -10,7 +10,24 @@ void signal_handler(int signal_num)
 {
 	if (signal_num == SIGINT)
 		g_server_alive = false;
-} 
+}
+
+size_t	ok_crlf_finder(std::vector<uint8_t> data)
+{
+	size_t							pos;
+	std::vector<uint8_t>::iterator	temp;
+
+	pos = 1;
+	for (std::vector<uint8_t>::iterator it = data.begin(); it != data.end(); it++)
+	{
+		++pos;
+		temp = it;
+		temp++;
+		if (temp != data.end() && *it == '\r' && *temp == '\n')
+			return (pos);
+	}
+	return (0);
+}
 
 void	server_loop(t_server ts)
 {
@@ -142,6 +159,83 @@ void	server_loop(t_server ts)
 						it->second->_data.push_back(ts.buffer[i]);
 					}
 					std::cout << NO_COLOUR "]" << std::endl;
+
+
+					//while CRLF in data
+					// get position of the crlf
+					// if data overflow flag
+					//   remove data till CRLF and remove the flag
+					// copy the data till CRLF to string
+					// remove data till CRLF from the data
+					// try to extract the message from the string
+					// if valid message
+					//   add it to multimap
+					// els
+					//   increase error message counter
+
+					size_t	pos;
+					while ((pos = ok_crlf_finder(it->second->_data)))
+					{
+						if (it->second->getOverflowFlag())
+						{
+							it->second->_data.erase(it->second->_data.begin(), it->second->_data.begin() + pos);
+							it->second->unsetOverflowFlag();
+							continue ;
+						}
+						std::string msg;
+						// pos - 2 because CRLF is not needed in the string, it was verified here
+						msg.assign(it->second->_data.begin(), it->second->_data.begin() + pos - 2);
+						if (DEBUG)
+						{
+							std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+						}
+						if (DEBUG > 1)
+						{
+							for (size_t i = 0; i < msg.length(); i++)
+								std::cout << RED_COLOUR << (int)msg[i] << NO_COLOUR << std::endl;
+						}
+						it->second->_data.erase(it->second->_data.begin(), it->second->_data.begin() + pos);
+
+						// try construct message
+						// if success
+						//   add to multimap
+						// catch exception and throw away
+						try
+						{
+							ts.messages.insert(std::pair<int, Message*>(ts.sd, new Message(ts.sd, msg)));
+						}
+						catch(const std::exception& e)
+						{
+							std::cout << REDBG_COLOUR "MESSAGE" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+							std::cout << REDBG_COLOUR "NOT VALID, BECAUSE" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+						}
+					}
+
+
+					//if data >512 without CRLF
+					// clear the data from data
+					// set the  data overflow flag
+					// if it ends with \r
+					//   keep \r in the data
+
+					if (it->second->_data.size() > 512)
+					{
+						if (DEBUG)
+							std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
+						it->second->setOverflowFlag();
+						if (*(it->second->_data.rbegin()) == '\r')
+						{
+							it->second->_data.clear();
+							it->second->_data.push_back('\r');
+						}
+						else
+						{
+							it->second->_data.clear();
+						}
+					}
 					// if (DEBUG)
 					// 	std::cout << "before send " << i << std::endl;
 					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed

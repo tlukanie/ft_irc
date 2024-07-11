@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/10 17:13:20 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/11 16:05:00 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,10 @@
 
 # define MYENDL "\t\t" << __FILE__ << ":" << __func__ << ":" << __LINE__ << std::endl
 
+# define READING_LOOP 1
+# define SENDING_LOOP 2
+# define CRLF "\r\n"
+
 typedef struct s_server {
 	std::string password;
 	int	port;
@@ -55,11 +59,13 @@ typedef struct s_server {
 	int	valread;
 	int	sd;
 	int	max_sd;
-	struct sockaddr_in	address;
-	struct timeval		timeout;
-	char buffer[512]; //irc message is up to 512
-	std::map<int, Connection*>	connections;
-	//std::multimap<int, Message*>	connections;
+	int	state;
+	struct sockaddr_in											address;
+	struct timeval												timeout;
+	char														buffer[512]; //irc message is up to 512
+	std::map<int, Connection*>									connections; //map of Users/Connections/Clients
+	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
+	std::map<std::string, void (*)(Message*, *struct s_server)	commands; //map of commands and related functions
 }	t_server;
 
 #endif

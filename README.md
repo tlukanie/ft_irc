@@ -55,12 +55,22 @@
   <li><s>Create message class</s></li>
 </ol>
 
-<h4>Plan for 11.07.24 (10:30-12:00 && 15:30-17:30 Prague time) and the rest of the week</h4>
+<h4>Plan for 11.07.24 (10:30-12:00 && 15:30-17:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li>Extract message from the buffer 2.3.1</li>
-  <li>Process message (class? structure? maybe split it in the constructor getters for command and params)</li>
-  <li>Free data and discard invalid commands</li>
+  <li><s>Extract message from the data buffer 2.3.1</s></li>
+  <li><s>Free data buffer and discard invalid commands</s></li>
+  <li><s>Process message (class? structure? maybe split it in the constructor getters for command and params)</s></li>
 </ol>
+
+<h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
+<ol>
+  <li>Set the map of commands and functions (PING-PONG, PASS,...)</li>
+  <li>Go through messages and pass them to functions</li>
+  <li>Clear the multimap</li>
+  <li>Optimise/rewrite the loop</li>
+  <li>Test the code</li>
+</ol>
+
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
@@ -70,4 +80,5 @@
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Update client to test prefix, server validation of messages</li>
   <li>Make a container of commands, check if they exist</li>
+  <li>new</li>
 </ol>
