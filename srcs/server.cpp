@@ -341,6 +341,7 @@ void	server_loop(t_server ts)
 			else
 			{
 				std::cout << RED_COLOUR "Command: " REDBG_COLOUR << it->second->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
+				//strike count of invalid messages
 			}
 		}
 	}
