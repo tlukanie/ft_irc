@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 10:53:00 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 16:30:38 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,9 @@ class Message
 		Message(unsigned short sd, std::string msg);
 		
 		// getters and setters? for mode
-		std::string		getCommand(void);
-
+		unsigned short				getSD(void);
+		std::string					getCommand(void);
+		std::vector<std::string>	getParams(void);
 		
 		//methods
 		//extract message

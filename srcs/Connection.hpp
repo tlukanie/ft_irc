@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/11 12:00:11 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 16:25:33 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,12 @@ class Connection
 		// getters and setters? for mode
 		unsigned short	getPort(void);
 		std::string		getIP(void);
+		std::string		getNick(void);
 		bool			getOverflowFlag(void);
 		
 		void			setOverflowFlag(void);
 		void			unsetOverflowFlag(void);
+		void			setNick(std::string nick);
 		//methods
 		//extract message
 		//store in buffer
@@ -72,6 +74,7 @@ class Connection
 		bool	_data_overflow_flag;
 		// strike count for number of invalid messages in a row???
 		int	_strikecount;
+		std::string	_nick;
 		//nick
 		//username
 		//host?

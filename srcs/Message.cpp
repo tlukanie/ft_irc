@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 10:53:42 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 16:47:07 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ Message::Message(unsigned short sd, std::string msg)
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
-	this->_sd = 0;
+	this->_sd = sd;
 	//this->
 	// if (msg.size() < 10)
 	// 	throw std::runtime_error("Message too short");
@@ -158,9 +158,19 @@ Message::Message(unsigned short sd, std::string msg)
 	}
 }
 
+unsigned short	Message::getSD(void)
+{
+	return (this->_sd);
+}
+
 std::string		Message::getCommand(void)
 {
 	return (this->_command);
+}
+
+std::vector<std::string>	Message::getParams(void)
+{
+	return (this->_params);
 }
 
 // more specific exceptions are needed

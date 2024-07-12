@@ -49,27 +49,77 @@ void irc_pass(Message* msg, struct s_server *ts)
 // handle existing nick later
 void irc_nick(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "NICK COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::string	reply;
+
+	std::cout << MAGENTA_COLOUR "NICK COMMAND is not fully supported" NO_COLOUR << std::endl;
+	// later check if nick is in use and valid string
+
+	//setting the first (and only?) parameter as a nick in the map of connections
+	//accessed by the socket descriptor gained from the message class
+	std::cout << MAGENTA_COLOUR "Connection " << msg->getSD()
+	<< " setting nick " << msg->getParams()[0] << NO_COLOUR << std::endl;
+
+	if (ts->connections[msg->getSD()]->getNick().size() == 0)
+		ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
+	else
+	{
+		ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
+		//send to all?
+		//:net!net@127.0.0.1 << need to be not hardcoded
+		reply = ":net!net@127.0.0.1 NICK :" +  ts->connections[msg->getSD()]->getNick() + CRLF;
+		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+		{ 
+			std::cerr << "send failed" << std::endl;
+		} 
+		else
+		{
+			std::cout << "Reply message sent successfully" << std::endl;
+		}
+	}
+
+	std::cout << MAGENTA_COLOUR "Connection " << msg->getSD()
+	<< " got nick " << ts->connections[msg->getSD()]->getNick() << NO_COLOUR << std::endl;
 }
 
 // USER net net localhost :net
 // reply :IRCQ+ 001 net :Welcome to IRCQ+ net!net@127.0.0.1
+//net!net@127.0.0.1 <<<< save this string somehow? Create function to make it?
 void irc_user(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "USER COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::string	reply;
+	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
+	reply = "001 " +  ts->connections[msg->getSD()]->getNick() + " :Hello there" + CRLF;
+	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	{ 
+		std::cerr << "send failed" << std::endl;
+	} 
+	else
+	{
+		std::cout << "Reply message sent successfully" << std::endl;
+	}
 }
 
 // PING
 // :IRCQ+ PONG net :IRCQ+
 void irc_ping(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "PING COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::string	reply;
+
+	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
+	
+	reply = "PONG " +  ts->connections[msg->getSD()]->getNick() + " :" + msg->getParams()[0] + CRLF;
+	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+
+	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	{ 
+		std::cerr << "send failed" << std::endl;
+	} 
+	else
+	{
+		std::cout << "Reply message sent successfully" << std::endl;
+	}
 }
 
 // PONG

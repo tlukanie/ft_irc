@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/11 12:00:01 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 16:33:25 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,16 @@ unsigned short	Connection::getPort(void)
 std::string	Connection::getIP(void)
 {
 	return (this->_ip);
+}
+
+std::string	Connection::getNick(void)
+{
+	return (this->_nick);
+}
+
+void	Connection::setNick(std::string nick)
+{
+	this->_nick = nick;
 }
 
 bool	Connection::getOverflowFlag(void)
