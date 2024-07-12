@@ -60,14 +60,16 @@
   <li><s>Extract message from the data buffer 2.3.1</s></li>
   <li><s>Free data buffer and discard invalid commands</s></li>
   <li><s>Process message (class? structure? maybe split it in the constructor getters for command and params)</s></li>
+  <li><s>map container "(string command, pointer to function to process message)"</s></li>
 </ol>
 
 <h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
 <ol>
   <li><s>Set the map of commands and functions (PING-PONG, PASS,...)</s></li>
-  <li>Go through messages and pass them to functions</li>
+  <li><s>Make a container of commands, check if they exist</s></li>
+  <li><s>Go through messages and pass them to functions</s></li>
   <li>Send something back to client for ping and user message</li>
-  <li>Clear the multimap</li>
+  <li><s>Clear the multimap</s></li>
   <li>Optimise/rewrite the loop</li>
   <li>Test the code</li>
 </ol>
@@ -75,11 +77,13 @@
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
-  <li>map container "(string command, pointer to function to process message)"</li>
   <li>Fix memory leaks and free everything that needs freeing</li>
   <li>Read through the modern irc specification</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
+  <li>Channel class and </li>
+  <li> 2 maps of users and channels one with key on user another with key on channel</li>
+  <li>new</li>
   <li>Update client to test prefix, server validation of messages</li>
-  <li>Make a container of commands, check if they exist</li>
+  
   <li>new</li>
 </ol>
