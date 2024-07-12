@@ -59,11 +59,10 @@ void irc_nick(Message* msg, struct s_server *ts)
 	std::cout << MAGENTA_COLOUR "Connection " << msg->getSD()
 	<< " setting nick " << msg->getParams()[0] << NO_COLOUR << std::endl;
 
-	if (ts->connections[msg->getSD()]->getNick().size() == 0)
-		ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
-	else
+	ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
+
+	if (ts->connections[msg->getSD()]->getNick().size())
 	{
-		ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
 		//send to all?
 		//:net!net@127.0.0.1 << need to be not hardcoded
 		reply = ":net!net@127.0.0.1 NICK :" +  ts->connections[msg->getSD()]->getNick() + CRLF;
