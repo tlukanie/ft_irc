@@ -64,8 +64,9 @@
 
 <h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li>Set the map of commands and functions (PING-PONG, PASS,...)</li>
+  <li><s>Set the map of commands and functions (PING-PONG, PASS,...)</s></li>
   <li>Go through messages and pass them to functions</li>
+  <li>Send something back to client for ping and user message</li>
   <li>Clear the multimap</li>
   <li>Optimise/rewrite the loop</li>
   <li>Test the code</li>

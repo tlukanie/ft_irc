@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/11 16:57:11 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 10:53:42 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,5 +158,9 @@ Message::Message(unsigned short sd, std::string msg)
 	}
 }
 
+std::string		Message::getCommand(void)
+{
+	return (this->_command);
+}
 
 // more specific exceptions are needed

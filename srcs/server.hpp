@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/11 16:05:00 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/12 10:46:03 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ typedef struct s_server {
 	char														buffer[512]; //irc message is up to 512
 	std::map<int, Connection*>									connections; //map of Users/Connections/Clients
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
-	std::map<std::string, void (*)(Message*, *struct s_server)	commands; //map of commands and related functions
+	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
+	//map nicks to sds
 }	t_server;
 
 #endif

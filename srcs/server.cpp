@@ -29,6 +29,74 @@ size_t	ok_crlf_finder(std::vector<uint8_t> data)
 	return (0);
 }
 
+// CAP LS
+void irc_cap(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "CAP COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// PASS a
+void irc_pass(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "PASS COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// NICK net
+// handle existing nick later
+void irc_nick(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "NICK COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// USER net net localhost :net
+// reply :IRCQ+ 001 net :Welcome to IRCQ+ net!net@127.0.0.1
+void irc_user(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "USER COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// PING
+// :IRCQ+ PONG net :IRCQ+
+void irc_ping(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "PING COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// PONG
+void irc_pong(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "PONG COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// QUIT
+void irc_quit(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "QUIT COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+// MODE net +i
+void irc_mode(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "MODE COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
+
+
 void	server_loop(t_server ts)
 {
 	//set of socket descriptors 
@@ -258,7 +326,23 @@ void	server_loop(t_server ts)
 				// READ FROM BUFFER STRING IF IT EXISTS
 				it++;
 			}
-		} 
+		}
+		for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); it++)
+		{
+			std::cout << "iterating through messages because why not" << std::endl;
+
+
+			// find if the command is in commands
+			//	execute
+			if (ts.commands.find(it->second->getCommand()) != ts.commands.end())
+			{
+				ts.commands[it->second->getCommand()](it->second, &ts);
+			}
+			else
+			{
+				std::cout << RED_COLOUR "Command: " REDBG_COLOUR << it->second->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
+			}
+		}
 	}
 	if (DEBUG)
 		std::cout << "Main while loop ended..." << std::endl;
@@ -322,6 +406,31 @@ void	init_server(t_server ts)
 	//accept the incoming connection 
 	ts.addrlen = sizeof(ts.address); 
 	std::cout << "Waiting for connections ..." << std::endl; 
+
+	//add commands
+	ts.commands["CAP"] = irc_cap;
+	ts.commands["PASS"] = irc_pass;
+	ts.commands["NICK"] = irc_nick;
+	ts.commands["USER"] = irc_user;
+	ts.commands["PING"] = irc_ping;
+	ts.commands["PONG"] = irc_pong;
+	ts.commands["MODE"] = irc_mode;
+	
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+	// ts.commands[""] = irc_;
+
 
 	//main server loop
 	server_loop(ts);
