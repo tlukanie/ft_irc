@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 16:33:25 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/14 14:05:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,21 @@ void	Connection::setOverflowFlag(void)
 void	Connection::unsetOverflowFlag(void)
 {
 	this->_data_overflow_flag = false;
+}
+
+bool	Connection::getReadingFlag(void)
+{
+	return (this->_reading_flag);
+}
+
+void	Connection::setReadingFlag(void)
+{
+	this->_reading_flag = true;
+}
+
+void	Connection::unsetReadingFlag(void)
+{
+	this->_reading_flag = false;
 }
 
 

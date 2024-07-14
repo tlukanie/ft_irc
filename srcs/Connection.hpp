@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 16:25:33 by okraus           ###   ########.fr       */
+/*   Updated: 2024/07/14 14:05:19 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,12 @@ class Connection
 		std::string		getIP(void);
 		std::string		getNick(void);
 		bool			getOverflowFlag(void);
+		bool			getReadingFlag(void);
 		
 		void			setOverflowFlag(void);
 		void			unsetOverflowFlag(void);
+		void			setReadingFlag(void);
+		void			unsetReadingFlag(void);
 		void			setNick(std::string nick);
 		//methods
 		//extract message

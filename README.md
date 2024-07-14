@@ -70,20 +70,25 @@
   <li><s>Go through messages and pass them to functions</s></li>
   <li><s>Send something back to client for ping and user message</s></li>
   <li><s>Clear the multimap</s></li>
-  <li>Optimise/rewrite the loop</li>
-  <li>Test the code</li>
+</ol>
+
+<h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
+<ol>
+  <li><s>Optimise/rewrite the loop</s></li>
+  <li><s>Read through the modern irc specification (especially commands)</s></li>
 </ol>
 
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
   <li>Read through the modern irc specification (especially commands)</li>
-  <li>Fix memory leaks and free everything that needs freeing</li>
+  <li>Fix/check memory leaks and free everything that needs freeing</li>
+  <li>Update client to test prefix, server validation of messages</li>
+  <li>Create a second client. One will be automated another will take messages manually like telnet</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Channel class and </li>
   <li> 2 maps of users and channels one with key on user another with key on channel</li>
   <li>Process more commands make them work in all scenarios</li>
-  <li>Update client to test prefix, server validation of messages</li>
   
   <li>new</li>
 </ol>

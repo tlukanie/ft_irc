@@ -38,6 +38,12 @@ void irc_cap(Message* msg, struct s_server *ts)
 }
 
 // PASS a
+// https://modern.ircdocs.horse/#pass-message
+// Numeric replies:
+// 
+// ERR_NEEDMOREPARAMS (461)
+// ERR_ALREADYREGISTERED (462)
+// ERR_PASSWDMISMATCH (464)
 void irc_pass(Message* msg, struct s_server *ts)
 {
 	std::cout << MAGENTA_COLOUR "PASS COMMAND not supported" NO_COLOUR << std::endl; 
@@ -46,7 +52,25 @@ void irc_pass(Message* msg, struct s_server *ts)
 }
 
 // NICK net
+// https://modern.ircdocs.horse/#nick-message
 // handle existing nick later
+// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
+
+// Numeric Replies:
+
+// ERR_NONICKNAMEGIVEN (431)
+// ERR_ERRONEUSNICKNAME (432)
+// ERR_NICKNAMEINUSE (433)
+// ERR_NICKCOLLISION (436)
+// Command Example:
+
+//   NICK Wiz                  ; Requesting the new nick "Wiz".
+// Message Examples:
+
+//   :WiZ NICK Kilroy          ; WiZ changed his nickname to Kilroy.
+
+//   :dan-!d@localhost NICK Mamoped
+//                             ; dan- changed his nickname to Mamoped.
 void irc_nick(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
@@ -82,8 +106,13 @@ void irc_nick(Message* msg, struct s_server *ts)
 }
 
 // USER net net localhost :net
+// https://modern.ircdocs.horse/#user-message
 // reply :IRCQ+ 001 net :Welcome to IRCQ+ net!net@127.0.0.1
 //net!net@127.0.0.1 <<<< save this string somehow? Create function to make it?
+//Numeric Replies:
+
+// ERR_NEEDMOREPARAMS (461)
+// ERR_ALREADYREGISTERED (462)
 void irc_user(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
@@ -101,7 +130,12 @@ void irc_user(Message* msg, struct s_server *ts)
 }
 
 // PING
+// https://modern.ircdocs.horse/#ping-message
 // :IRCQ+ PONG net :IRCQ+
+// Numeric Replies:
+
+// ERR_NEEDMOREPARAMS (461)
+// ERR_NOORIGIN (409)
 void irc_ping(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
@@ -122,6 +156,7 @@ void irc_ping(Message* msg, struct s_server *ts)
 }
 
 // PONG
+// https://modern.ircdocs.horse/#pong-message
 void irc_pong(Message* msg, struct s_server *ts)
 {
 	std::cout << MAGENTA_COLOUR "PONG COMMAND not supported" NO_COLOUR << std::endl; 
@@ -130,6 +165,7 @@ void irc_pong(Message* msg, struct s_server *ts)
 }
 
 // QUIT
+// https://modern.ircdocs.horse/#quit-message
 void irc_quit(Message* msg, struct s_server *ts)
 {
 	std::cout << MAGENTA_COLOUR "QUIT COMMAND not supported" NO_COLOUR << std::endl; 
@@ -137,7 +173,44 @@ void irc_quit(Message* msg, struct s_server *ts)
 	(void)ts;
 }
 
+// Error
+// https://modern.ircdocs.horse/#error-message
+
+/* CHANNEL OPERATIONS */
+
+// JOIN
+// https://modern.ircdocs.horse/#join-message
+
+// PART
+//https://modern.ircdocs.horse/#part-message
+
+//TOPIC
+// https://modern.ircdocs.horse/#topic-message
+
+//INVITE
+// https://modern.ircdocs.horse/#invite-message
+
+//KICK
+//https://modern.ircdocs.horse/#kick-message
+
+
+//AWAY
+//https://modern.ircdocs.horse/#away-message
+
+
+
 // MODE net +i
+//https://modern.ircdocs.horse/#mode-message
+//https://modern.ircdocs.horse/#channel-modes
+
+
+//PRIVMSG
+//https://modern.ircdocs.horse/#privmsg-message
+
+//NOTICE
+//https://modern.ircdocs.horse/#notice-message
+
+
 void irc_mode(Message* msg, struct s_server *ts)
 {
 	std::cout << MAGENTA_COLOUR "MODE COMMAND not supported" NO_COLOUR << std::endl; 
@@ -168,36 +241,47 @@ void	server_loop(t_server ts)
 
 		//add connection sockets to set
 		//in the reading loop
-		if (ts.state & READING_LOOP)
+		// if (ts.state & READING_LOOP)
+		// {
+		Connection * connection_ptr;
+		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
 		{
-			for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
+			//socket descriptor
+			ts.sd = it->first;
+			connection_ptr = it->second;
+			if (DEBUG)
+				std::cout << BLUE_COLOUR "First for loop reading sd " << ts.sd << NO_COLOUR << std::endl;
+			if (connection_ptr->getReadingFlag())
 			{
-				//socket descriptor
-				ts.sd = it->first;
-				if (DEBUG)
-					std::cout << BLUE_COLOUR "First for loop reading sd " << ts.sd << NO_COLOUR << std::endl;
 				FD_SET(ts.sd , &readfds);
 				if (DEBUG)
-					std::cout << YELLOW_COLOUR "setting sd: " << ts.sd << NO_COLOUR << MYENDL;
-				if(ts.sd > ts.max_sd) 
-					ts.max_sd = ts.sd; 
+					std::cout << YELLOW_COLOUR "setting reading sd: " << ts.sd << NO_COLOUR << MYENDL;
 			}
-		}
-		else if (ts.state & SENDING_LOOP)
-		{
-			for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
+			else
 			{
-				//socket descriptor
-				ts.sd = it->first;
-				if (DEBUG)
-					std::cout << BLUE_COLOUR "First for loop sending sd " << ts.sd << NO_COLOUR << std::endl;
 				FD_SET(ts.sd , &writefds);
 				if (DEBUG)
-					std::cout << YELLOW_COLOUR "setting sd: " << ts.sd << NO_COLOUR << MYENDL;
-				if(ts.sd > ts.max_sd) 
-					ts.max_sd = ts.sd; 
+					std::cout << YELLOW_COLOUR "setting writing sd: " << ts.sd << NO_COLOUR << MYENDL;
 			}
+			if(ts.sd > ts.max_sd) 
+				ts.max_sd = ts.sd; 
 		}
+		// }
+		// else if (ts.state & SENDING_LOOP)
+		// {
+		// 	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
+		// 	{
+		// 		//socket descriptor
+		// 		ts.sd = it->first;
+		// 		if (DEBUG)
+		// 			std::cout << BLUE_COLOUR "First for loop sending sd " << ts.sd << NO_COLOUR << std::endl;
+		// 		FD_SET(ts.sd , &writefds);
+		// 		if (DEBUG)
+		// 			std::cout << YELLOW_COLOUR "setting sd: " << ts.sd << NO_COLOUR << MYENDL;
+		// 		if(ts.sd > ts.max_sd) 
+		// 			ts.max_sd = ts.sd; 
+		// 	}
+		// }
 		std::cout << WHITE_COLOUR "before select" NO_COLOUR << std::endl;
 		//function to find nfds goes here
 		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
@@ -247,161 +331,159 @@ void	server_loop(t_server ts)
 
 		//ITERATE OVER CONNECTIONS
 		// READING AND SENDING LOOP
-		if (ts.state & READING_LOOP)
+		// if (ts.state & READING_LOOP)
+		// {
+		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
 		{
-			for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
+			std::map<int, Connection *>::iterator temp = it;
+			ts.sd = it->first;
+			Connection * user_ptr = it->second;
+			it++;
+			if (DEBUG)
+				std::cout << BLUE_COLOUR "Second for loop. SD: " << ts.sd << NO_COLOUR << std::endl;
+			//READ FROM READING FDS
+			if (FD_ISSET(ts.sd , &readfds)) 
 			{
-				std::map<int, Connection *>::iterator temp = it;
-				ts.sd = it->first;
-				Connection * user_ptr = it->second;
-				it++;
-				if (DEBUG)
-					std::cout << BLUE_COLOUR "Second for loop. SD: " << ts.sd << NO_COLOUR << std::endl;
-				//READ FROM READING FDS
-				if (FD_ISSET(ts.sd , &readfds)) 
-				{
-					std::cout << YELLOW_COLOUR "sd is set: " << ts.sd << NO_COLOUR << MYENDL;
-					//Check if it was for closing , and also read the 
-					//incoming message 
-					if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
-					{ 
-						//Somebody disconnected , get his details and print 
-						// getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
-						// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
-						// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
-						//Close the socket and mark as 0 in list for reuse
-						if (DEBUG)
-							std::cout << "Closing connection on sd: " << ts.sd << std::endl;
-						close(ts.sd);
-						//REMOVE CONNECTION FROM MAP
-						delete user_ptr;
-						
-						ts.connections.erase(temp);
-					} 
-					//Print the message that came in 
-					else
-					{
-						std::cout << "Received data" << std::endl;
-						std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR;
-						for (int i = 0; i < ts.valread; i++)
-						{
-							std::cout << ts.buffer[i];
-							user_ptr->_data.push_back(ts.buffer[i]);
-						}
-						std::cout << NO_COLOUR "]" << std::endl;
-
-
-						//while CRLF in data
-						// get position of the crlf
-						// if data overflow flag
-						//   remove data till CRLF and remove the flag
-						// copy the data till CRLF to string
-						// remove data till CRLF from the data
-						// try to extract the message from the string
-						// if valid message
-						//   add it to multimap
-						// els
-						//   increase error message counter
-
-						size_t	pos;
-						while ((pos = ok_crlf_finder(user_ptr->_data)))
-						{
-							if (user_ptr->getOverflowFlag())
-							{
-								user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
-								user_ptr->unsetOverflowFlag();
-								continue ;
-							}
-							std::string msg;
-							// pos - 2 because CRLF is not needed in the string, it was verified here
-							msg.assign(user_ptr->_data.begin(), user_ptr->_data.begin() + pos - 2);
-							if (DEBUG)
-							{
-								std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
-								std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
-							}
-							if (DEBUG > 1)
-							{
-								for (size_t i = 0; i < msg.length(); i++)
-									std::cout << RED_COLOUR << (int)msg[i] << NO_COLOUR << std::endl;
-							}
-							user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
-
-							// try construct message
-							// if success
-							//   add to multimap
-							// catch exception and throw away
-							try
-							{
-								ts.messages.insert(std::pair<int, Message*>(ts.sd, new Message(ts.sd, msg)));
-								ts.state = SENDING_LOOP;
-							}
-							catch(const std::exception& e)
-							{
-								std::cout << REDBG_COLOUR "MESSAGE" NO_COLOUR << std::endl;
-								std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
-								std::cout << REDBG_COLOUR "NOT VALID, BECAUSE" NO_COLOUR << std::endl;
-								std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
-							}
-						}
-
-
-						//if data >512 without CRLF
-						// clear the data from data
-						// set the  data overflow flag
-						// if it ends with \r
-						//   keep \r in the data
-
-						if (user_ptr->_data.size() > 512)
-						{
-							if (DEBUG)
-								std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
-							user_ptr->setOverflowFlag();
-							if (*(user_ptr->_data.rbegin()) == '\r')
-							{
-								user_ptr->_data.clear();
-								user_ptr->_data.push_back('\r');
-							}
-							else
-							{
-								user_ptr->_data.clear();
-							}
-						}
-						// if (DEBUG)
-						// 	std::cout << "before send " << i << std::endl;
-						// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
-						// if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
-						// {
-						// 	if (DEBUG)
-						// 		std::cerr << "send failed" << i << std::endl;
-						// }
-					}
-				}
-				// else if (FD_ISSET(ts.sd , &writefds))
-				// {
-				// 	// SEND TO WRITING FDS
-				// 	// SEND WITH YELLOW COLOUR
-
-
-				// 	it++;
+				std::cout << YELLOW_COLOUR "sd is set: " << ts.sd << NO_COLOUR << MYENDL;
+				//Check if it was for closing , and also read the 
+				//incoming message 
+				if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
+				{ 
+					//Somebody disconnected , get his details and print 
+					// getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
+					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
+					// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
+					//Close the socket and mark as 0 in list for reuse
+					if (DEBUG)
+						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
+					close(ts.sd);
+					//REMOVE CONNECTION FROM MAP
+					delete user_ptr;
 					
-				// }
+					ts.connections.erase(temp);
+				} 
+				//Print the message that came in 
+				else
+				{
+					std::cout << "Received data" << std::endl;
+					std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR;
+					for (int i = 0; i < ts.valread; i++)
+					{
+						std::cout << ts.buffer[i];
+						user_ptr->_data.push_back(ts.buffer[i]);
+					}
+					std::cout << NO_COLOUR "]" << std::endl;
+
+
+					//while CRLF in data
+					// get position of the crlf
+					// if data overflow flag
+					//   remove data till CRLF and remove the flag
+					// copy the data till CRLF to string
+					// remove data till CRLF from the data
+					// try to extract the message from the string
+					// if valid message
+					//   add it to multimap
+					// els
+					//   increase error message counter
+
+					size_t	pos;
+					while ((pos = ok_crlf_finder(user_ptr->_data)))
+					{
+						if (user_ptr->getOverflowFlag())
+						{
+							user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
+							user_ptr->unsetOverflowFlag();
+							continue ;
+						}
+						std::string msg;
+						// pos - 2 because CRLF is not needed in the string, it was verified here
+						msg.assign(user_ptr->_data.begin(), user_ptr->_data.begin() + pos - 2);
+						if (DEBUG)
+						{
+							std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+						}
+						if (DEBUG > 1)
+						{
+							for (size_t i = 0; i < msg.length(); i++)
+								std::cout << RED_COLOUR << (int)msg[i] << NO_COLOUR << std::endl;
+						}
+						user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
+
+						// try construct message
+						// if success
+						//   add to multimap
+						// catch exception and throw away
+						try
+						{
+							ts.messages.insert(std::pair<int, Message*>(ts.sd, new Message(ts.sd, msg)));
+							// ts.state = SENDING_LOOP;
+							user_ptr->unsetReadingFlag();
+						}
+						catch(const std::exception& e)
+						{
+							std::cout << REDBG_COLOUR "MESSAGE" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+							std::cout << REDBG_COLOUR "NOT VALID, BECAUSE" NO_COLOUR << std::endl;
+							std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+						}
+					}
+
+
+					//if data >512 without CRLF
+					// clear the data from data
+					// set the  data overflow flag
+					// if it ends with \r
+					//   keep \r in the data
+
+					if (user_ptr->_data.size() > 512)
+					{
+						if (DEBUG)
+							std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
+						user_ptr->setOverflowFlag();
+						if (*(user_ptr->_data.rbegin()) == '\r')
+						{
+							user_ptr->_data.clear();
+							user_ptr->_data.push_back('\r');
+						}
+						else
+						{
+							user_ptr->_data.clear();
+						}
+					}
+					// if (DEBUG)
+					// 	std::cout << "before send " << i << std::endl;
+					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
+					// if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
+					// {
+					// 	if (DEBUG)
+					// 		std::cerr << "send failed" << i << std::endl;
+					// }
+				}
 			}
-		}
-		else if (ts.state & SENDING_LOOP)
-		{
-			for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop */)
+			else if (FD_ISSET(ts.sd , &writefds))
 			{
-				std::multimap<int, Message*>::iterator temp = it;
-				ts.sd = it->first;
-				Message * msg_ptr = it->second;
-				it++;
+				// SEND TO WRITING FDS
+				// SEND WITH YELLOW COLOUR
+					// for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop */)
+					// {
+				std::multimap<int, Message*>::iterator iter;
+				iter = ts.messages.find(ts.sd);
+				//if we processed all messages
+				if (iter == ts.messages.end())
+				{
+					user_ptr->setReadingFlag();
+					continue ;
+				}
+				Message * msg_ptr = iter->second;
 
 				// find if the command is in commands
 				//	execute
 				if (ts.commands.find(msg_ptr->getCommand()) != ts.commands.end())
 				{
 					std::cout << "Executing message " << msg_ptr->getCommand() << std::endl;
+					//maybe run in try and catch block
 					ts.commands[msg_ptr->getCommand()](msg_ptr, &ts);
 				}
 				else
@@ -411,11 +493,45 @@ void	server_loop(t_server ts)
 				}
 				std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
 				delete msg_ptr;
-				ts.messages.erase(temp);
+				ts.messages.erase(iter);
 			}
-			ts.state = READING_LOOP;
+			else
+			{
+				//fd is not ready
+				//check for pending messages and timeout???
+			}
 		}
 	}
+
+	// PROBABLY not needed
+	// else if (ts.state & SENDING_LOOP)
+	// {
+	// 	for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop */)
+	// 	{
+	// 		std::multimap<int, Message*>::iterator temp = it;
+	// 		ts.sd = it->first;
+	// 		Message * msg_ptr = it->second;
+	// 		it++;
+
+	// 		// find if the command is in commands
+	// 		//	execute
+	// 		if (ts.commands.find(msg_ptr->getCommand()) != ts.commands.end())
+	// 		{
+	// 			std::cout << "Executing message " << msg_ptr->getCommand() << std::endl;
+	// 			ts.commands[msg_ptr->getCommand()](msg_ptr, &ts);
+	// 		}
+	// 		else
+	// 		{
+	// 			std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
+	// 			//strike count of invalid messages
+	// 		}
+	// 		std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
+	// 		delete msg_ptr;
+	// 		ts.messages.erase(temp);
+	// 	}
+	// 	ts.state = READING_LOOP;
+	// }
+	// }
 	if (DEBUG)
 		std::cout << "Main while loop ended..." << std::endl;
 	// ITERATE OVER MAP AND DELETE EVERYTHING
