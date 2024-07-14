@@ -63,7 +63,7 @@
   <li><s>map container "(string command, pointer to function to process message)"</s></li>
 </ol>
 
-<h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
+<h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time)</h4>
 <ol>
   <li><s>Set the map of commands and functions (PING-PONG, PASS,...)</s></li>
   <li><s>Make a container of commands, check if they exist</s></li>
@@ -72,7 +72,7 @@
   <li><s>Clear the multimap</s></li>
 </ol>
 
-<h4>Plan for 12.07.24 (09:30 - 11:30 && 13:30 - 19:00 Prague time) and the rest of the week</h4>
+<h4>Plan for 14.07.24 (14:30 - 15:30 Prague time)</h4>
 <ol>
   <li><s>Optimise/rewrite the loop</s></li>
   <li><s>Read through the modern irc specification (especially commands)</s></li>
