@@ -78,17 +78,26 @@
   <li><s>Read through the modern irc specification (especially commands)</s></li>
 </ol>
 
+<h4>Plan for 21.07.24 (11:15 - 13:15 Prague time)</h4>
+<ol>
+  <li><s>Password command check<s></li>
+  <li><s>Updated colours<s></li>
+  <li>Nick message prefix (need to process USER first)</li>
+</ol>
+
 
 <h4>Plan for an unscheduled future</h4>
 <ol>
-  <li>Read through the modern irc specification (especially commands)</li>
-  <li>Fix/check memory leaks and free everything that needs freeing</li>
   <li>Update client to test prefix, server validation of messages</li>
   <li>Create a second client. One will be automated another will take messages manually like telnet</li>
+  <li>Logger/debugger - different colours for different levels</li>
+  <li>Add User class - Connection verified by password and with user details and nick maybe a child class of Connection</li>
+  <li>Read through the modern irc specification (especially commands)</li>
+  <li>Proper password command check</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Channel class and </li>
   <li> 2 maps of users and channels one with key on user another with key on channel</li>
   <li>Process more commands make them work in all scenarios</li>
-  
+  <li>Fix/check memory leaks and free everything that needs freeing</li>
   <li>new</li>
 </ol>

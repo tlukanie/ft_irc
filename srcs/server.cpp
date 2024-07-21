@@ -41,14 +41,45 @@ void irc_cap(Message* msg, struct s_server *ts)
 // https://modern.ircdocs.horse/#pass-message
 // Numeric replies:
 // 
-// ERR_NEEDMOREPARAMS (461)
-// ERR_ALREADYREGISTERED (462)
-// ERR_PASSWDMISMATCH (464)
+
+
+
 void irc_pass(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "PASS COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::string reply;
+	std::cout << MAGENTA_COLOUR "PASS COMMAND not fully supported" NO_COLOUR << std::endl; 
+
+	if (!msg->getParams().size())
+	{
+		// ERR_NEEDMOREPARAMS (461)
+		// incorrect message count
+		std::cerr << RED_COLOUR "no parameter" NO_COLOUR << std::endl;
+		return ;
+	}
+	// ERR_ALREADYREGISTERED (462)
+	if (msg->getParams()[0] == ts->password)
+	{
+		std::cout << GREEN_COLOUR "correct password" NO_COLOUR << std::endl; 
+	}
+	else
+	{
+		// ERR_PASSWDMISMATCH (464)
+		std::cerr << RED_COLOUR "wrong password" NO_COLOUR << std::endl;
+		reply = ":IRC 464  :Wrong password try again" CRLF;
+		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+		
+		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+		{ 
+			std::cerr << "send failed" << std::endl;
+		} 
+		else
+		{
+			std::cout << "Reply message sent successfully" << std::endl;
+		}
+		close(msg->getSD());
+		ts->connections.erase(ts->connections.find(msg->getSD()));
+	}
+	
 }
 
 // NICK net
@@ -64,6 +95,9 @@ void irc_pass(Message* msg, struct s_server *ts)
 // ERR_NICKCOLLISION (436)
 // Command Example:
 
+
+// oldnickname[ [ "!" user ] "@" host ] 
+// oldnick!user@host
 //   NICK Wiz                  ; Requesting the new nick "Wiz".
 // Message Examples:
 
