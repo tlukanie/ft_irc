@@ -3,6 +3,7 @@
 
 #include "server.hpp"
 #include "colours.hpp"
+#include "debugger.hpp"
 
 static bool		g_server_alive = true;
 
@@ -674,7 +675,11 @@ void	init_server(t_server ts)
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;
 
-
+	ok_debugger(ts.debuglvl, 0, "This is a debug message");
+	ok_debugger(ts.debuglvl, 1, "This is an info message");
+	ok_debugger(ts.debuglvl, 2, "This is a notice message");
+	ok_debugger(ts.debuglvl, 3, "This is a warning message");
+	ok_debugger(ts.debuglvl, 4, "This is an error message");
 	//main server loop
 	server_loop(ts);
 }
@@ -682,7 +687,7 @@ void	init_server(t_server ts)
 int	ft_usage(void)
 {
 	std::cerr << ERROR_COLOUR "Usage:" NO_COLOUR << std::endl
-		<< REDBG_COLOUR "./ircserv <port> <password>" NO_COLOUR << std::endl;
+		<< REDBG_COLOUR "./ircserv <port> <password> --debug-lvl=n (n = 0-4)" NO_COLOUR << std::endl;
 	return (1);
 }
 
@@ -692,6 +697,14 @@ int	ft_usage_port(void)
 		<< REDBG_COLOUR "port has to be in the range of 1-65535" NO_COLOUR << std::endl;
 	return (2);
 }
+
+int	ft_usage_debug(void)
+{
+	std::cerr << ERROR_COLOUR "Invalid debug message:" NO_COLOUR << std::endl
+		<< REDBG_COLOUR "--debug-lvl=n; n has to be integer between 0 and 4" NO_COLOUR << std::endl;
+	return (2);
+}
+
 
 static int	ok_strtoi(std::string str)
 {
@@ -703,9 +716,53 @@ static int	ok_strtoi(std::string str)
 	return (num);
 }
 
+static bool ok_argvcheck(char *argv, t_server *ts)
+{
+	ts->debuglvl = 3;
+	if (DEBUG)
+		ts->debuglvl = 0;
+	if (!argv)
+		return (true);
+	std::string	str(argv);
+	std::cout << ORANGE_COLOUR << "ARGVSTRING: " << str << std::endl;
+	if (str == "--debug-lvl=0")
+	{
+		ts->debuglvl = 0;
+		return (true);
+	}
+	if (str == "--debug-lvl=1")
+	{
+		ts->debuglvl = 1;
+		return (true);
+	}
+	if (str == "--debug-lvl=2")
+	{
+		ts->debuglvl = 2;
+		return (true);
+	}
+	if (str == "--debug-lvl=3")
+	{
+		ts->debuglvl = 3;
+		return (true);
+	}
+	if (str == "--debug-lvl=4")
+	{
+		ts->debuglvl = 4;
+		return (true);
+	}
+	return (false);
+}
+
+//debug levels
+// 0 debug
+// 1 info
+// 2 notice
+// 3 warnings (default)
+// 4 errors only
+
 int	main(int argc , char *argv[]) 
 {
-	if (argc != 3)
+	if (argc < 3 || argc > 4)
 		return (ft_usage());
 	//check argv1
 	//check argv2?
@@ -714,6 +771,9 @@ int	main(int argc , char *argv[])
 	ts.port = ok_strtoi(argv[1]);
 	if (ts.port <=0 || ts.port > 65535)
 		return (ft_usage_port());
+	if (!ok_argvcheck(argv[3], &ts))
+		return (ft_usage_debug());
+	std::cout << ORANGE_COLOUR << "DEBUG LEVEL: " << ts.debuglvl << NO_COLOUR << std::endl;
 	ts.password = argv[2];
 	init_server(ts);
 	return 0; 

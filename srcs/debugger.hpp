@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   colours.hpp                                        :+:      :+:    :+:   */
+/*   debugger.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/11 15:22:51 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/25 16:04:33 by okraus           ###   ########.fr       */
+/*   Created: 2024/08/25 16:08:26 by okraus            #+#    #+#             */
+/*   Updated: 2024/08/25 16:23:28 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#ifndef COLOURS_HPP
-# define COLOURS_HPP
+#ifndef DEBUGGER_HPP
+# define DEBUGGER_HPP
 # include <iostream>
 # include <sstream>
 # include <stdint.h>
@@ -41,8 +41,8 @@
 # define BLACK_COLOUR "\033[1;38:5:0m"
 # define NO_COLOUR "\033[0m"
 
-void		ft_colorize(uintptr_t i);
-std::string	ft_str_colorize(uintptr_t i);
-void		ft_uncolorize(void);
+
+//change int i to enum
+void	ok_debugger(int debuglvl, int msglvl, std::string message);
 
 #endif
