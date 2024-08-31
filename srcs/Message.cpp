@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 16:47:07 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:10:23 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ Message &Message::operator = (const Message &src)
 
 Message::~Message(void)
 {
-	if (DEBUG)
+	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "Destructor of the Message class called.";
@@ -58,7 +58,7 @@ Message::Message(unsigned short sd, std::string msg)
 	// std::string prefix;
 	// std::string command;
 	std::string param;
-	if (DEBUG)
+	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "Overriden constructor of the Message class called.";
@@ -122,7 +122,7 @@ Message::Message(unsigned short sd, std::string msg)
 		std::cout << "processed param" << std::endl;
 	}
 	std::cout << "passed the params" << std::endl;
-	if (DEBUG)
+	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "PREFIX:";

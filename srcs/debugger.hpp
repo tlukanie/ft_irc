@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:08:26 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/25 16:23:28 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:52:48 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,18 @@
 # define BLACK_COLOUR "\033[1;38:5:0m"
 # define NO_COLOUR "\033[0m"
 
+enum	DebugLvl
+{
+	EXTRADEBUG,
+	DEBUG,
+	INFO,
+	NOTICE,
+	WARNING,
+	ERROR,
+	DISABLED
+};
 
 //change int i to enum
-void	ok_debugger(int debuglvl, int msglvl, std::string message);
+void	ok_debugger(DebugLvl level, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/25 15:38:35 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:49:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,20 @@
 
 # include "Connection.hpp"
 # include "Message.hpp"
+# include "debugger.hpp"
+#include "colours.hpp"
 
 # define TRUE 1 
 # define FALSE 0
 
-# ifndef DEBUG
-#  define DEBUG 1
+# ifndef DEEPDEBUG
+#  define DEEPDEBUG 1
 # endif
 
 # define MESSAGE "ECHO Daemon v1.0 \r\n"
 
 # define MYENDL "\t\t" << __FILE__ << ":" << __func__ << ":" << __LINE__ << std::endl
+# define MYDEBUG std::string(__FILE__) + ":" + std::string(__func__) + ":" + ok_itostr(__LINE__)
 
 # define READING_LOOP 1
 # define SENDING_LOOP 2
@@ -67,7 +70,7 @@ typedef struct s_server {
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
 	//map nicks to sds
-	int															debuglvl;
+	DebugLvl													debuglvl;
 }	t_server;
 
 #endif

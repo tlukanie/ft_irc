@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/14 14:05:19 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:13:08 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@
 # define RECEIVING true
 # define SENDING false
 
-# ifndef DEBUG
-#  define DEBUG 1
+# ifndef DEEPDEBUG
+#  define DEEPDEBUG 1
 # endif
 
 class Connection

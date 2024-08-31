@@ -84,6 +84,19 @@
   <li><s>Updated colours</s></li>
 </ol>
 
+<h4>Plan for 31.08.24 (13:30-15:30 Prague time)</h4>
+<ol>
+  <li><s>Logger/debugger improvements</s></li>
+</ol>
+
+<h4>Plan for 01.09.24 (13:30-15:30 Prague time)</h4>
+<ol>
+  <li>More logger/debugger improvements</li>
+  <li>Understand the code</li>
+  <li>Utils functions</li>
+  <li>Template functions strtoi and itostr</li>
+</ol>
+
 <h4>Plan for the next week</h4>
 <ol>
   <li>Understand the code</li>
@@ -107,5 +120,7 @@
   <li> 2 (multi)maps of users and channels one with key on user another with key on channel</li>
   <li>Process more commands make them work in all scenarios</li>
   <li>Fix/check memory leaks and free everything that needs freeing</li>
+  <li>Get rid of exit and other? functions that are not allowed</li>
+  <li>Try-catch blocks for server breaking errors</li>
   <li>new</li>
 </ol>

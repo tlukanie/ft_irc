@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/12 16:30:38 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:10:38 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@
 # define RECEIVING true
 # define SENDING false
 
-# ifndef DEBUG
-#  define DEBUG 1
+# ifndef DEEPDEBUG
+#  define DEEPDEBUG 1
 # endif
 
 class Message

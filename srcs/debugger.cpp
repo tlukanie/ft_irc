@@ -6,37 +6,36 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/25 16:29:29 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 15:00:13 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debugger.hpp"
 
-void	ok_debugger(int debuglvl, int msglvl, std::string message)
+void	ok_debugger(DebugLvl globalLevel, DebugLvl debugLevel, std::string message, std::string details, std::string extra)
 {
-	if (debuglvl <= msglvl && msglvl == 0)
+	if (globalLevel <= debugLevel && debugLevel == DEBUG)
 	{
-		std::cerr << GREYBG_COLOUR "DEBUG:" NO_COLOUR "   " GREY_COLOUR
-			<< message << NO_COLOUR << std::endl;
+		std::cout << GREYBG_COLOUR "DEBUG:" NO_COLOUR "   " GREY_COLOUR;
 	}
-	else if (debuglvl <= msglvl && msglvl == 1)
+	else if (globalLevel <= debugLevel && debugLevel == INFO)
 	{
-		std::cerr << GREENBG_COLOUR "INFO:" NO_COLOUR "    " GREEN_COLOUR
-			<< message << NO_COLOUR << std::endl;
+		std::cout << GREENBG_COLOUR "INFO:" NO_COLOUR "    " GREEN_COLOUR;
 	}
-	else if (debuglvl <= msglvl && msglvl == 2)
+	else if (globalLevel <= debugLevel && debugLevel == NOTICE)
 	{
-		std::cerr << YELLOWBG_COLOUR "NOTICE:" NO_COLOUR "  " YELLOW_COLOUR
-			<< message << NO_COLOUR << std::endl;
+		std::cout << YELLOWBG_COLOUR "NOTICE:" NO_COLOUR "  " YELLOW_COLOUR;
 	}
-	else if (debuglvl <= msglvl && msglvl == 3)
+	else if (globalLevel <= debugLevel && debugLevel == WARNING)
 	{
-		std::cerr << ORANGEBG_COLOUR "WARNING:" NO_COLOUR " " ORANGE_COLOUR
-			<< message << NO_COLOUR << std::endl;
+		std::cout << ORANGEBG_COLOUR "WARNING:" NO_COLOUR " " ORANGE_COLOUR;
 	}
-	else if (debuglvl <= msglvl && msglvl == 4)
+	else if (globalLevel <= debugLevel && debugLevel == ERROR)
 	{
-		std::cerr << ERROR_COLOUR "ERROR:" NO_COLOUR "   " RED_COLOUR
-			<< message << NO_COLOUR << std::endl;
+		std::cout << ERROR_COLOUR "ERROR:" NO_COLOUR "   " RED_COLOUR;
 	}
+	std::cout << message << " " << details;
+	if (globalLevel == EXTRADEBUG)
+		std::cout << "\t\t" << extra;
+	std::cout << NO_COLOUR << std::endl;
 }

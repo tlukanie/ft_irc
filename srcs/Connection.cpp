@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/07/14 14:05:04 by okraus           ###   ########.fr       */
+/*   Updated: 2024/08/31 14:10:23 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ Connection &Connection::operator = (const Connection &src)
 
 Connection::~Connection(void)
 {
-	if (DEBUG)
+	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "Destructor of the Connection class called.";
@@ -58,7 +58,7 @@ Connection::~Connection(void)
 
 Connection::Connection(unsigned short sd, unsigned short port, std::string ip)
 {
-	if (DEBUG)
+	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
 		std::cout << "Overriden constructor of the Connection class called.";
