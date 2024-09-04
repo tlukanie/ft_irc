@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/01 14:36:32 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/04 11:45:15 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,17 @@
 # define SENDING_LOOP 2
 # define CRLF "\r\n"
 
+typedef struct s_debugger {
+	bool		date;
+	bool		time;
+	bool		utime;
+	int			precision;
+	bool		colour;
+	bool		extra;
+	int			fd;
+	DebugLvl	debuglvl;
+}	t_debugger;
+
 typedef struct s_server {
 	std::string password;
 	int	port;
@@ -72,7 +83,7 @@ typedef struct s_server {
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
 	//map nicks to sds
-	DebugLvl													debuglvl;
+	t_debugger													debugger;
 }	t_server;
 
 #endif

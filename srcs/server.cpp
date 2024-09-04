@@ -264,7 +264,7 @@ void	server_loop(t_server ts)
 	while(g_server_alive) 
 	{
 		if (DEEPDEBUG)
-			ok_debugger(&ts, DEBUG, "While loop started...", "", MYDEBUG);
+			ok_debugger(&(ts.debugger), DEBUG, "While loop started...", "", MYDEBUG);
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
@@ -315,7 +315,7 @@ void	server_loop(t_server ts)
 		// 			ts.max_sd = ts.sd; 
 		// 	}
 		// }
-		ok_debugger(&ts, EXTRADEBUG, "Before select", "", MYDEBUG);
+		ok_debugger(&(ts.debugger), EXTRADEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
 		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
 		// nfds   This argument should be set to the highest-numbered file 
@@ -325,11 +325,11 @@ void	server_loop(t_server ts)
 		ts.timeout.tv_sec = 15;
 		ts.timeout.tv_usec = 0;
 		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout);
-		ok_debugger(&ts, EXTRADEBUG, "After select", "", MYDEBUG);
+		ok_debugger(&(ts.debugger), EXTRADEBUG, "After select", "", MYDEBUG);
 		//check later if allowed
 		if (ts.activity < 0) 
 		{ 
-			ok_debugger(&ts, ERROR, "Select error", ok_itostr(errno), MYDEBUG);
+			ok_debugger(&(ts.debugger), ERROR, "Select error", ok_itostr(errno), MYDEBUG);
 			continue ;
 		}
 		// IF SELECT RETURNS 0  MAYBE CONTINUE ???
@@ -343,7 +343,7 @@ void	server_loop(t_server ts)
 			if ((ts.new_socket = accept(ts.master_socket, 
 					(struct sockaddr *)&ts.address, (socklen_t*)&ts.addrlen))<0) 
 			{ 
-				ok_debugger(&ts, ERROR, "Accept failed", ok_itostr(errno), MYDEBUG);
+				ok_debugger(&(ts.debugger), ERROR, "Accept failed", ok_itostr(errno), MYDEBUG);
 				// PROPER_EXIT
 				exit(EXIT_FAILURE); 
 			} 
@@ -566,7 +566,7 @@ void	server_loop(t_server ts)
 	// }
 	// }
 	if (DEEPDEBUG)
-		ok_debugger(&ts, WARNING, "Main loop terminating...", "", MYDEBUG);
+		ok_debugger(&(ts.debugger), WARNING, "Main loop terminating...", "", MYDEBUG);
 	// ITERATE OVER MAP AND DELETE EVERYTHING
 	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in the loop*/)
 	{
@@ -603,7 +603,7 @@ void	init_server(t_server ts)
 	//create a master socket 
 	if( (ts.master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
 	{
-		ok_debugger(&ts, ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
+		ok_debugger(&(ts.debugger), ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 	
@@ -621,7 +621,7 @@ void	init_server(t_server ts)
 	if( setsockopt(ts.master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&ts.opt, 
 		sizeof(ts.opt)) < 0 ) 
 	{ 
-		ok_debugger(&ts, ERROR, "Setsockopt failed", ok_itostr(errno), MYDEBUG);
+		ok_debugger(&(ts.debugger), ERROR, "Setsockopt failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 	
@@ -633,22 +633,22 @@ void	init_server(t_server ts)
 	//bind the socket to localhost port 8888 
 	if (bind(ts.master_socket, (struct sockaddr *)&ts.address, sizeof(ts.address))<0) 
 	{ 
-		ok_debugger(&ts, ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
+		ok_debugger(&(ts.debugger), ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	}
-	ok_debugger(&ts, INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
+	ok_debugger(&(ts.debugger), INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
 	//std::cout << "Listener on port " << ts.port << std::endl; 
 		
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(ts.master_socket, 3) < 0) 
 	{ 
-		ok_debugger(&ts, ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
+		ok_debugger(&(ts.debugger), ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 		
 	//accept the incoming connection 
 	ts.addrlen = sizeof(ts.address); 
-	ok_debugger(&ts, INFO, "Waiting for connections ...", "", MYDEBUG);
+	ok_debugger(&(ts.debugger), INFO, "Waiting for connections ...", "", MYDEBUG);
 
 	//add commands
 	ts.commands["CAP"] = irc_cap;
@@ -674,11 +674,11 @@ void	init_server(t_server ts)
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;
 
-	// ok_debugger(&ts, DEBUG, "This is a debug message", "", MYDEBUG);
-	// ok_debugger(&ts, INFO, "This is an info message", "", MYDEBUG);
-	// ok_debugger(&ts, NOTICE, "This is a notice message", "", MYDEBUG);
-	// ok_debugger(&ts, WARNING, "This is a warning message", "", MYDEBUG);
-	// ok_debugger(&ts, ERROR, "This is an error message", "", MYDEBUG);
+	// ok_debugger(&(ts.debugger), DEBUG, "This is a debug message", "", MYDEBUG);
+	// ok_debugger(&(ts.debugger), INFO, "This is an info message", "", MYDEBUG);
+	// ok_debugger(&(ts.debugger), NOTICE, "This is a notice message", "", MYDEBUG);
+	// ok_debugger(&(ts.debugger), WARNING, "This is a warning message", "", MYDEBUG);
+	// ok_debugger(&(ts.debugger), ERROR, "This is an error message", "", MYDEBUG);
 	//main server loop
 	server_loop(ts);
 }
@@ -706,45 +706,45 @@ int	ft_usage_debug(void)
 
 static bool ok_argvcheck(char *argv, t_server *ts)
 {
-	ts->debuglvl = WARNING;
+	ts->debugger.debuglvl = WARNING;
 	if (DEEPDEBUG)
-		ts->debuglvl = DEBUG;
+		ts->debugger.debuglvl = DEBUG;
 	if (!argv)
 		return (true);
 	std::string	str(argv);
 	if (str == "--debug-lvl=0")
 	{
-		ts->debuglvl = EXTRADEBUG;
+		ts->debugger.debuglvl = EXTRADEBUG;
 		return (true);
 	}
 	if (str == "--debug-lvl=1")
 	{
-		ts->debuglvl = DEBUG;
+		ts->debugger.debuglvl = DEBUG;
 		return (true);
 	}
 	if (str == "--debug-lvl=2")
 	{
-		ts->debuglvl = INFO;
+		ts->debugger.debuglvl = INFO;
 		return (true);
 	}
 	if (str == "--debug-lvl=3")
 	{
-		ts->debuglvl = NOTICE;
+		ts->debugger.debuglvl = NOTICE;
 		return (true);
 	}
 	if (str == "--debug-lvl=4")
 	{
-		ts->debuglvl = WARNING;
+		ts->debugger.debuglvl = WARNING;
 		return (true);
 	}
 	if (str == "--debug-lvl=5")
 	{
-		ts->debuglvl = ERROR;
+		ts->debugger.debuglvl = ERROR;
 		return (true);
 	}
 	if (str == "--debug-lvl=6")
 	{
-		ts->debuglvl = DISABLED;
+		ts->debugger.debuglvl = DISABLED;
 		return (true);
 	}
 	return (false);
@@ -756,6 +756,28 @@ static bool ok_argvcheck(char *argv, t_server *ts)
 // 2 notice
 // 3 warnings (default)
 // 4 errors only
+
+
+// typedef struct s_debugger {
+// 	bool		date;
+// 	bool		time;
+// 	bool		utime;
+// 	bool		colour;
+// 	bool		extra;
+// 	int			fd;
+// 	DebugLvl	debuglvl;
+// }	t_debugger;
+
+static void ft_init_debugger(s_debugger *debugger)
+{
+	debugger->date = false;
+	debugger->time = true;
+	debugger->utime = true;
+	debugger->precision = 4; // should be 0-6
+	debugger->colour = true;
+	debugger->extra = true;
+	debugger->fd = 1;
+}
 
 int	main(int argc , char *argv[]) 
 {
@@ -770,7 +792,8 @@ int	main(int argc , char *argv[])
 		return (ft_usage_port());
 	if (!ok_argvcheck(argv[3], &ts))
 		return (ft_usage_debug());
-	ok_debugger(&ts, NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debuglvl), "", MYDEBUG);
+	ft_init_debugger(&(ts.debugger));
+	ok_debugger(&(ts.debugger), NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debugger.debuglvl), "", MYDEBUG);
 	ts.password = argv[2];
 	init_server(ts);
 	//try init server

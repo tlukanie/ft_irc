@@ -97,16 +97,24 @@
   <li><s>Template functions strtoi and itostr</s></li>
 </ol>
 
-<h4>Plan for 07.09.24 (10:30-11:30 && 12:30-13:30 Prague time)</h4>
+<h4>Plan for 04.09.24 (10:00 - 12:00)</h4>
 <ol>
-  <li>More logger/debugger improvements (time stamps)</li>
+  <li><s>More logger/debugger improvements (time stamps)</s></li>
+</ol>
+
+<h4>Plan for 05.09.24 (8:30-10:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger used in the code</li>
   <li>Understand the code</li>
+</ol>
+
+<h4>Plan for 07.09.24 (13:00-15:00 Prague time)</h4>
+<ol>
+  <li>User class</li>
 </ol>
 
 <h4>Plan for the next week</h4>
 <ol>
-  <li>Understand the code</li>
-  <li>Logger/debugger - different colours for different levels on stderr</li>
   <li>Utils functions</li>
   <li>Read the new documentation</li>
   <li>User class</li>
