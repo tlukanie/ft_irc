@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/31 14:49:04 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/01 14:36:32 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,12 @@
 # include <map>
 # include <algorithm>
 
+# include "enums.hpp"
 # include "Connection.hpp"
 # include "Message.hpp"
 # include "debugger.hpp"
-#include "colours.hpp"
+# include "utils.hpp"
+# include "colours.hpp"
 
 # define TRUE 1 
 # define FALSE 0

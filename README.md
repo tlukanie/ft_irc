@@ -91,10 +91,16 @@
 
 <h4>Plan for 01.09.24 (13:30-15:30 Prague time)</h4>
 <ol>
-  <li>More logger/debugger improvements</li>
+  <li><s>More logger/debugger improvements</s></li>
+  <li><s>Understand the code</s></li>
+  <li><s>Utils functions</s></li>
+  <li><s>Template functions strtoi and itostr</s></li>
+</ol>
+
+<h4>Plan for 07.09.24 (10:30-11:30 && 12:30-13:30 Prague time)</h4>
+<ol>
+  <li>More logger/debugger improvements (time stamps)</li>
   <li>Understand the code</li>
-  <li>Utils functions</li>
-  <li>Template functions strtoi and itostr</li>
 </ol>
 
 <h4>Plan for the next week</h4>
@@ -117,7 +123,7 @@
   <li>Proper password command check</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
   <li>Channel class and </li>
-  <li> 2 (multi)maps of users and channels one with key on user another with key on channel</li>
+  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
   <li>Process more commands make them work in all scenarios</li>
   <li>Fix/check memory leaks and free everything that needs freeing</li>
   <li>Get rid of exit and other? functions that are not allowed</li>

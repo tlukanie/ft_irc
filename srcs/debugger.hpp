@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:08:26 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/31 14:52:48 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/01 14:36:51 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <sstream>
 # include <stdint.h>
+# include "server.hpp"
 
 # define ERROR_BLINKING_COLOUR "\033[1;5;38:5:226;48:5:160m"
 # define ERROR_COLOUR "\033[1;38:5:226;48:5:160m"
@@ -41,18 +42,9 @@
 # define BLACK_COLOUR "\033[1;38:5:0m"
 # define NO_COLOUR "\033[0m"
 
-enum	DebugLvl
-{
-	EXTRADEBUG,
-	DEBUG,
-	INFO,
-	NOTICE,
-	WARNING,
-	ERROR,
-	DISABLED
-};
+struct s_server;
 
 //change int i to enum
-void	ok_debugger(DebugLvl level, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
+void	ok_debugger(s_server *ts, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
 
 #endif

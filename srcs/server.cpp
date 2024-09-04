@@ -5,26 +5,6 @@
 
 static bool		g_server_alive = true;
 
-static int	ok_strtoi(std::string str)
-{
-	std::stringstream	temp;
-	int					num;
-
-	temp << str;
-	temp >> num;
-	return (num);
-}
-
-static std::string	ok_itostr(int num)
-{
-	std::stringstream	temp;
-	std::string			str;
-
-	temp << num;
-	temp >> str;
-	return (str);
-}
-
 void signal_handler(int signal_num) 
 {
 	if (signal_num == SIGINT)
@@ -284,7 +264,7 @@ void	server_loop(t_server ts)
 	while(g_server_alive) 
 	{
 		if (DEEPDEBUG)
-			std::cout << WHITEBG_COLOUR "While loop start" NO_COLOUR << MYDEBUG << std::endl;
+			ok_debugger(&ts, DEBUG, "While loop started...", "", MYDEBUG);
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
@@ -335,7 +315,7 @@ void	server_loop(t_server ts)
 		// 			ts.max_sd = ts.sd; 
 		// 	}
 		// }
-		std::cout << WHITE_COLOUR "before select" NO_COLOUR << std::endl;
+		ok_debugger(&ts, EXTRADEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
 		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
 		// nfds   This argument should be set to the highest-numbered file 
@@ -344,12 +324,12 @@ void	server_loop(t_server ts)
 		// BUGS).
 		ts.timeout.tv_sec = 15;
 		ts.timeout.tv_usec = 0;
-		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout); 
-		std::cout << WHITE_COLOUR "after select "<< ts.activity << NO_COLOUR << MYENDL;
+		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout);
+		ok_debugger(&ts, EXTRADEBUG, "After select", "", MYDEBUG);
 		//check later if allowed
 		if (ts.activity < 0) 
 		{ 
-			std::cerr << ERROR_COLOUR "select error" NO_COLOUR << std::endl;
+			ok_debugger(&ts, ERROR, "Select error", ok_itostr(errno), MYDEBUG);
 			continue ;
 		}
 		// IF SELECT RETURNS 0  MAYBE CONTINUE ???
@@ -363,7 +343,7 @@ void	server_loop(t_server ts)
 			if ((ts.new_socket = accept(ts.master_socket, 
 					(struct sockaddr *)&ts.address, (socklen_t*)&ts.addrlen))<0) 
 			{ 
-				std::cerr << "accept failed" << std::endl;
+				ok_debugger(&ts, ERROR, "Accept failed", ok_itostr(errno), MYDEBUG);
 				// PROPER_EXIT
 				exit(EXIT_FAILURE); 
 			} 
@@ -586,7 +566,7 @@ void	server_loop(t_server ts)
 	// }
 	// }
 	if (DEEPDEBUG)
-		std::cout << "Main while loop ended..." << std::endl;
+		ok_debugger(&ts, WARNING, "Main loop terminating...", "", MYDEBUG);
 	// ITERATE OVER MAP AND DELETE EVERYTHING
 	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in the loop*/)
 	{
@@ -622,8 +602,8 @@ void	init_server(t_server ts)
 	ts.opt = TRUE;
 	//create a master socket 
 	if( (ts.master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
-	{ 
-		std::cerr << "socket failed" << std::endl;
+	{
+		ok_debugger(&ts, ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 	
@@ -641,7 +621,7 @@ void	init_server(t_server ts)
 	if( setsockopt(ts.master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&ts.opt, 
 		sizeof(ts.opt)) < 0 ) 
 	{ 
-		std::cerr << "setsockopt" << std::endl;
+		ok_debugger(&ts, ERROR, "Setsockopt failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 	
@@ -653,22 +633,22 @@ void	init_server(t_server ts)
 	//bind the socket to localhost port 8888 
 	if (bind(ts.master_socket, (struct sockaddr *)&ts.address, sizeof(ts.address))<0) 
 	{ 
-		std::cerr << "bind failed" << std::endl;
+		ok_debugger(&ts, ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	}
-	ok_debugger(ts.debuglvl, INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
+	ok_debugger(&ts, INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
 	//std::cout << "Listener on port " << ts.port << std::endl; 
 		
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(ts.master_socket, 3) < 0) 
 	{ 
-		std::cerr << "listen" << std::endl;
+		ok_debugger(&ts, ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
 		exit(EXIT_FAILURE); 
 	} 
 		
 	//accept the incoming connection 
 	ts.addrlen = sizeof(ts.address); 
-	ok_debugger(ts.debuglvl, INFO, "Waiting for connections ...", "", MYDEBUG);
+	ok_debugger(&ts, INFO, "Waiting for connections ...", "", MYDEBUG);
 
 	//add commands
 	ts.commands["CAP"] = irc_cap;
@@ -694,11 +674,11 @@ void	init_server(t_server ts)
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;
 
-	// ok_debugger(ts.debuglvl, DEBUG, "This is a debug message", "", MYDEBUG);
-	// ok_debugger(ts.debuglvl, INFO, "This is an info message", "", MYDEBUG);
-	// ok_debugger(ts.debuglvl, NOTICE, "This is a notice message", "", MYDEBUG);
-	// ok_debugger(ts.debuglvl, WARNING, "This is a warning message", "", MYDEBUG);
-	// ok_debugger(ts.debuglvl, ERROR, "This is an error message", "", MYDEBUG);
+	// ok_debugger(&ts, DEBUG, "This is a debug message", "", MYDEBUG);
+	// ok_debugger(&ts, INFO, "This is an info message", "", MYDEBUG);
+	// ok_debugger(&ts, NOTICE, "This is a notice message", "", MYDEBUG);
+	// ok_debugger(&ts, WARNING, "This is a warning message", "", MYDEBUG);
+	// ok_debugger(&ts, ERROR, "This is an error message", "", MYDEBUG);
 	//main server loop
 	server_loop(ts);
 }
@@ -785,12 +765,12 @@ int	main(int argc , char *argv[])
 	//check argv2?
 	signal(SIGINT, signal_handler); 
 	t_server	ts;
-	ts.port = ok_strtoi(argv[1]);
+	ts.port = ok_strtoi<int>(argv[1]);
 	if (ts.port <=0 || ts.port > 65535)
 		return (ft_usage_port());
 	if (!ok_argvcheck(argv[3], &ts))
 		return (ft_usage_debug());
-	ok_debugger(ts.debuglvl, NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debuglvl), "", MYDEBUG);
+	ok_debugger(&ts, NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debuglvl), "", MYDEBUG);
 	ts.password = argv[2];
 	init_server(ts);
 	//try init server
