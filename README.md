@@ -102,7 +102,7 @@
   <li><s>More logger/debugger improvements (time stamps)</s></li>
 </ol>
 
-<h4>Plan for 05.09.24 (8:30-10:30 Prague time)</h4>
+<h4>Plan for 05.09.24 (13:30-15:30 Prague time)</h4>
 <ol>
   <li>Logger/debugger used in the code</li>
   <li>Understand the code</li>
