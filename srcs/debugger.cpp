@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/04 11:54:12 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/05 14:46:13 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,9 +122,9 @@ void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message,
 			if (debugger->precision >= 0 && debugger->precision <= 6)
 				timestamp += get_utime().substr(0, debugger->precision);
 		}
+		timestamp += "] ";
 		if (debugger->colour)
 			timestamp += NO_COLOUR;
-		timestamp += "]";
 	}
 	output += timestamp;
 	//assign appropriate string and colours

@@ -8,6 +8,8 @@
 <p>https://modern.ircdocs.horse/</p>
 <h3>Could be needed for file transfers (bonus part)</h3>
 <p>https://en.wikipedia.org/wiki/Direct_Client-to-Client</p>
+
+<p>/connect localhost 5555 aaa</p>
 <h4>Plan for 30.06.24 (DONE)</h4> 
 <ol>
   <li><s>Rewrite server in cpp oop style, get rid off read, printf, puts, perror</s></li>
@@ -104,12 +106,14 @@
 
 <h4>Plan for 05.09.24 (13:30-15:30 Prague time)</h4>
 <ol>
-  <li>Logger/debugger used in the code</li>
-  <li>Understand the code</li>
+  <li><s>Logger/debugger used in the code</s></li>
+  <li><s>Understand the code</s></li>
+  <li><s>Utils functions</s></li>
 </ol>
 
 <h4>Plan for 07.09.24 (13:00-15:00 Prague time)</h4>
 <ol>
+  <li>Logger/debugger used in the code</li>
   <li>User class</li>
 </ol>
 
@@ -120,6 +124,7 @@
   <li>User class</li>
   <li>Nick message prefix (need to process USER first)</li>
   <li>Channel class</li>
+  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>

@@ -257,10 +257,10 @@ void	server_loop(t_server ts)
 	//set of socket descriptors 
 	fd_set readfds;
 	fd_set writefds;
-	//CHECK IF NEEDED TO DO EVERY LOOP BECAUSE OF SELECT
-	FD_ZERO(&readfds);
-	FD_ZERO(&writefds); 
-	FD_SET(ts.master_socket, &readfds);
+	// //NEEDED TO DO EVERY LOOP BECAUSE OF SELECT
+	// FD_ZERO(&readfds);
+	// FD_ZERO(&writefds); 
+	// FD_SET(ts.master_socket, &readfds);
 	while(g_server_alive) 
 	{
 		if (DEEPDEBUG)
@@ -283,38 +283,22 @@ void	server_loop(t_server ts)
 			ts.sd = it->first;
 			connection_ptr = it->second;
 			if (DEEPDEBUG)
-				std::cout << BLUE_COLOUR "First for loop reading sd " << ts.sd << NO_COLOUR << std::endl;
+				ok_debugger(&(ts.debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts.sd), MYDEBUG);
 			if (connection_ptr->getReadingFlag())
 			{
 				FD_SET(ts.sd , &readfds);
 				if (DEEPDEBUG)
-					std::cout << YELLOW_COLOUR "setting reading sd: " << ts.sd << NO_COLOUR << MYENDL;
+					ok_debugger(&(ts.debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts.sd), MYDEBUG);
 			}
 			else
 			{
 				FD_SET(ts.sd , &writefds);
 				if (DEEPDEBUG)
-					std::cout << YELLOW_COLOUR "setting writing sd: " << ts.sd << NO_COLOUR << MYENDL;
+					ok_debugger(&(ts.debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts.sd), MYDEBUG);
 			}
 			if(ts.sd > ts.max_sd) 
 				ts.max_sd = ts.sd; 
 		}
-		// }
-		// else if (ts.state & SENDING_LOOP)
-		// {
-		// 	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
-		// 	{
-		// 		//socket descriptor
-		// 		ts.sd = it->first;
-		// 		if (DEEPDEBUG)
-		// 			std::cout << BLUE_COLOUR "First for loop sending sd " << ts.sd << NO_COLOUR << std::endl;
-		// 		FD_SET(ts.sd , &writefds);
-		// 		if (DEEPDEBUG)
-		// 			std::cout << YELLOW_COLOUR "setting sd: " << ts.sd << NO_COLOUR << MYENDL;
-		// 		if(ts.sd > ts.max_sd) 
-		// 			ts.max_sd = ts.sd; 
-		// 	}
-		// }
 		ok_debugger(&(ts.debugger), EXTRADEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
 		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
@@ -351,13 +335,6 @@ void	server_loop(t_server ts)
 			//inform user of socket number - used in send and receive commands 
 			//Information in constructor
 			ts.connections.insert(std::pair<int, Connection*>(ts.new_socket, new Connection(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
-			//send new connection greeting message 
-			// if(send(ts.new_socket, MESSAGE, std::strlen(MESSAGE), 0) != (ssize_t)std::strlen(MESSAGE) ) 
-			// { 
-			// 	std::cerr << "send failed" << std::endl;
-			// } 
-				
-			// std::cout << "Welcome message sent successfully" << std::endl;
 		} 
 			
 		//else its some IO operation on some other socket
@@ -373,11 +350,11 @@ void	server_loop(t_server ts)
 			Connection * user_ptr = it->second;
 			it++;
 			if (DEEPDEBUG)
-				std::cout << BLUE_COLOUR "Second for loop. SD: " << ts.sd << NO_COLOUR << std::endl;
+				ok_debugger(&(ts.debugger), DEBUG, "Reading for loop ", ok_itostr(ts.sd), MYDEBUG);
 			//READ FROM READING FDS
 			if (FD_ISSET(ts.sd , &readfds)) 
 			{
-				std::cout << YELLOW_COLOUR "sd is set: " << ts.sd << NO_COLOUR << MYENDL;
+				ok_debugger(&(ts.debugger), DEBUG, "SD is set: ", ok_itostr(ts.sd), MYDEBUG);
 				//Check if it was for closing , and also read the 
 				//incoming message 
 				if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
@@ -388,11 +365,10 @@ void	server_loop(t_server ts)
 					// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
 					if (DEEPDEBUG)
-						std::cout << "Closing connection on sd: " << ts.sd << std::endl;
+						ok_debugger(&(ts.debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts.sd), MYDEBUG);
 					close(ts.sd);
 					//REMOVE CONNECTION FROM MAP
 					delete user_ptr;
-					
 					ts.connections.erase(temp);
 				} 
 				//Print the message that came in 
@@ -437,11 +413,6 @@ void	server_loop(t_server ts)
 							std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
 							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
 						}
-						if (DEBUG > 1)
-						{
-							for (size_t i = 0; i < msg.length(); i++)
-								std::cout << RED_COLOUR << (int)msg[i] << NO_COLOUR << std::endl;
-						}
 						user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
 
 						// try construct message
@@ -485,14 +456,6 @@ void	server_loop(t_server ts)
 							user_ptr->_data.clear();
 						}
 					}
-					// if (DEEPDEBUG)
-					// 	std::cout << "before send " << i << std::endl;
-					// //MSG_NOSIGNAL flag added to preent server dying on SIG_PIPE signal from send when socket is closed
-					// if (send(ts.sd, ts.buffer, strlen(ts.buffer), MSG_NOSIGNAL) == -1)
-					// {
-					// 	if (DEEPDEBUG)
-					// 		std::cerr << "send failed" << i << std::endl;
-					// }
 				}
 			}
 			else if (FD_ISSET(ts.sd , &writefds))
@@ -535,36 +498,6 @@ void	server_loop(t_server ts)
 			}
 		}
 	}
-
-	// PROBABLY not needed
-	// else if (ts.state & SENDING_LOOP)
-	// {
-	// 	for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop */)
-	// 	{
-	// 		std::multimap<int, Message*>::iterator temp = it;
-	// 		ts.sd = it->first;
-	// 		Message * msg_ptr = it->second;
-	// 		it++;
-
-	// 		// find if the command is in commands
-	// 		//	execute
-	// 		if (ts.commands.find(msg_ptr->getCommand()) != ts.commands.end())
-	// 		{
-	// 			std::cout << "Executing message " << msg_ptr->getCommand() << std::endl;
-	// 			ts.commands[msg_ptr->getCommand()](msg_ptr, &ts);
-	// 		}
-	// 		else
-	// 		{
-	// 			std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
-	// 			//strike count of invalid messages
-	// 		}
-	// 		std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
-	// 		delete msg_ptr;
-	// 		ts.messages.erase(temp);
-	// 	}
-	// 	ts.state = READING_LOOP;
-	// }
-	// }
 	if (DEEPDEBUG)
 		ok_debugger(&(ts.debugger), WARNING, "Main loop terminating...", "", MYDEBUG);
 	// ITERATE OVER MAP AND DELETE EVERYTHING
@@ -637,8 +570,7 @@ void	init_server(t_server ts)
 		exit(EXIT_FAILURE); 
 	}
 	ok_debugger(&(ts.debugger), INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
-	//std::cout << "Listener on port " << ts.port << std::endl; 
-		
+
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(ts.master_socket, 3) < 0) 
 	{ 
@@ -683,26 +615,7 @@ void	init_server(t_server ts)
 	server_loop(ts);
 }
 
-int	ft_usage(void)
-{
-	std::cerr << ERROR_COLOUR "Usage:" NO_COLOUR << std::endl
-		<< REDBG_COLOUR "./ircserv <port> <password> --debug-lvl=n (n = 0-4)" NO_COLOUR << std::endl;
-	return (1);
-}
 
-int	ft_usage_port(void)
-{
-	std::cerr << ERROR_COLOUR "Invalid port:" NO_COLOUR << std::endl
-		<< REDBG_COLOUR "port has to be in the range of 1-65535" NO_COLOUR << std::endl;
-	return (2);
-}
-
-int	ft_usage_debug(void)
-{
-	std::cerr << ERROR_COLOUR "Invalid debug message:" NO_COLOUR << std::endl
-		<< REDBG_COLOUR "--debug-lvl=n; n has to be integer between 0 and 4" NO_COLOUR << std::endl;
-	return (2);
-}
 
 static bool ok_argvcheck(char *argv, t_server *ts)
 {
