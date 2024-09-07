@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/31 14:10:38 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/07 13:55:58 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@
 // waiting on any activity
 // if activity -> go to loop 1
 // loop 1
-// server reads data from connections
+// server reads data from users
 // extract messages from the data and save valid ones in multimap
 // if valid message go to loop 2
 // loop 2
 // process messages in multimap (and empty it)
-// and send response to connections
+// and send response to users
 // if all messages processed go to loop 0
 
 //for accessing function pointer in map of commands
@@ -77,8 +77,8 @@ class Message
 		// };
 
 	private:
-		// ??? number of connections?
-		//static int	connections;
+		// ??? number of users?
+		//static int	users;
 		// socket descriptor
 		unsigned short				_sd;
 		// more stuff will come here

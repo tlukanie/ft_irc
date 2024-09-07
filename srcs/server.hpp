@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/04 11:45:15 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/07 13:56:53 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # include <algorithm>
 
 # include "enums.hpp"
-# include "Connection.hpp"
+# include "User.hpp"
 # include "Message.hpp"
 # include "debugger.hpp"
 # include "utils.hpp"
@@ -62,24 +62,26 @@ typedef struct s_debugger {
 	bool		extra;
 	int			fd;
 	DebugLvl	debuglvl;
+	std::string	log; //log to be printed;
 }	t_debugger;
 
 typedef struct s_server {
-	std::string password;
-	int	port;
-	int	opt;
-	int	addrlen;
-	int	master_socket;
-	int	new_socket;
-	int	activity;
-	int	valread;
-	int	sd;
-	int	max_sd;
-	int	state;
+	std::string													servername;
+	std::string													password;
+	int															port; //unsigned short
+	int															opt;
+	int															addrlen;
+	int															master_socket;
+	int															new_socket;
+	int															activity;
+	int															valread;
+	int															sd;
+	int															max_sd;
+	int															state;
 	struct sockaddr_in											address;
 	struct timeval												timeout;
 	char														buffer[512]; //irc message is up to 512
-	std::map<int, Connection*>									connections; //map of Users/Connections/Clients
+	std::map<int, User*>										users; //map of Users/Users/Clients
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
 	//map nicks to sds

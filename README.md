@@ -4,6 +4,8 @@
 <p>https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/</p>
 <h3>Official documentation for IRC</h3>
 <p>https://www.rfc-editor.org/rfc/rfc1459</p>
+<h3>An IRC quickstart guide</h3>
+<p>https://opensource.com/life/16/6/irc-quickstart-guide</p>
 <h3>Modern IRC</h3>
 <p>https://modern.ircdocs.horse/</p>
 <h3>Could be needed for file transfers (bonus part)</h3>
@@ -47,12 +49,12 @@
 <ol>
   <li><s>buffer for every connection?</s></li>
   <li><s>class? for every connection?</s></li>
-  <li><s>map of class connections (sd-connection class)</s></li>
+  <li><s>map of class users (sd-connection class)</s></li>
 </ol>
 
 <h4>Plan for 10.07.24 (14:15-15:45 16:30-19:00 Prague time) and the rest of the week</h4>
 <ol>
-  <li><s>Use connections in the main server loop</s></li>
+  <li><s>Use users in the main server loop</s></li>
   <li><s>Use connection buffer (vector _data)</s></li>
   <li><s>Create message class</s></li>
 </ol>
@@ -113,14 +115,16 @@
 
 <h4>Plan for 07.09.24 (13:00-15:00 Prague time)</h4>
 <ol>
-  <li>Logger/debugger used in the code</li>
+  <li>Logger/debugger used in the code</li><>
+  <li>Read the new documentation</li>
   <li>User class</li>
 </ol>
 
 <h4>Plan for 08.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
   <li>Logger/debugger used in the code</li>
-  <li>User class</li>
+  <li>User class username, realname, auth getters and setters</li>
+  <li>Config file</li>
 </ol>
 
 <h4>Plan for the next week</h4>
@@ -137,7 +141,7 @@
 <ol>
   <li>Update client to test prefix, server validation of messages</li>
   <li>Create a second client. One will be automated another will take messages manually like telnet</li>
-  <li>Add User class - Connection verified by password and with user details and nick maybe a child class of Connection</li>
+  <li>Add User class - User verified by password and with user details and nick maybe a child class of User</li>
   <li>Read through the modern irc specification (especially commands)</li>
   <li>Proper password command check</li>
   <li>Create channels (class channel, assign user, client-channel objs)</li>
@@ -147,5 +151,14 @@
   <li>Fix/check memory leaks and free everything that needs freeing</li>
   <li>Get rid of exit and other? functions that are not allowed</li>
   <li>Try-catch blocks for server breaking errors</li>
+  <li>Check if the server can run on other IP than localhost</li>
+  <li>Transfer files</li>
+  <li>Bot (magic 8ball "magic8bot")</li>
+  <li>new</li>
+  <li>new</li>
+  <li>new</li>
+  <li>new</li>
+  <li>new</li>
+  <li>new</li>
   <li>new</li>
 </ol>

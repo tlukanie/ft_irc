@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.hpp                                     :+:      :+:    :+:   */
+/*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/31 14:13:08 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/07 14:03:29 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,15 @@
 #  define DEEPDEBUG 1
 # endif
 
-class Connection
+class User
 {
 	public:
-		Connection(void);
-		Connection(const Connection& copy);
-		Connection &operator	= (const Connection &src);
-		~Connection(void);
+		User(void);
+		User(const User& copy);
+		User &operator	= (const User &src);
+		~User(void);
 	
-		Connection(unsigned short sd, unsigned short port, std::string ip);
+		User(unsigned short sd, unsigned short port, std::string ip);
 		
 		// getters and setters? for mode
 		unsigned short	getPort(void);
@@ -63,22 +63,28 @@ class Connection
 
 		std::vector<uint8_t>	_data;
 	private:
-		// ??? number of connections?
-		//static int	connections;
+		// ??? number of users?
+		//static int	users;
 		// socket descriptor
 		unsigned short	_sd;
 		// port
 		unsigned short	_port;
 		// ip address
-		std::string	_ip;
+		std::string		_ip;
 		// reading or writing mode
-		bool	_reading_flag;
+		bool			_auth_flag; //valid password and unique nick and so on
+		bool			_reading_flag;
 		// flag for invalid buffer (too much data without separator)
-		bool	_data_overflow_flag;
+		bool			_data_overflow_flag;
 		// strike count for number of invalid messages in a row???
-		int	_strikecount;
-		std::string	_nick;
-		//nick
+		int				_strikecount;
+		std::string		_nick;
+		std::string		_username;
+		std::string		_hostname;
+		std::string		_servername;
+		std::string		_realname;
+		// <username> <hostname> <servername> <realname>
+		//nick	
 		//username
 		//host?
 		//realname

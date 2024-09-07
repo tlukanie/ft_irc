@@ -23,10 +23,10 @@ int main()
     //Binding the Server Socket (makes the socket public)
     bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); // assigning socket file descriptor with the ip address
 
-    //Listening for Connections
+    //Listening for Users
     listen(serverSocket, 5);
 
-    //Accepting a Client Connection
+    //Accepting a Client User
     int clientSocket = accept(serverSocket, nullptr, nullptr);
 
     //Receiving Data from the Client

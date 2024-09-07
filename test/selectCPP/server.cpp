@@ -1,5 +1,5 @@
 //Example code: A simple server side code, which echos back the received message. 
-//Handle multiple socket connections with select and fd_set on Linux 
+//Handle multiple socket users with select and fd_set on Linux 
 #include <stdio.h> 
 #include <string.h> //strlen 
 #include <stdlib.h> 
@@ -44,7 +44,7 @@ int main(int argc , char *argv[])
 		exit(EXIT_FAILURE); 
 	} 
 	
-	//set master socket to allow multiple connections , 
+	//set master socket to allow multiple users , 
 	//this is just a good habit, it will work without this 
 	if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, 
 		sizeof(opt)) < 0 ) 
@@ -66,7 +66,7 @@ int main(int argc , char *argv[])
 	} 
 	printf("Listener on port %d \n", PORT); 
 		
-	//try to specify maximum of 3 pending connections for the master socket 
+	//try to specify maximum of 3 pending users for the master socket 
 	if (listen(master_socket, 3) < 0) 
 	{ 
 		perror("listen"); 
@@ -75,7 +75,7 @@ int main(int argc , char *argv[])
 		
 	//accept the incoming connection 
 	addrlen = sizeof(address); 
-	puts("Waiting for connections ..."); 
+	puts("Waiting for users ..."); 
 		
 	while(TRUE) 
 	{ 

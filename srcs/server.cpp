@@ -1,5 +1,5 @@
 //Example code: A simple server side code, which echos back the received message. 
-//Handle multiple socket connections with select and fd_set on Linux 
+//Handle multiple socket users with select and fd_set on Linux 
 
 #include "server.hpp"
 
@@ -76,7 +76,7 @@ void irc_pass(Message* msg, struct s_server *ts)
 			std::cout << "Reply message sent successfully" << std::endl;
 		}
 		close(msg->getSD());
-		ts->connections.erase(ts->connections.find(msg->getSD()));
+		ts->users.erase(ts->users.find(msg->getSD()));
 	}
 	
 }
@@ -111,18 +111,18 @@ void irc_nick(Message* msg, struct s_server *ts)
 	std::cout << MAGENTA_COLOUR "NICK COMMAND is not fully supported" NO_COLOUR << std::endl;
 	// later check if nick is in use and valid string
 
-	//setting the first (and only?) parameter as a nick in the map of connections
+	//setting the first (and only?) parameter as a nick in the map of users
 	//accessed by the socket descriptor gained from the message class
-	std::cout << MAGENTA_COLOUR "Connection " << msg->getSD()
+	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
 	<< " setting nick " << msg->getParams()[0] << NO_COLOUR << std::endl;
 
-	ts->connections[msg->getSD()]->setNick(msg->getParams()[0]);
+	ts->users[msg->getSD()]->setNick(msg->getParams()[0]);
 
-	if (ts->connections[msg->getSD()]->getNick().size())
+	if (ts->users[msg->getSD()]->getNick().size())
 	{
 		//send to all?
 		//:net!net@127.0.0.1 << need to be not hardcoded
-		reply = ":net!net@127.0.0.1 NICK :" +  ts->connections[msg->getSD()]->getNick() + CRLF;
+		reply = ":net!net@127.0.0.1 NICK :" +  ts->users[msg->getSD()]->getNick() + CRLF;
 		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
 		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 		{ 
@@ -134,11 +134,17 @@ void irc_nick(Message* msg, struct s_server *ts)
 		}
 	}
 
-	std::cout << MAGENTA_COLOUR "Connection " << msg->getSD()
-	<< " got nick " << ts->connections[msg->getSD()]->getNick() << NO_COLOUR << std::endl;
+	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
+	<< " got nick " << ts->users[msg->getSD()]->getNick() << NO_COLOUR << std::endl;
 }
 
 // USER net net localhost :net
+// USER guest 0 * :Ronnie Reagan
+//Parameters: <username> <hostname> <servername> <realname> //hostname and servername can be ignored for local users
+// https://www.rfc-editor.org/rfc/rfc2812#section-3.1.3
+// Parameters: <user> <mode> <unused> <realname>
+//      Command: USER
+//   Parameters: <username> 0 * <realname>
 // https://modern.ircdocs.horse/#user-message
 // reply :IRCQ+ 001 net :Welcome to IRCQ+ net!net@127.0.0.1
 //net!net@127.0.0.1 <<<< save this string somehow? Create function to make it?
@@ -148,9 +154,11 @@ void irc_nick(Message* msg, struct s_server *ts)
 // ERR_ALREADYREGISTERED (462)
 void irc_user(Message* msg, struct s_server *ts)
 {
+	// we need to check that there are 4 parameters?
+	// process the 4 parameters
 	std::string	reply;
 	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
-	reply = "001 " +  ts->connections[msg->getSD()]->getNick() + " :Hello there" + CRLF;
+	reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there" + CRLF;
 	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
 	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 	{ 
@@ -175,7 +183,7 @@ void irc_ping(Message* msg, struct s_server *ts)
 
 	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
 	
-	reply = "PONG " +  ts->connections[msg->getSD()]->getNick() + " :" + msg->getParams()[0] + CRLF;
+	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0] + CRLF;
 	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
 
 	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
@@ -276,8 +284,8 @@ void	server_loop(t_server ts)
 		//in the reading loop
 		// if (ts.state & READING_LOOP)
 		// {
-		Connection * connection_ptr;
-		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); it++)
+		User * connection_ptr;
+		for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); it++)
 		{
 			//socket descriptor
 			ts.sd = it->first;
@@ -334,7 +342,7 @@ void	server_loop(t_server ts)
 			
 			//inform user of socket number - used in send and receive commands 
 			//Information in constructor
-			ts.connections.insert(std::pair<int, Connection*>(ts.new_socket, new Connection(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
+			ts.users.insert(std::pair<int, User*>(ts.new_socket, new User(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
 		} 
 			
 		//else its some IO operation on some other socket
@@ -343,11 +351,11 @@ void	server_loop(t_server ts)
 		// READING AND SENDING LOOP
 		// if (ts.state & READING_LOOP)
 		// {
-		for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in loop*/)
+		for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); /*iterating in loop*/)
 		{
-			std::map<int, Connection *>::iterator temp = it;
+			std::map<int, User *>::iterator temp = it;
 			ts.sd = it->first;
-			Connection * user_ptr = it->second;
+			User * user_ptr = it->second;
 			it++;
 			if (DEEPDEBUG)
 				ok_debugger(&(ts.debugger), DEBUG, "Reading for loop ", ok_itostr(ts.sd), MYDEBUG);
@@ -369,7 +377,7 @@ void	server_loop(t_server ts)
 					close(ts.sd);
 					//REMOVE CONNECTION FROM MAP
 					delete user_ptr;
-					ts.connections.erase(temp);
+					ts.users.erase(temp);
 				} 
 				//Print the message that came in 
 				else
@@ -501,7 +509,7 @@ void	server_loop(t_server ts)
 	if (DEEPDEBUG)
 		ok_debugger(&(ts.debugger), WARNING, "Main loop terminating...", "", MYDEBUG);
 	// ITERATE OVER MAP AND DELETE EVERYTHING
-	for (std::map<int, Connection *>::iterator it = ts.connections.begin(); it != ts.connections.end(); /*iterating in the loop*/)
+	for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); /*iterating in the loop*/)
 	{
 		if (DEEPDEBUG)
 		{
@@ -511,9 +519,9 @@ void	server_loop(t_server ts)
 			<< NO_COLOUR << std::endl;
 		}
 		delete it->second;
-		std::map<int, Connection *>::iterator temp = it;
+		std::map<int, User *>::iterator temp = it;
 		it++;
-		ts.connections.erase(temp);
+		ts.users.erase(temp);
 	}
 	for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop*/)
 	{
@@ -540,7 +548,7 @@ void	init_server(t_server ts)
 		exit(EXIT_FAILURE); 
 	} 
 	
-	//server starts by listening for new connections
+	//server starts by listening for new users
 	ts.state = READING_LOOP;
 
 	//wait for an activity on one of the sockets , timeout is not NULL
@@ -549,7 +557,7 @@ void	init_server(t_server ts)
 	ts.timeout.tv_sec = 15;
 	ts.timeout.tv_usec = 0;
 
-	//set master socket to allow multiple connections , 
+	//set master socket to allow multiple users , 
 	//this is just a good habit, it will work without this 
 	if( setsockopt(ts.master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&ts.opt, 
 		sizeof(ts.opt)) < 0 ) 
@@ -560,7 +568,7 @@ void	init_server(t_server ts)
 	
 	//type of socket created 
 	ts.address.sin_family = AF_INET; 
-	ts.address.sin_addr.s_addr = INADDR_ANY; 
+	ts.address.sin_addr.s_addr = INADDR_ANY; //is it localhost or any IP address on the machine?
 	ts.address.sin_port = htons(ts.port); 
 		
 	//bind the socket to localhost port 8888 
@@ -571,7 +579,7 @@ void	init_server(t_server ts)
 	}
 	ok_debugger(&(ts.debugger), INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
 
-	//try to specify maximum of 3 pending connections for the master socket 
+	//try to specify maximum of 3 pending users for the master socket 
 	if (listen(ts.master_socket, 3) < 0) 
 	{ 
 		ok_debugger(&(ts.debugger), ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
@@ -580,7 +588,7 @@ void	init_server(t_server ts)
 		
 	//accept the incoming connection 
 	ts.addrlen = sizeof(ts.address); 
-	ok_debugger(&(ts.debugger), INFO, "Waiting for connections ...", "", MYDEBUG);
+	ok_debugger(&(ts.debugger), INFO, "Waiting for users ...", "", MYDEBUG);
 
 	//add commands
 	ts.commands["CAP"] = irc_cap;

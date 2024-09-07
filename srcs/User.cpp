@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.cpp                                     :+:      :+:    :+:   */
+/*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/31 14:10:23 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/07 13:39:52 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Connection.hpp"
+#include "User.hpp"
 
-Connection::Connection(void)
+User::User(void)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Default constructor of the Connection class called.";
+	std::cout << "Default constructor of the User class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
 	this->_sd = 0;
@@ -26,42 +26,42 @@ Connection::Connection(void)
 	this->_strikecount = 0;
 }
 
-Connection::Connection(const Connection& copy)
+User::User(const User& copy)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Copy constructor of the Connection class called.";
+	std::cout << "Copy constructor of the User class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
 	*this = copy;
 }
 
-Connection &Connection::operator = (const Connection &src)
+User &User::operator = (const User &src)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Assigment operator of the Connection class called.";
+	std::cout << "Assigment operator of the User class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
 	(void)src;
 	return (*this);
 }
 
-Connection::~Connection(void)
+User::~User(void)
 {
 	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Destructor of the Connection class called.";
+		std::cout << "Destructor of the User class called.";
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
 }
 
-Connection::Connection(unsigned short sd, unsigned short port, std::string ip)
+User::User(unsigned short sd, unsigned short port, std::string ip)
 {
 	if (DEEPDEBUG)
 	{
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Overriden constructor of the Connection class called.";
+		std::cout << "Overriden constructor of the User class called.";
 		ft_uncolorize();
 		std::cout << std::endl;
 		ft_colorize(reinterpret_cast<uintptr_t>(this));
@@ -79,54 +79,53 @@ Connection::Connection(unsigned short sd, unsigned short port, std::string ip)
 	this->_strikecount = 0;
 }
 
-unsigned short	Connection::getPort(void)
+unsigned short	User::getPort(void)
 {
 	return (this->_port);
 }
 
-std::string	Connection::getIP(void)
+std::string	User::getIP(void)
 {
 	return (this->_ip);
 }
 
-std::string	Connection::getNick(void)
+std::string	User::getNick(void)
 {
 	return (this->_nick);
 }
 
-void	Connection::setNick(std::string nick)
+void	User::setNick(std::string nick)
 {
 	this->_nick = nick;
 }
 
-bool	Connection::getOverflowFlag(void)
+bool	User::getOverflowFlag(void)
 {
 	return (this->_data_overflow_flag);
 }
 
-void	Connection::setOverflowFlag(void)
+void	User::setOverflowFlag(void)
 {
 	this->_data_overflow_flag = true;
 }
 
-void	Connection::unsetOverflowFlag(void)
+void	User::unsetOverflowFlag(void)
 {
 	this->_data_overflow_flag = false;
 }
 
-bool	Connection::getReadingFlag(void)
+bool	User::getReadingFlag(void)
 {
 	return (this->_reading_flag);
 }
 
-void	Connection::setReadingFlag(void)
+void	User::setReadingFlag(void)
 {
 	this->_reading_flag = true;
 }
 
-void	Connection::unsetReadingFlag(void)
+void	User::unsetReadingFlag(void)
 {
 	this->_reading_flag = false;
 }
-
 
