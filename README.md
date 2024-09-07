@@ -117,6 +117,12 @@
   <li>User class</li>
 </ol>
 
+<h4>Plan for 08.09.24 (9:30-11:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger used in the code</li>
+  <li>User class</li>
+</ol>
+
 <h4>Plan for the next week</h4>
 <ol>
   <li>Utils functions</li>
