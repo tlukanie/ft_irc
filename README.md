@@ -122,9 +122,17 @@
 
 <h4>Plan for 08.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
-  <li>Logger/debugger used in the code</li>
-  <li>User class username, realname, auth getters and setters</li>
-  <li>Config file</li>
+  <li><s>Logger/debugger used in the code</s></li>
+  <li><s>User class username, realname, auth getters and setters</s></li>
+  <li><s>Nick message prefix (need to process USER first)</s></li>
+  <li><s>Config file</s></li>
+</ol>
+
+<h4>Plan for 09.09.24 (14:30-16:30 Prague time)</h4>
+<ol>
+  <li>Channel class</li>
+  <li>Logger/debugger (function to display messages and buffers)</li>
+  <li>Read the new documentation</li>
 </ol>
 
 <h4>Plan for the next week</h4>
@@ -132,9 +140,9 @@
   <li>Utils functions</li>
   <li>Read the new documentation</li>
   <li>User class</li>
-  <li>Nick message prefix (need to process USER first)</li>
   <li>Channel class</li>
   <li>Logger/debugger used everywhere in the code</li>
+  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>

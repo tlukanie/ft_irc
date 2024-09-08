@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/07 13:56:53 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/08 10:32:27 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # define SERVER_HPP
 # include <stdio.h>
 # include <iostream>
+# include <fstream>
 # include <sstream>
 # include <cstring>
 # include <csignal>

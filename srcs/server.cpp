@@ -107,7 +107,10 @@ void irc_pass(Message* msg, struct s_server *ts)
 void irc_nick(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
+	std::string	oldnick;
 
+	if (ts->users[msg->getSD()]->getNick().size())
+		oldnick = ts->users[msg->getSD()]->getNick();
 	std::cout << MAGENTA_COLOUR "NICK COMMAND is not fully supported" NO_COLOUR << std::endl;
 	// later check if nick is in use and valid string
 
@@ -122,7 +125,8 @@ void irc_nick(Message* msg, struct s_server *ts)
 	{
 		//send to all?
 		//:net!net@127.0.0.1 << need to be not hardcoded
-		reply = ":net!net@127.0.0.1 NICK :" +  ts->users[msg->getSD()]->getNick() + CRLF;
+		reply = ":" + oldnick + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
+		reply += " NICK :" +  ts->users[msg->getSD()]->getNick() + CRLF;
 		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
 		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 		{ 
@@ -155,6 +159,16 @@ void irc_nick(Message* msg, struct s_server *ts)
 void irc_user(Message* msg, struct s_server *ts)
 {
 	// we need to check that there are 4 parameters?
+	if (msg->getParams().size() != 4)
+	{
+		std::cerr << "NOT 4 parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	ts->users[msg->getSD()]->setUserName(msg->getParams()[0]);
+	ts->users[msg->getSD()]->setHostName(msg->getParams()[1]);
+	ts->users[msg->getSD()]->setServerName(msg->getParams()[2]);
+	ts->users[msg->getSD()]->setRealName(msg->getParams()[3]);
 	// process the 4 parameters
 	std::string	reply;
 	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
@@ -700,22 +714,180 @@ static void ft_init_debugger(s_debugger *debugger)
 	debugger->fd = 1;
 }
 
+// PORT=5555;
+// #IP=10.12.1.3
+// PASSWORD=abc;
+// DEBUG_LVL=debug;			#debug, info, notice, warning, error, disabled
+// DEBUG_FD=2; 
+// #DEBUGFILE="debug.txt"
+// DEBUG_DATE=0;			# show date
+// DEBUG_TIME=1;			# show time
+// DEBUG_UTIME=1;			# show microseconds
+// DEBUG_UPRECISION=4;		# precision of time in microseconds
+// DEBUG_COLOUR=1;			# use ansi escape codes
+// DEBUG_EXTRA=1;			# show file:function:line
+
+static int ft_read_config(t_server *ts)
+{
+	std::ifstream	file(".ft_irc.conf");
+	std::string		line;
+	std::string		key;
+	std::string		value;
+
+	if (file.fail() || !file.is_open())
+		return (1);
+	while (std::getline(file, line))
+	{
+		size_t index = line.find('=');
+		if (index == std::string::npos || index == line.size())
+			continue ;
+		key = line.substr(0, index);
+		size_t end = line.find(';');
+		if (line.size() && line[0] == '#')
+			continue ;
+		if (end == std::string::npos)
+		{
+			continue ;
+		}
+		value = line.substr(index + 1, end - index -1); //+1 to skip '=' and -1 to ignore ';'
+		if (key == "PORT")
+		{
+			if (ok_strtoi<int>(value) < 0 || ok_strtoi<int>(value) > 65535)
+				return (1);
+			ts->port = ok_strtoi<int>(value);
+		}
+		else if (key == "IP")
+		{
+			//not implemented
+		}
+		else if (key == "PASSWORD")
+		{
+			ts->password = value;
+		}
+		else if (key == "DEBUG_LVL")
+		{
+			if (value == "debug")
+				ts->debugger.debuglvl = DEBUG;
+			else if (value == "info")
+				ts->debugger.debuglvl = INFO;
+			else if (value == "notice")
+				ts->debugger.debuglvl = NOTICE;
+			else if (value == "warning")
+				ts->debugger.debuglvl = WARNING;
+			else if (value == "error")
+				ts->debugger.debuglvl = ERROR;
+			else if (value == "disabled")
+				ts->debugger.debuglvl = DISABLED;
+			else
+				std::cout << "Invalid DEBUG_LVL: " << value << std::endl;
+		}
+		else if (key == "DEBUG_FD")
+		{
+			if (value == "1")
+				ts->debugger.fd = 1;
+			else if (value == "2")
+				ts->debugger.fd = 2;
+			else
+				std::cout << "Invalid DEBUG_FD: " << value << std::endl;
+		}
+		else if (key == "DEBUG_DATE")
+		{
+			if (value == "0")
+				ts->debugger.date = false;
+			else if (value == "1")
+				ts->debugger.date = true;
+			else
+				std::cout << "Invalid DEBUG_DATE: " << value << std::endl;
+		}
+		else if (key == "DEBUG_TIME")
+		{
+			if (value == "0")
+				ts->debugger.time = false;
+			else if (value == "1")
+				ts->debugger.time = true;
+			else
+				std::cout << "Invalid DEBUG_TIME: " << value << std::endl;
+		}
+		else if (key == "DEBUG_UTIME")
+		{
+			if (value == "0")
+				ts->debugger.utime = false;
+			else if (value == "1")
+				ts->debugger.utime = true;
+			else
+				std::cout << "Invalid DEBUG_UTIME: " << value << std::endl;
+		}
+		else if (key == "DEBUG_UPRECISION")
+		{
+			if (value == "0")
+				ts->debugger.precision = 0;
+			else if (value == "1")
+				ts->debugger.precision = 1;
+			else if (value == "2")
+				ts->debugger.precision = 2;
+			else if (value == "3")
+				ts->debugger.precision = 3;
+			else if (value == "4")
+				ts->debugger.precision = 4;
+			else if (value == "5")
+				ts->debugger.precision = 5;
+			else if (value == "6")
+				ts->debugger.precision = 6;
+			else
+				std::cout << "Invalid DEBUG_UPRECISION: " << value << std::endl;
+		}
+		else if (key == "DEBUG_COLOUR")
+		{
+			if (value == "0")
+				ts->debugger.colour = false;
+			else if (value == "1")
+				ts->debugger.colour = true;
+			else
+				std::cout << "Invalid DEBUG_COLOUR: " << value << std::endl;
+		}
+		else if (key == "DEBUG_EXTRA")
+		{
+			if (value == "0")
+				ts->debugger.extra = false;
+			else if (value == "1")
+				ts->debugger.extra = true;
+			else
+				std::cout << "Invalid DEBUG_EXTRA: " << value << std::endl;
+		}
+		else
+				std::cout << "Unknown key: " << key << std::endl;
+	}
+	if (!ts->port)
+		return (1);
+	if (ts->password.size() == 0)
+		return (1);
+	return (0);
+}
+
 int	main(int argc , char *argv[]) 
 {
-	if (argc < 3 || argc > 4)
-		return (ft_usage());
+	t_server	ts;
 	//check argv1
 	//check argv2?
+	ts.port = 0;
 	signal(SIGINT, signal_handler); 
-	t_server	ts;
-	ts.port = ok_strtoi<int>(argv[1]);
-	if (ts.port <=0 || ts.port > 65535)
-		return (ft_usage_port());
-	if (!ok_argvcheck(argv[3], &ts))
-		return (ft_usage_debug());
-	ft_init_debugger(&(ts.debugger));
+	if (argc < 3 || argc > 4)
+	{
+		ft_init_debugger(&(ts.debugger));
+		if (ft_read_config(&ts))
+			return (ft_usage());
+	}
+	else
+	{
+		ts.port = ok_strtoi<int>(argv[1]);
+		if (ts.port <=0 || ts.port > 65535)
+			return (ft_usage_port());
+		if (!ok_argvcheck(argv[3], &ts))
+			return (ft_usage_debug());
+		ft_init_debugger(&(ts.debugger));
+		ts.password = argv[2];
+	}
 	ok_debugger(&(ts.debugger), NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debugger.debuglvl), "", MYDEBUG);
-	ts.password = argv[2];
 	init_server(ts);
 	//try init server
 	// catch

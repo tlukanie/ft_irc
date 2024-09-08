@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/07 13:39:52 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/08 09:47:45 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,46 @@ void	User::setNick(std::string nick)
 	this->_nick = nick;
 }
 
+std::string	User::getUserName(void)
+{
+	return (this->_username);
+}
+
+void	User::setUserName(std::string username)
+{
+	this->_username = username;
+}
+
+std::string	User::getHostName(void)
+{
+	return (this->_hostname);
+}
+
+void	User::setHostName(std::string hostname)
+{
+	this->_hostname = hostname;
+}
+
+std::string	User::getServerName(void)
+{
+	return (this->_servername);
+}
+
+void	User::setServerName(std::string servername)
+{
+	this->_servername = servername;
+}
+
+std::string	User::getRealName(void)
+{
+	return (this->_realname);
+}
+
+void	User::setRealName(std::string realname)
+{
+	this->_realname = realname;
+}
+
 bool	User::getOverflowFlag(void)
 {
 	return (this->_data_overflow_flag);
@@ -112,6 +152,21 @@ void	User::setOverflowFlag(void)
 void	User::unsetOverflowFlag(void)
 {
 	this->_data_overflow_flag = false;
+}
+
+bool	User::getAuthFlag(void)
+{
+	return (this->_auth_flag);
+}
+
+void	User::setAuthFlag(void)
+{
+	this->_auth_flag = true;
+}
+
+void	User::unsetAuthFlag(void)
+{
+	this->_auth_flag = false;
 }
 
 bool	User::getReadingFlag(void)

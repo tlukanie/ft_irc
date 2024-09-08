@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/07 14:03:29 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/08 09:44:37 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,25 @@ class User
 		unsigned short	getPort(void);
 		std::string		getIP(void);
 		std::string		getNick(void);
+		std::string		getUserName(void);
+		std::string		getHostName(void);
+		std::string		getServerName(void);
+		std::string		getRealName(void);
 		bool			getOverflowFlag(void);
+		bool			getAuthFlag(void);
 		bool			getReadingFlag(void);
 		
 		void			setOverflowFlag(void);
 		void			unsetOverflowFlag(void);
+		void			setAuthFlag(void);
+		void			unsetAuthFlag(void);
 		void			setReadingFlag(void);
 		void			unsetReadingFlag(void);
 		void			setNick(std::string nick);
+		void			setUserName(std::string username);
+		void			setHostName(std::string hostname);
+		void			setServerName(std::string servername);
+		void			setRealName(std::string realname);
 		//methods
 		//extract message
 		//store in buffer
