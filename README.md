@@ -115,9 +115,9 @@
 
 <h4>Plan for 07.09.24 (13:00-15:00 Prague time)</h4>
 <ol>
-  <li>Logger/debugger used in the code</li><>
-  <li>Read the new documentation</li>
-  <li>User class</li>
+  <li><s>Logger/debugger used in the code</s></li>
+  <li><s>Read the new documentation</s></li>
+  <li><s>User class</s></li>
 </ol>
 
 <h4>Plan for 08.09.24 (9:30-11:30 Prague time)</h4>
