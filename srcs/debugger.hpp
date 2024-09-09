@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:08:26 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/04 11:38:15 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/09 15:43:00 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@
 struct s_debugger;
 
 //change int i to enum
-void	ok_debugger(s_debugger *debugger, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
+void		ok_debugger(s_debugger *debugger, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
+std::string	ok_display_reply(s_debugger *debugger, std::string reply);
 
 #endif

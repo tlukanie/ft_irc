@@ -65,8 +65,7 @@ void irc_pass(Message* msg, struct s_server *ts)
 		// ERR_PASSWDMISMATCH (464)
 		std::cerr << RED_COLOUR "wrong password" NO_COLOUR << std::endl;
 		reply = ":IRC 464  :Wrong password try again" CRLF;
-		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
-		
+		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);		
 		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 		{ 
 			std::cerr << "send failed" << std::endl;
@@ -127,7 +126,7 @@ void irc_nick(Message* msg, struct s_server *ts)
 		//:net!net@127.0.0.1 << need to be not hardcoded
 		reply = ":" + oldnick + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
 		reply += " NICK :" +  ts->users[msg->getSD()]->getNick() + CRLF;
-		std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
 		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 		{ 
 			std::cerr << "send failed" << std::endl;
@@ -173,7 +172,7 @@ void irc_user(Message* msg, struct s_server *ts)
 	std::string	reply;
 	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
 	reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there" + CRLF;
-	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
+	ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
 	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 	{ 
 		std::cerr << "send failed" << std::endl;
@@ -198,8 +197,8 @@ void irc_ping(Message* msg, struct s_server *ts)
 	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
 	
 	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0] + CRLF;
-	std::cout << YELLOWBG_COLOUR << reply << NO_COLOUR << std::endl;
-
+	ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
+	
 	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 	{ 
 		std::cerr << "send failed" << std::endl;

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/05 14:46:13 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/09 16:17:58 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,43 @@ static std::string	get_utime(void)
 	<< std::setfill('0') << std::setw(6) << tv.tv_usec;
 	temp >> utime;
 	return (utime);
+}
+
+
+//fixing for unicode in string
+static int		ok_get_text_size(std::string text)
+{
+	int		size = 0;
+	bool	skip = false;
+	for (std::string::iterator it = text.begin(); it < text.end(); it++)
+	{
+		if (skip)
+		{
+			if (*it == 'm')
+				skip = false;
+			continue ;
+		}
+		if (*it == '\033')
+		{
+			skip = true;
+			continue;
+		}
+		if (*it & 0b10000000)
+		{
+			if (*it & 0b01000000)
+			{
+				if (*it & 0b00100000)
+				{
+					if (*it & 0b00010000)
+						it++;
+					it++;
+				}
+				it++;
+			}
+		}
+		++size;
+	}
+	return (size);
 }
 
 void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message, std::string details, std::string extra)
@@ -139,7 +176,8 @@ void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message,
 	if (debugger->extra)
 	{
 		text += " ";
-		while (text.size() < 42)
+		int	text_size = ok_get_text_size(text);
+		while (++text_size < 64)
 			text += " ";
 		text += extra;
 	}
@@ -147,4 +185,36 @@ void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message,
 	if (debugger->colour)
 		output += NO_COLOUR;
 	std::cout << output << std::endl;
+}
+
+// std::string	ok_display_buffer(s_debugger *debugger, octets_t octet)
+// {
+	
+// }
+
+std::string	ok_display_reply(s_debugger *debugger, std::string reply)
+{
+	std::string	str;
+	std::string	ascii_reply;
+
+	for (std::string::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_reply += *it;
+		else if (*it == '\n')
+			ascii_reply += "␤";
+		else if (*it == '\r')
+			ascii_reply += "␍";
+		else
+			ascii_reply += "�";
+	}
+	if (debugger->colour)
+	{
+		str = "[" YELLOW_COLOUR + ascii_reply + NO_COLOUR GREY_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_reply + "]";
+	}
+	return (str);
 }

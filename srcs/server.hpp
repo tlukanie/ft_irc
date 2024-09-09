@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/08 10:32:27 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/09 14:49:00 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 
 # include "enums.hpp"
 # include "User.hpp"
+# include "Channel.hpp"
 # include "Message.hpp"
 # include "debugger.hpp"
 # include "utils.hpp"

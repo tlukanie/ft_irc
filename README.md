@@ -130,19 +130,64 @@
 
 <h4>Plan for 09.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>Channel class</li>
-  <li>Logger/debugger (function to display messages and buffers)</li>
-  <li>Read the new documentation</li>
+  <li><s>Channel class</s></li>
+  <li><s>Logger/debugger (function to display messages outgoing)</s></li>
+</ol>
+
+<h4>Plan for 10.09.24 (13:30-15:30 Prague time)</h4>
+<ol>
+ <li>Read the new documentation</li>
+  <li>Logger/debugger (function to display buffers)</li>
+  <li>JOIN message</li>
+  <li>PART message</li>
+  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
+</ol>
+
+<h4>Plan for 11.09.24 (10:30-12:30 Prague time)</h4>
+<ol>
+  <li>PRIVMSG</li>
+  <li>NOTICE ?</li>
+</ol>
+
+<h4>Plan for 12.09.24 (10:30-12:30 Prague time)</h4>
+<ol>
+  <li>TOPIC</li>
+  <li>INVITE</li>
+</ol>
+
+<h4>Plan for 13.09.24 (09:30-11:30 Prague time)</h4>
+<ol>
+  <li>KICK</li>
+  <li>AWAY</li>
+</ol>
+
+<h4>Plan for 14.09.24 (14:30-16:30 Prague time)</h4>
+<ol>
+  <li>MODE</li>
+  <li>Logger/debugger (function to display messages incoming)</li>
+  <li>Logger/debugger used everywhere in the code</li>
+</ol>
+
+<h4>Plan for 15.09.24 (09:30-11:30 Prague time)</h4>
+<ol>
+  <li>PONG</li>
+  <li>server pinging users</li>
+  <li>QUIT</li>
+</ol>
+
+<h4>Plan for 16.09.24 (???? Prague time)</h4>
+<ol>
+  <li>...</li>
 </ol>
 
 <h4>Plan for the next week</h4>
 <ol>
-  <li>Utils functions</li>
-  <li>Read the new documentation</li>
-  <li>User class</li>
-  <li>Channel class</li>
-  <li>Logger/debugger used everywhere in the code</li>
-  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
+  <li>Too many socket descriptors over time</li>
+  <li>Proper command handling</li>
+  <li>Error codes</li>
+  <li>Get rid of exit and other? functions that are not allowed</li>
+  <li>Try-catch blocks for server breaking errors</li>
+  <li>Logger/debugger goes through select()</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
