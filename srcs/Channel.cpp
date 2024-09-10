@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 14:40:31 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/10 15:00:42 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Channel::Channel(void)
 	std::cout << "Default constructor of the Channel class called.";
 	ft_uncolorize();
 	std::cout << std::endl;
-
+	this->_channelName = "noname";
 }
 
 Channel::Channel(const Channel& copy)
@@ -49,4 +49,18 @@ Channel::~Channel(void)
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
+}
+
+Channel::Channel(std::string channelName)
+{
+	ft_colorize(reinterpret_cast<uintptr_t>(this));
+	std::cout << "Overloaded constructor of the Channel class called.";
+	ft_uncolorize();
+	std::cout << std::endl;
+	this->_channelName = channelName;
+}
+
+std::string	Channel::getChannelName(void)
+{
+	return (this->_channelName);
 }

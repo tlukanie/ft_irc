@@ -227,6 +227,10 @@ void irc_quit(Message* msg, struct s_server *ts)
 	(void)ts;
 }
 
+
+
+
+
 // Error
 // https://modern.ircdocs.horse/#error-message
 
@@ -234,22 +238,166 @@ void irc_quit(Message* msg, struct s_server *ts)
 
 // JOIN
 // https://modern.ircdocs.horse/#join-message
+void irc_join(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "JOIN COMMAND not fully supported" NO_COLOUR << std::endl; 
+	if (!msg->getParams().size())
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	std::string	channelName = msg->getParams()[0];
+	//check if the channel name valid
+	//check if user can join the channel
+
+	//if the channel does not exist
+	if (ts->channels.find(channelName) == ts->channels.end())
+	{
+		try
+		{
+			ts->channels[channelName] = new Channel(channelName);
+			ok_debugger(&(ts->debugger), INFO, "Creating channel: ", channelName, MYDEBUG);
+		}
+		catch(const std::exception& e)
+		{
+			std::cout << REDBG_COLOUR "Channel " NO_COLOUR << std::endl;
+			std::cout << RED_COLOUR << channelName << NO_COLOUR << std::endl;
+			std::cout << REDBG_COLOUR " could not be created, because: " NO_COLOUR << std::endl;
+			std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+		}
+	}
+	else
+	{
+		ok_debugger(&(ts->debugger), DEBUG, "This channel already exists: ", channelName, MYDEBUG);
+	}
+		
+
+	//add channel to multimap
+	ts->user2channel.insert(std::pair<std::string, Channel*>(ts->users[msg->getSD()]->getNick(), ts->channels[channelName]));
+	//add user to multimap
+	ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->users[msg->getSD()]));
+
+
+	// process the 4 parameters
+	// std::string	reply;
+	// std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
+	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there" + CRLF;
+	// ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
+	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	// { 
+	// 	std::cerr << "send failed" << std::endl;
+	// } 
+	// else
+	// {
+	// 	std::cout << "Reply message sent successfully" << std::endl;
+	// }
+}
 
 // PART
 //https://modern.ircdocs.horse/#part-message
+void irc_part(Message* msg, struct s_server *ts)
+{
+	std::string	reply;
+	std::cout << MAGENTA_COLOUR "PART COMMAND not fully supported" NO_COLOUR << std::endl; 
+	if (!msg->getParams().size())
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	std::string	channelName = msg->getParams()[0];
+	//check if the channel name valid
+	//check if user can join the channel
+
+	//if the channel does not exist
+	if (ts->channels.find(channelName) == ts->channels.end())
+	{
+		ok_debugger(&(ts->debugger), WARNING, "Cannot leave non-existing channel: ", channelName, MYDEBUG);
+		return ;
+	}
+	else
+	{
+		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelName, MYDEBUG);
+		reply = ":" + ts->users[msg->getSD()]->getNick() + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
+		reply += " PART " + channelName + " :" + (msg->getParams().size() > 1 ? msg->getParams()[1] : std::string("leaving")) + CRLF;
+		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
+		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+		{ 
+			std::cerr << "send failed" << std::endl;
+		} 
+		else
+		{
+			std::cout << "Reply message sent successfully" << std::endl;
+		}
+	}
+		
+
+	//remove user from multimap
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == ts->users[msg->getSD()]->getNick())
+			ts->channel2user.erase(it);
+		break ;
+	}
+	// ts->user2channel.insert(std::pair<std::string, Channel*>(ts->users[msg->getSD()]->getNick(), ts->channels[channelName]));
+	//remove channel from multimap
+	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(ts->users[msg->getSD()]->getNick()); it != ts->user2channel.upper_bound(ts->users[msg->getSD()]->getNick()); it++)
+	{
+		if (it->second->getChannelName() == channelName)
+			ts->user2channel.erase(it);
+		break ;
+	}
+	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->users[msg->getSD()]));
+	//if no users in channel delete it
+	if (ts->channel2user.find(channelName) == ts->channel2user.end())
+	{
+		delete ts->channels[channelName];
+		ts->channels.erase(channelName);
+		ok_debugger(&(ts->debugger), INFO, "Deleting channel: ", channelName, MYDEBUG);
+	}
+	// for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	// {
+	// 	std::cout << "Users in channel: " << it->second->getNick() << std::endl;
+	// }
+}
 
 //TOPIC
 // https://modern.ircdocs.horse/#topic-message
+void irc_topic(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "TOPIC COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 //INVITE
 // https://modern.ircdocs.horse/#invite-message
+void irc_invite(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "INVITE COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 //KICK
 //https://modern.ircdocs.horse/#kick-message
+void irc_kick(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "KICK COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 
 //AWAY
 //https://modern.ircdocs.horse/#away-message
+void irc_away(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "AWAY COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 
 
@@ -260,9 +408,21 @@ void irc_quit(Message* msg, struct s_server *ts)
 
 //PRIVMSG
 //https://modern.ircdocs.horse/#privmsg-message
+void irc_privmsg(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "PRIVMSG COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 //NOTICE
 //https://modern.ircdocs.horse/#notice-message
+void irc_notice(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "NOTICE COMMAND not supported" NO_COLOUR << std::endl; 
+	(void)msg;
+	(void)ts;
+}
 
 
 void irc_mode(Message* msg, struct s_server *ts)
@@ -548,6 +708,19 @@ void	server_loop(t_server ts)
 		it++;
 		ts.messages.erase(temp);
 	}
+	for (std::map<std::string, Channel *>::iterator it = ts.channels.begin(); it != ts.channels.end(); /*iterating in the loop*/)
+	{
+		if (DEEPDEBUG)
+		{
+			std::cout << MAGENTA_COLOUR "Removing channel: " << it->first
+			<< NO_COLOUR << std::endl;
+		}
+		delete it->second;
+		std::map<std::string, Channel *>::iterator temp = it;
+		it++;
+		ts.channels.erase(temp);
+	}
+	//erase multimaps?
 }
 
 // create map of commands and pointers to functions to process them
@@ -611,13 +784,15 @@ void	init_server(t_server ts)
 	ts.commands["PING"] = irc_ping;
 	ts.commands["PONG"] = irc_pong;
 	ts.commands["MODE"] = irc_mode;
-	
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
+	ts.commands["JOIN"] = irc_join;
+	ts.commands["PART"] = irc_part;
+	ts.commands["PRIVMSG"] = irc_privmsg;
+	ts.commands["NOTICE"] = irc_notice;
+	ts.commands["TOPIC"] = irc_topic;
+	ts.commands["INVITE"] = irc_invite;
+	ts.commands["KICK"] = irc_kick;
+	ts.commands["AWAY"] = irc_away;
+
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;

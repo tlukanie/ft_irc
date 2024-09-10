@@ -137,16 +137,16 @@
 <h4>Plan for 10.09.24 (13:30-15:30 Prague time)</h4>
 <ol>
  <li>Read the new documentation</li>
-  <li>Logger/debugger (function to display buffers)</li>
-  <li>JOIN message</li>
-  <li>PART message</li>
-  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
+  <li><s>JOIN message</s></li>
+  <li><s>PART message</s></li>
+  <li><s>2 (multi)maps of users and channels one with key on user another with key on channel</s></li>
 </ol>
 
 <h4>Plan for 11.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
   <li>PRIVMSG</li>
   <li>NOTICE ?</li>
+  <li>Logger/debugger (function to display buffers)</li>
 </ol>
 
 <h4>Plan for 12.09.24 (10:30-12:30 Prague time)</h4>

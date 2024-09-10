@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 14:40:08 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/10 15:00:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,11 @@ class Channel
 		Channel &operator	= (const Channel &src);
 		~Channel(void);
 
-	private:
+		Channel(std::string channelName);
+		std::string		getChannelName(void);
 
+	private:
+		std::string		_channelName;
 };
 
 #endif

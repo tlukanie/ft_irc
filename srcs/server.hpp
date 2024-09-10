@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 14:49:00 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/10 13:52:28 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,10 @@ typedef struct s_server {
 	std::map<int, User*>										users; //map of Users/Users/Clients
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
-	//map nicks to sds
+	//map nicks to sds?
+	std::map<std::string, Channel*>								channels;
+	std::multimap<std::string, Channel*>						user2channel;
+	std::multimap<std::string, User*>							channel2user;
 	t_debugger													debugger;
 }	t_server;
 
