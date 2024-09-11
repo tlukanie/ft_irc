@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/10 13:52:28 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/11 11:00:14 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_server {
 	struct timeval												timeout;
 	char														buffer[512]; //irc message is up to 512
 	std::map<int, User*>										users; //map of Users/Users/Clients
+	std::map<std::string, User*>								nicks;
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
 	//map nicks to sds?

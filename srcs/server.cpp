@@ -28,6 +28,24 @@ size_t	ok_crlf_finder(std::vector<uint8_t> data)
 	return (0);
 }
 
+static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text, int flags)
+{
+	std::string	reply;
+
+	if (Sender)
+		reply += ":" + Sender->getNick() + "!" + Sender->getUserName() + "@" + Sender->getIP() + " ";
+	reply += text + CRLF;
+	ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(sd) + "]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
+	if(send(sd, reply.c_str(), reply.length(), flags) != (ssize_t)reply.length())
+	{ 
+		std::cerr << "send failed" << std::endl;
+	} 
+	else
+	{
+		std::cout << "Reply message sent successfully" << std::endl;
+	}
+}
+
 // CAP LS
 void irc_cap(Message* msg, struct s_server *ts)
 {
@@ -337,16 +355,22 @@ void irc_part(Message* msg, struct s_server *ts)
 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
 	{
 		if (it->second->getNick() == ts->users[msg->getSD()]->getNick())
+		{
+			ok_debugger(&(ts->debugger), NOTICE, "Deleting user: ", it->second->getNick(), MYDEBUG);
 			ts->channel2user.erase(it);
-		break ;
+			break ;
+		}
 	}
 	// ts->user2channel.insert(std::pair<std::string, Channel*>(ts->users[msg->getSD()]->getNick(), ts->channels[channelName]));
 	//remove channel from multimap
 	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(ts->users[msg->getSD()]->getNick()); it != ts->user2channel.upper_bound(ts->users[msg->getSD()]->getNick()); it++)
 	{
 		if (it->second->getChannelName() == channelName)
+		{
+			ok_debugger(&(ts->debugger), NOTICE, "Deleting channel for user: ", channelName, MYDEBUG);
 			ts->user2channel.erase(it);
-		break ;
+			break ;
+		}
 	}
 	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->users[msg->getSD()]));
 	//if no users in channel delete it
@@ -408,18 +432,51 @@ void irc_away(Message* msg, struct s_server *ts)
 
 //PRIVMSG
 //https://modern.ircdocs.horse/#privmsg-message
+//:user123!net@127.0.0.1 PRIVMSG #aaa :hello there
+
 void irc_privmsg(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "PRIVMSG COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::cout << MAGENTA_COLOUR "PRIVMSG COMMAND not fully supported" NO_COLOUR << std::endl; 
+	if (msg->getParams().size() < 2)
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	//message to channel vs message to user
+	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '@')
+	{
+		std::string channelName = msg->getParams()[0];
+		//reply channel
+		//check if channel exists
+		if (ts->channels.find(channelName) == ts->channels.end())
+		{
+			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel: ", channelName, MYDEBUG);
+			return ;
+		}
+		//send reply to all other users in the channel
+		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+		{
+			if (it->second->getNick() != ts->users[msg->getSD()]->getNick())
+			{
+				
+				std::string	text;
+				text = "PRIVMSG " + channelName + " :" + msg->getParams()[1];
+				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text, 0);
+			}
+		}
+	}
+	else
+	{
+		//reply user
+	}
 }
 
 //NOTICE
 //https://modern.ircdocs.horse/#notice-message
 void irc_notice(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "NOTICE COMMAND not supported" NO_COLOUR << std::endl; 
+	std::cout << MAGENTA_COLOUR "NOTICE COMMAND not supported yet" NO_COLOUR << std::endl; 
 	(void)msg;
 	(void)ts;
 }
@@ -463,24 +520,24 @@ void	server_loop(t_server ts)
 			//socket descriptor
 			ts.sd = it->first;
 			connection_ptr = it->second;
-			if (DEEPDEBUG)
-				ok_debugger(&(ts.debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts.sd), MYDEBUG);
+			// if (DEEPDEBUG)
+			// 	ok_debugger(&(ts.debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts.sd), MYDEBUG);
 			if (connection_ptr->getReadingFlag())
 			{
 				FD_SET(ts.sd , &readfds);
-				if (DEEPDEBUG)
-					ok_debugger(&(ts.debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts.sd), MYDEBUG);
+				// if (DEEPDEBUG)
+				// 	ok_debugger(&(ts.debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts.sd), MYDEBUG);
 			}
 			else
 			{
 				FD_SET(ts.sd , &writefds);
-				if (DEEPDEBUG)
-					ok_debugger(&(ts.debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts.sd), MYDEBUG);
+				// if (DEEPDEBUG)
+				// 	ok_debugger(&(ts.debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts.sd), MYDEBUG);
 			}
 			if(ts.sd > ts.max_sd) 
 				ts.max_sd = ts.sd; 
 		}
-		ok_debugger(&(ts.debugger), EXTRADEBUG, "Before select", "", MYDEBUG);
+		// ok_debugger(&(ts.debugger), DEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
 		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
 		// nfds   This argument should be set to the highest-numbered file 
@@ -490,7 +547,7 @@ void	server_loop(t_server ts)
 		ts.timeout.tv_sec = 15;
 		ts.timeout.tv_usec = 0;
 		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout);
-		ok_debugger(&(ts.debugger), EXTRADEBUG, "After select", "", MYDEBUG);
+		// ok_debugger(&(ts.debugger), DEBUG, "After select", "", MYDEBUG);
 		//check later if allowed
 		if (ts.activity < 0) 
 		{ 
@@ -530,12 +587,12 @@ void	server_loop(t_server ts)
 			ts.sd = it->first;
 			User * user_ptr = it->second;
 			it++;
-			if (DEEPDEBUG)
-				ok_debugger(&(ts.debugger), DEBUG, "Reading for loop ", ok_itostr(ts.sd), MYDEBUG);
+			// if (DEEPDEBUG)
+			// 	ok_debugger(&(ts.debugger), DEBUG, "Reading for loop ", ok_itostr(ts.sd), MYDEBUG);
 			//READ FROM READING FDS
 			if (FD_ISSET(ts.sd , &readfds)) 
 			{
-				ok_debugger(&(ts.debugger), DEBUG, "SD is set: ", ok_itostr(ts.sd), MYDEBUG);
+				// ok_debugger(&(ts.debugger), DEBUG, "SD is set: ", ok_itostr(ts.sd), MYDEBUG);
 				//Check if it was for closing , and also read the 
 				//incoming message 
 				if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
@@ -545,8 +602,7 @@ void	server_loop(t_server ts)
 					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
 					// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
-					if (DEEPDEBUG)
-						ok_debugger(&(ts.debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts.sd), MYDEBUG);
+					ok_debugger(&(ts.debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts.sd), MYDEBUG);
 					close(ts.sd);
 					//REMOVE CONNECTION FROM MAP
 					delete user_ptr;
@@ -555,15 +611,13 @@ void	server_loop(t_server ts)
 				//Print the message that came in 
 				else
 				{
-					std::cout << "Received data" << std::endl;
-					std::cout << "Buffer on sd " << ts.sd << " [" CYAN_COLOUR;
+					std::string	buff;
 					for (int i = 0; i < ts.valread; i++)
 					{
-						std::cout << ts.buffer[i];
 						user_ptr->_data.push_back(ts.buffer[i]);
+						buff.push_back(ts.buffer[i]);
 					}
-					std::cout << NO_COLOUR "]" << std::endl;
-
+					ok_debugger(&(ts.debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts.sd) + "]" + ok_display_buffer(&(ts.debugger), buff), MYDEBUG);
 
 					//while CRLF in data
 					// get position of the crlf
@@ -591,8 +645,9 @@ void	server_loop(t_server ts)
 						msg.assign(user_ptr->_data.begin(), user_ptr->_data.begin() + pos - 2);
 						if (DEEPDEBUG)
 						{
-							std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
-							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+							ok_debugger(&(ts.debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
+							// std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
+							// std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
 						}
 						user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
 
@@ -659,7 +714,7 @@ void	server_loop(t_server ts)
 				//	execute
 				if (ts.commands.find(msg_ptr->getCommand()) != ts.commands.end())
 				{
-					std::cout << "Executing message " << msg_ptr->getCommand() << std::endl;
+					ok_debugger(&(ts.debugger), DEBUG, "Executing command:", "[" + ok_itostr(msg_ptr->getSD()) + "]" + ok_display_message(&(ts.debugger), msg_ptr->getMessage()), MYDEBUG);
 					//maybe run in try and catch block
 					ts.commands[msg_ptr->getCommand()](msg_ptr, &ts);
 				}
@@ -668,7 +723,7 @@ void	server_loop(t_server ts)
 					std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
 					//strike count of invalid messages
 				}
-				std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
+				// std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
 				delete msg_ptr;
 				ts.messages.erase(iter);
 			}

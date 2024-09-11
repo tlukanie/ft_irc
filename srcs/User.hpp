@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 14:48:35 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/11 11:14:33 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class User
 		
 		// getters and setters? for mode
 		unsigned short	getPort(void);
+		unsigned short	getSD(void);
 		std::string		getIP(void);
 		std::string		getNick(void);
 		std::string		getUserName(void);

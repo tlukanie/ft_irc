@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 14:52:16 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/11 11:15:12 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,11 @@ User::User(unsigned short sd, unsigned short port, std::string ip)
 unsigned short	User::getPort(void)
 {
 	return (this->_port);
+}
+
+unsigned short	User::getSD(void)
+{
+	return (this->_sd);
 }
 
 std::string	User::getIP(void)

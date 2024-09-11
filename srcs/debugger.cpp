@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/09 16:17:58 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/11 12:24:27 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message,
 	{
 		text += " ";
 		int	text_size = ok_get_text_size(text);
-		while (++text_size < 64)
+		while (++text_size < 80)
 			text += " ";
 		text += extra;
 	}
@@ -215,6 +215,62 @@ std::string	ok_display_reply(s_debugger *debugger, std::string reply)
 	else
 	{
 		str += "[" + ascii_reply + "]";
+	}
+	return (str);
+}
+
+
+std::string	ok_display_buffer(s_debugger *debugger, std::string buff)
+{
+	std::string	str;
+	std::string	ascii_buff;
+
+	for (std::string::iterator it = buff.begin(); it != buff.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_buff += *it;
+		else if (*it == '\n')
+			ascii_buff += "␤";
+		else if (*it == '\r')
+			ascii_buff += "␍";
+		else
+			ascii_buff += "�";
+	}
+	if (debugger->colour)
+	{
+		str = "[" CYAN_COLOUR + ascii_buff + NO_COLOUR GREY_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_buff + "]";
+	}
+	return (str);
+}
+
+
+std::string	ok_display_message(s_debugger *debugger, std::string msg)
+{
+	std::string	str;
+	std::string	ascii_msg;
+
+	for (std::string::iterator it = msg.begin(); it != msg.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_msg += *it;
+		else if (*it == '\n')
+			ascii_msg += "␤";
+		else if (*it == '\r')
+			ascii_msg += "␍";
+		else
+			ascii_msg += "�";
+	}
+	if (debugger->colour)
+	{
+		str = "[" RED_COLOUR + ascii_msg + NO_COLOUR GREY_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_msg + "]";
 	}
 	return (str);
 }

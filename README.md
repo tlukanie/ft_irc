@@ -136,7 +136,6 @@
 
 <h4>Plan for 10.09.24 (13:30-15:30 Prague time)</h4>
 <ol>
- <li>Read the new documentation</li>
   <li><s>JOIN message</s></li>
   <li><s>PART message</s></li>
   <li><s>2 (multi)maps of users and channels one with key on user another with key on channel</s></li>
@@ -144,15 +143,18 @@
 
 <h4>Plan for 11.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>PRIVMSG</li>
-  <li>NOTICE ?</li>
-  <li>Logger/debugger (function to display buffers)</li>
+  <li><s>PRIVMSG</s></li>
+  <li><s>Logger/debugger (function to display buffers)</s></li>
+  <li><s>Logger/debugger (function to display messages incoming)</s></li>
+  <li><s>Logger/debugger (function to display messages processing)</s></li>
+  <li><s>send_reply function</li>
 </ol>
 
-<h4>Plan for 12.09.24 (10:30-12:30 Prague time)</h4>
+<h4>Plan for 12.09.24 (15:30-17:30 Prague time)</h4>
 <ol>
   <li>TOPIC</li>
   <li>INVITE</li>
+  <li>send_reply function used for other messages</li>
 </ol>
 
 <h4>Plan for 13.09.24 (09:30-11:30 Prague time)</h4>
@@ -164,7 +166,6 @@
 <h4>Plan for 14.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
   <li>MODE</li>
-  <li>Logger/debugger (function to display messages incoming)</li>
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
@@ -177,6 +178,7 @@
 
 <h4>Plan for 16.09.24 (???? Prague time)</h4>
 <ol>
+  <li>NOTICE ?</li>
   <li>...</li>
 </ol>
 
@@ -206,7 +208,7 @@
   <li>Try-catch blocks for server breaking errors</li>
   <li>Check if the server can run on other IP than localhost</li>
   <li>Transfer files</li>
-  <li>Bot (magic 8ball "magic8bot")</li>
+  <li>Bot (magic 8ball "magic8bot") from our client</li>
   <li>new</li>
   <li>new</li>
   <li>new</li>
