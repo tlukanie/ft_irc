@@ -147,10 +147,10 @@
   <li><s>Logger/debugger (function to display buffers)</s></li>
   <li><s>Logger/debugger (function to display messages incoming)</s></li>
   <li><s>Logger/debugger (function to display messages processing)</s></li>
-  <li><s>send_reply function</li>
+  <li><s>send_reply function</s></li>
 </ol>
 
-<h4>Plan for 12.09.24 (15:30-17:30 Prague time)</h4>
+<h4>Plan for 12.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
   <li>TOPIC</li>
   <li>INVITE</li>
