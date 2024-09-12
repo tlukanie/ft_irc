@@ -46,6 +46,25 @@ static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std
 	}
 }
 
+static void	send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
+{
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		send_reply(ts, it->second->getSD(), Sender, text, flags);
+	}
+}
+
+// static void	send_reply_others(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
+// {
+// 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+// 	{
+// 		if (it->second->getNick() != ts->users[Sender->getSD()]->getNick())
+// 		{
+// 			send_reply(ts, it->second->getSD(), Sender, text, flags);
+// 		}
+// 	}
+// }
+
 // CAP LS
 void irc_cap(Message* msg, struct s_server *ts)
 {
@@ -99,6 +118,7 @@ void irc_pass(Message* msg, struct s_server *ts)
 }
 
 // NICK net
+//CHECK IF NICK IS UNIQUE
 // https://modern.ircdocs.horse/#nick-message
 // handle existing nick later
 // The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
@@ -125,6 +145,7 @@ void irc_nick(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 	std::string	oldnick;
+	std::string	newnick = msg->getParams()[0];
 
 	if (ts->users[msg->getSD()]->getNick().size())
 		oldnick = ts->users[msg->getSD()]->getNick();
@@ -134,10 +155,15 @@ void irc_nick(Message* msg, struct s_server *ts)
 	//setting the first (and only?) parameter as a nick in the map of users
 	//accessed by the socket descriptor gained from the message class
 	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
-	<< " setting nick " << msg->getParams()[0] << NO_COLOUR << std::endl;
+	<< " setting nick " << newnick << NO_COLOUR << std::endl;
 
-	ts->users[msg->getSD()]->setNick(msg->getParams()[0]);
-
+	ts->users[msg->getSD()]->setNick(newnick);
+	if (oldnick.size())
+	{
+		ts->nicks.erase(ts->nicks.find(oldnick));
+	}
+	ts->nicks.insert(std::pair<std::string, User*>(newnick, ts->users[msg->getSD()]));
+	// ts.users.insert(std::pair<int, User*>(ts.new_socket, new User(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
 	if (ts->users[msg->getSD()]->getNick().size())
 	{
 		//send to all?
@@ -388,20 +414,76 @@ void irc_part(Message* msg, struct s_server *ts)
 
 //TOPIC
 // https://modern.ircdocs.horse/#topic-message
+//TOPIC #test :Hello
+//:user123!net@127.0.0.1 TOPIC #test :Hello
+
 void irc_topic(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "TOPIC COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::cout << MAGENTA_COLOUR "TOPIC COMMAND not fully supported" NO_COLOUR << std::endl; 
+	//send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
+	if (msg->getParams().size() < 2)
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	std::string channelName = msg->getParams()[0];
+	std::string topic = msg->getParams()[1];
+	std::string text = "TOPIC " + channelName + " :" + topic;
+	if (ts->channels.find(channelName) != ts->channels.end())
+	{
+		ts->channels[channelName]->setTopic(topic);
+		send_reply_channel(ts, channelName, ts->users[msg->getSD()], text, 0);
+	}
 }
 
 //INVITE
 // https://modern.ircdocs.horse/#invite-message
+// INVITE user123 #test
+// FD:5	:IRCQ+ 341 net user123 #test
+// FD:5	:user123!net@127.0.0.1 JOIN :#test
+// FD:6	:user123!net@127.0.0.1 JOIN :#test
+// FD:6	:IRCQ+ 332 user123 #test :
+// FD:6	:IRCQ+ 353 user123 = #test :@net user123
+// FD:6	:IRCQ+ 366 user123 #test :End of Names list
+
 void irc_invite(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "INVITE COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::cout << MAGENTA_COLOUR "INVITE COMMAND not fully supported" NO_COLOUR << std::endl; 
+	// if user exists and if user not in channel, join user to channel
+	if (msg->getParams().size() < 2)
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	std::string nick = msg->getParams()[0];
+	std::string channelName = msg->getParams()[1];
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == nick)
+		{
+			std::cerr << "User already in the channel" << std::endl;
+			return ;
+		}
+		else
+			std::cerr << "User " << it->second->getNick() << " in the channel" << std::endl;
+	}
+if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	{
+		std::cerr << "NICK or CHannel does not exist" << std::endl;
+		return ;
+	}
+	std::string	reply;
+	reply = "341 INVITE " + ts->users[msg->getSD()]->getNick() + " " + nick + " " + channelName;
+	send_reply(ts, msg->getSD(), NULL, reply, 0);
+	reply = "JOIN :" + channelName;
+	send_reply_channel(ts, channelName, ts->nicks[nick], reply, 0);
+	send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply, 0);
+	//add channel to multimap
+	ts->user2channel.insert(std::pair<std::string, Channel*>(nick, ts->channels[channelName]));
+	//add user to multimap
+	ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->nicks[nick]));
 }
 
 //KICK
@@ -605,6 +687,8 @@ void	server_loop(t_server ts)
 					ok_debugger(&(ts.debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts.sd), MYDEBUG);
 					close(ts.sd);
 					//REMOVE CONNECTION FROM MAP
+					if (user_ptr->getNick().size())
+						ts.nicks.erase(ts.nicks.find(user_ptr->getNick()));
 					delete user_ptr;
 					ts.users.erase(temp);
 				} 

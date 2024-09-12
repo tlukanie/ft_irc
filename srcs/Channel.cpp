@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/10 15:00:42 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/12 10:35:07 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,14 @@ Channel::Channel(std::string channelName)
 std::string	Channel::getChannelName(void)
 {
 	return (this->_channelName);
+}
+
+std::string	Channel::getTopic(void)
+{
+	return (this->_topic);
+}
+
+void	Channel::setTopic(std::string topic)
+{
+	this->_topic = topic;
 }

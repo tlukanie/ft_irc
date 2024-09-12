@@ -152,20 +152,23 @@
 
 <h4>Plan for 12.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>TOPIC</li>
-  <li>INVITE</li>
-  <li>send_reply function used for other messages</li>
+  <li><s>TOPIC</s></li>
+  <li><s>INVITE</s></li>
+  <li><s>send_reply_channel function</s></li>
+  <li><s>send_reply_others function</s></li>
 </ol>
 
 <h4>Plan for 13.09.24 (09:30-11:30 Prague time)</h4>
 <ol>
   <li>KICK</li>
   <li>AWAY</li>
+  <li>send_reply function used for other messages</li>
 </ol>
 
 <h4>Plan for 14.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
   <li>MODE</li>
+  <li>WHO</li>
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
@@ -179,6 +182,7 @@
 <h4>Plan for 16.09.24 (???? Prague time)</h4>
 <ol>
   <li>NOTICE ?</li>
+  <li>NICK</li>
   <li>...</li>
 </ol>
 
