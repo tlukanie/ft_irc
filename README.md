@@ -160,9 +160,8 @@
 
 <h4>Plan for 13.09.24 (09:30-11:30 Prague time)</h4>
 <ol>
-  <li>KICK</li>
-  <li>AWAY</li>
-  <li>send_reply function used for other messages</li>
+  <li><s>KICK</s></li>
+  <li><s>AWAY</s></li>
 </ol>
 
 <h4>Plan for 14.09.24 (14:30-16:30 Prague time)</h4>
@@ -174,9 +173,10 @@
 
 <h4>Plan for 15.09.24 (09:30-11:30 Prague time)</h4>
 <ol>
+  <li>Operator priviledges and user status in channel or user class? identify users by sd?</li>
   <li>PONG</li>
-  <li>server pinging users</li>
   <li>QUIT</li>
+  <li>server pinging users?</li>
 </ol>
 
 <h4>Plan for 16.09.24 (???? Prague time)</h4>
@@ -188,6 +188,8 @@
 
 <h4>Plan for the next week</h4>
 <ol>
+  <li>Update logic of replies so they always go through select</li>
+  <li>send_reply function used for other messages</li>
   <li>Too many socket descriptors over time</li>
   <li>Proper command handling</li>
   <li>Error codes</li>

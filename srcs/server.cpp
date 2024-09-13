@@ -293,6 +293,11 @@ void irc_join(Message* msg, struct s_server *ts)
 	}
 	std::string	channelName = msg->getParams()[0];
 	//check if the channel name valid
+	if (msg->getParams()[0][0] != '#' && msg->getParams()[0][0] != '@')
+	{
+		//not valid
+		return ;
+	}
 	//check if user can join the channel
 
 	//if the channel does not exist
@@ -469,7 +474,7 @@ void irc_invite(Message* msg, struct s_server *ts)
 		else
 			std::cerr << "User " << it->second->getNick() << " in the channel" << std::endl;
 	}
-if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
 	{
 		std::cerr << "NICK or CHannel does not exist" << std::endl;
 		return ;
@@ -488,11 +493,50 @@ if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) ==
 
 //KICK
 //https://modern.ircdocs.horse/#kick-message
+//  KICK #Finnish John :Speaking English
+//    :WiZ!jto@tolsun.oulu.fi KICK #Finnish John
 void irc_kick(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "KICK COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::cout << MAGENTA_COLOUR "KICK COMMAND not fully supported" NO_COLOUR << std::endl; 
+	if (msg->getParams().size() < 2)
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	std::string channelName = msg->getParams()[0];
+	std::string nick = msg->getParams()[1];
+	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	{
+		std::cerr << "NICK or CHannel does not exist" << std::endl;
+		return ;
+	}
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == nick)
+		{
+			//inform channel
+			std::string	reply;
+			reply = "KICK " + channelName + " " + nick;
+			if (msg->getParams().size() > 2)
+				reply += " :" + msg->getParams()[2];
+			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply, 0);
+			std::cerr << "Removing user from channel" << std::endl;
+			//remove user
+			ts->channel2user.erase(it);
+			for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.lower_bound(nick); iter != ts->user2channel.upper_bound(nick); iter++)
+			{
+				if (iter->second->getChannelName() == channelName)
+				{
+					ts->user2channel.erase(iter);
+					std::cerr << "Removing channel from user" << std::endl;
+					break ;
+				}
+			}
+			return ;
+		}
+	}
+	//user not in channel
 }
 
 
@@ -500,9 +544,20 @@ void irc_kick(Message* msg, struct s_server *ts)
 //https://modern.ircdocs.horse/#away-message
 void irc_away(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "AWAY COMMAND not supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	std::cout << MAGENTA_COLOUR "AWAY COMMAND not really supported" NO_COLOUR << std::endl;
+
+	if (!msg->getParams().size())
+	{
+		ts->users[msg->getSD()]->setAwayMessage("");
+		//reply unwaway
+		send_reply(ts, msg->getSD(), NULL, "305 " + ts->users[msg->getSD()]->getNick() + " :You are no longer marked as being away", 0);
+	}
+	else if (msg->getParams().size() == 1)
+	{
+		ts->users[msg->getSD()]->setAwayMessage(msg->getParams()[0]);
+		//reply nowaway
+		send_reply(ts, msg->getSD(), NULL, "306 " + ts->users[msg->getSD()]->getNick() + " :You have been marked as being away", 0);
+	}
 }
 
 
@@ -702,7 +757,7 @@ void	server_loop(t_server ts)
 						buff.push_back(ts.buffer[i]);
 					}
 					ok_debugger(&(ts.debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts.sd) + "]" + ok_display_buffer(&(ts.debugger), buff), MYDEBUG);
-
+					ok_debugger(&(ts.debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts.sd) + "]" + ok_display_real_buffer(&(ts.debugger), user_ptr->_data), MYDEBUG);
 					//while CRLF in data
 					// get position of the crlf
 					// if data overflow flag

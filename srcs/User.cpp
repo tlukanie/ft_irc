@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/11 11:15:12 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/13 10:20:46 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,16 @@ std::string	User::getRealName(void)
 void	User::setRealName(std::string realname)
 {
 	this->_realname = realname;
+}
+
+std::string	User::getAwayMessage(void)
+{
+	return (this->_awaymessage);
+}
+
+void	User::setAwayMessage(std::string awaymessage)
+{
+	this->_awaymessage = awaymessage;
 }
 
 bool	User::getOverflowFlag(void)

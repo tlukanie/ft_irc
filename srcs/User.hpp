@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/11 11:14:33 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/13 10:19:16 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class User
 		std::string		getHostName(void);
 		std::string		getServerName(void);
 		std::string		getRealName(void);
+		std::string		getAwayMessage(void);
 		bool			getOverflowFlag(void);
 		bool			getAuthFlag(void);
 		bool			getReadingFlag(void);
@@ -67,6 +68,7 @@ class User
 		void			setHostName(std::string hostname);
 		void			setServerName(std::string servername);
 		void			setRealName(std::string realname);
+		void			setAwayMessage(std::string awaymessage);
 		//methods
 		//extract message
 		//store in buffer
@@ -95,6 +97,7 @@ class User
 		std::string		_hostname;
 		std::string		_servername;
 		std::string		_realname;
+		std::string		_awaymessage;
 		// <username> <hostname> <servername> <realname>
 		//nick	
 		//username
