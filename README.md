@@ -164,24 +164,21 @@
   <li><s>AWAY</s></li>
 </ol>
 
-<h4>Plan for 14.09.24 (14:30-16:30 Prague time)</h4>
+<h4>Plan for 14.09.24 (11:30-13:30 Prague time)</h4>
 <ol>
-  <li>MODE</li>
-  <li>WHO</li>
-  <li>Logger/debugger used everywhere in the code</li>
+  <li><s>MODE +itkl</s></li>
 </ol>
 
 <h4>Plan for 15.09.24 (09:30-11:30 Prague time)</h4>
 <ol>
+  <li>MODE +o</li>
   <li>Operator priviledges and user status in channel or user class? identify users by sd?</li>
-  <li>PONG</li>
   <li>QUIT</li>
-  <li>server pinging users?</li>
+  <li>plan for next week</li>
 </ol>
 
-<h4>Plan for 16.09.24 (???? Prague time)</h4>
+<h4>Plan for 16.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>NOTICE ?</li>
   <li>NICK</li>
   <li>...</li>
 </ol>
@@ -195,6 +192,7 @@
   <li>Error codes</li>
   <li>Get rid of exit and other? functions that are not allowed</li>
   <li>Try-catch blocks for server breaking errors</li>
+  <li>Logger/debugger used everywhere in the code</li>
   <li>Logger/debugger goes through select()</li>
 </ol>
 
@@ -205,14 +203,13 @@
   <li>Add User class - User verified by password and with user details and nick maybe a child class of User</li>
   <li>Read through the modern irc specification (especially commands)</li>
   <li>Proper password command check</li>
-  <li>Create channels (class channel, assign user, client-channel objs)</li>
-  <li>Channel class and </li>
-  <li>2 (multi)maps of users and channels one with key on user another with key on channel</li>
   <li>Process more commands make them work in all scenarios</li>
   <li>Fix/check memory leaks and free everything that needs freeing</li>
-  <li>Get rid of exit and other? functions that are not allowed</li>
-  <li>Try-catch blocks for server breaking errors</li>
   <li>Check if the server can run on other IP than localhost</li>
+  <li>WHO</li>
+  <li>PONG</li>
+  <li>server pinging users?</li>
+  <li>NOTICE ?</li>
   <li>Transfer files</li>
   <li>Bot (magic 8ball "magic8bot") from our client</li>
   <li>new</li>

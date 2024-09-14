@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/12 10:35:07 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/14 12:37:52 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,10 @@ Channel::Channel(std::string channelName)
 	ft_uncolorize();
 	std::cout << std::endl;
 	this->_channelName = channelName;
+	this->_topic = "";
+	this->_key = "";	//password
+	this->_modeFlags = 0;
+	this->_channelLimit = 0;
 }
 
 std::string	Channel::getChannelName(void)
@@ -73,4 +77,39 @@ std::string	Channel::getTopic(void)
 void	Channel::setTopic(std::string topic)
 {
 	this->_topic = topic;
+}
+
+std::string	Channel::getKey(void)
+{
+	return (this->_key);
+}
+
+void	Channel::setKey(std::string key)
+{
+	this->_key = key;
+}
+
+unsigned int	Channel::getModeFlags(void)
+{
+	return (this->_modeFlags);
+}
+
+void	Channel::addModeFlags(unsigned int flag)
+{
+	this->_modeFlags |= flag;
+}
+
+void	Channel::removeModeFlags(unsigned int flag)
+{
+	this->_modeFlags &= ~flag;
+}
+
+int		Channel::getChannelLimit(void)
+{
+	return (this->_channelLimit);
+}
+
+void	Channel::setChannelLimit(int channelLimit)
+{
+	this->_channelLimit = channelLimit;
 }

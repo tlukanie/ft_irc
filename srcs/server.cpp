@@ -562,10 +562,131 @@ void irc_away(Message* msg, struct s_server *ts)
 
 
 
-// MODE net +i
+// MODE 
+// MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on channel #Finnish.
+// MODE #42 +k oulu                ; Set the channel key to "oulu".
+// MODE #eu-opers +l 10            ; Set the limit for the number of users on channel to 10.
+// MODE #Finnish +i               ; Makes #Finnish channel 'invite-only'.
+//  t - topic settable by channel operator only flag;
 //https://modern.ircdocs.horse/#mode-message
 //https://modern.ircdocs.horse/#channel-modes
 
+static bool isChannel(struct s_server *ts, std::string channelName)
+{
+	return (ts->channels.find(channelName) != ts->channels.end());
+}
+
+		// std::string		getKey(void);
+		// void			setKey(std::string key);
+		// unsigned int	getModeFlags(void);
+		// void			andModeFlags(unsigned int mask);
+		// void			orModeFlags(unsigned int mask);
+		// int				getChannelLimit(void);
+		// void			setChannelLimit(int channelLimit);
+void irc_mode(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "MODE COMMAND not really supported" NO_COLOUR << std::endl;
+	Channel *channel;
+	if (msg->getParams().size() < 2)
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		return ;
+	}
+	std::string channelName = msg->getParams()[0];
+	std::string	flags = msg->getParams()[1];
+	if (!channelName.size() || flags.size() < 2 || !isChannel(ts, channelName)
+		|| (flags[0] != '+' && flags[0] != '-'))
+	{
+		std::cerr << "NOT good parameters" << std::endl;
+		return ;
+	}
+	bool	plus = (flags[0] == '+');
+	//check channel as param[0]
+	//check plus or minus as param [1][0]
+	//check param[1][1]
+	channel = ts->channels[channelName];
+	if (flags[1] == 'i')
+	{
+		if (plus)
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is now invite only.", "", MYDEBUG);
+			channel->addModeFlags(CHANNEL_INVITE);
+		}
+		else
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is no longer invite only.", "", MYDEBUG);
+			channel->removeModeFlags(CHANNEL_INVITE);
+		}
+	}
+	else if (flags[1] == 't')
+	{
+		if (plus)
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by moderators only.", "", MYDEBUG);
+			channel->addModeFlags(CHANNEL_TOPIC);
+		}
+		else
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by anyone.", "", MYDEBUG);
+			channel->removeModeFlags(CHANNEL_TOPIC);
+		}
+	}
+	else if (flags[1] == 'k')
+	{
+		if (plus)
+		{
+			if (msg->getParams().size() < 3)
+			{
+				std::cerr << "NOT enough parameters" << std::endl;
+				return ;
+			}
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " locked by key:", msg->getParams()[2], MYDEBUG);
+			channel->setKey(msg->getParams()[2]);
+			channel->addModeFlags(CHANNEL_KEY);
+		}
+		else
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " unlocked.", "", MYDEBUG);
+			channel->setKey("");
+			channel->removeModeFlags(CHANNEL_KEY);
+		}
+	}
+	else if (flags[1] == 'l')
+	{
+		if (plus)
+		{
+			if (msg->getParams().size() < 3)
+			{
+				std::cerr << "NOT enough parameters" << std::endl;
+				return ;
+			}
+			int	limit = ok_strtoi<int>(msg->getParams()[2]);
+			if (limit < 2 || limit > 256)
+			{
+				std::cerr << "Invalid limit: " << limit << std::endl;
+				return ;
+			}
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " limited to " + ok_itostr(limit) + " users.", "", MYDEBUG);
+			channel->setChannelLimit(limit);
+			channel->addModeFlags(CHANNEL_LIMIT);
+		}
+		else
+		{
+			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " not limited.", "", MYDEBUG);
+			channel->setChannelLimit(0);
+			channel->removeModeFlags(CHANNEL_LIMIT);
+		}
+	}
+	else if (flags[1] == 'o')
+	{
+		std::cerr << "NOT supported...yet" << std::endl;
+	}
+	else
+	{
+		std::cerr << "NOT good parameters" << std::endl;
+		return ;
+	}
+}
 
 //PRIVMSG
 //https://modern.ircdocs.horse/#privmsg-message
@@ -588,7 +709,7 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 		//check if channel exists
 		if (ts->channels.find(channelName) == ts->channels.end())
 		{
-			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel: ", channelName, MYDEBUG);
+			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel:", channelName, MYDEBUG);
 			return ;
 		}
 		//send reply to all other users in the channel
@@ -618,10 +739,11 @@ void irc_notice(Message* msg, struct s_server *ts)
 	(void)ts;
 }
 
-
-void irc_mode(Message* msg, struct s_server *ts)
+//WHO
+// https://modern.ircdocs.horse/#who-message
+void irc_who(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "MODE COMMAND not supported" NO_COLOUR << std::endl; 
+	std::cout << MAGENTA_COLOUR "WHO COMMAND not supported" NO_COLOUR << std::endl; 
 	(void)msg;
 	(void)ts;
 }
@@ -986,6 +1108,7 @@ void	init_server(t_server ts)
 	ts.commands["INVITE"] = irc_invite;
 	ts.commands["KICK"] = irc_kick;
 	ts.commands["AWAY"] = irc_away;
+	ts.commands["WHO"] = irc_who;
 
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;

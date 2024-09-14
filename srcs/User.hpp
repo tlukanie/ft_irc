@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/13 10:19:16 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/13 11:13:33 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ class User
 		
 		// buffer string (octet string? vector?)
 
-		std::vector<uint8_t>	_data;
+		std::vector<uint8_t>	_data; //received data
+		std::vector<uint8_t>	_data_out; //data to send to client
 	private:
 		// ??? number of users?
 		//static int	users;
