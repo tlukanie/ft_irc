@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/14 12:37:52 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/15 10:32:34 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ Channel::~Channel(void)
 	}
 }
 
-Channel::Channel(std::string channelName)
+Channel::Channel(std::string channelName, unsigned short sd)
 {
 	ft_colorize(reinterpret_cast<uintptr_t>(this));
 	std::cout << "Overloaded constructor of the Channel class called.";
@@ -62,6 +62,7 @@ Channel::Channel(std::string channelName)
 	this->_key = "";	//password
 	this->_modeFlags = 0;
 	this->_channelLimit = 0;
+	this->_usersInChannel[sd] = true;
 }
 
 std::string	Channel::getChannelName(void)
@@ -112,4 +113,33 @@ int		Channel::getChannelLimit(void)
 void	Channel::setChannelLimit(int channelLimit)
 {
 	this->_channelLimit = channelLimit;
+}
+
+bool	Channel::isOperator(unsigned short sd)
+{
+	if (this->_usersInChannel.find(sd) != this->_usersInChannel.end())
+		return (this->_usersInChannel[sd]);
+	return (false); //should not happen?
+}
+
+void	Channel::addOperator(unsigned short sd)
+{
+	this->_usersInChannel[sd] = true;
+}
+
+void	Channel::removeOperator(unsigned short sd)
+{
+	this->_usersInChannel[sd] = false;
+}
+
+void	Channel::addUser(unsigned short sd)
+{
+	this->_usersInChannel[sd] = false;
+}
+
+int	Channel::removeUser(unsigned short sd)
+{
+	if (this->_usersInChannel.find(sd) != this->_usersInChannel.end())
+		this->_usersInChannel.erase(sd);
+	return (this->_usersInChannel.size());
 }

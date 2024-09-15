@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/14 12:28:23 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/15 10:30:48 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 //# include <cstddef>
 # include <iostream>
 # include <vector>
+# include <map>
 # include <stdint.h>
 // # include <fstream>
 // # include <sstream>
@@ -39,7 +40,7 @@ class Channel
 		Channel &operator	= (const Channel &src);
 		~Channel(void);
 
-		Channel(std::string channelName);
+		Channel(std::string channelName, unsigned short sd);
 		std::string		getChannelName(void);
 		std::string		getTopic(void);
 		void			setTopic(std::string topic);
@@ -50,13 +51,19 @@ class Channel
 		void			removeModeFlags(unsigned int flag);
 		int				getChannelLimit(void);
 		void			setChannelLimit(int channelLimit);
+		bool			isOperator(unsigned short sd);
+		void			addOperator(unsigned short sd);
+		void			removeOperator(unsigned short sd);
+		void			addUser(unsigned short sd);
+		int				removeUser(unsigned short sd);// returns number of users in the channel
 
 	private:
-		std::string		_channelName;
-		std::string		_topic;
-		std::string		_key;	//password
-		unsigned int	_modeFlags;
-		int				_channelLimit;
+		std::string						_channelName;
+		std::string						_topic;
+		std::string						_key;	//password
+		unsigned int					_modeFlags;
+		int								_channelLimit;
+		std::map<unsigned short, bool>	_usersInChannel;	//sd : op permission
 };
 
 #endif

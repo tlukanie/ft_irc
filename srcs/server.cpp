@@ -263,12 +263,15 @@ void irc_pong(Message* msg, struct s_server *ts)
 }
 
 // QUIT
+// :dan-!d@localhost QUIT :Quit: Bye for now!
 // https://modern.ircdocs.horse/#quit-message
 void irc_quit(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "QUIT COMMAND not supported" NO_COLOUR << std::endl; 
+	std::cout << MAGENTA_COLOUR "QUIT COMMAND not yet supported" NO_COLOUR << std::endl; 
 	(void)msg;
 	(void)ts;
+	//user leave all the channels they are in
+	//send quitting message to all uers that share the channels
 }
 
 
@@ -305,7 +308,7 @@ void irc_join(Message* msg, struct s_server *ts)
 	{
 		try
 		{
-			ts->channels[channelName] = new Channel(channelName);
+			ts->channels[channelName] = new Channel(channelName, msg->getSD());
 			ok_debugger(&(ts->debugger), INFO, "Creating channel: ", channelName, MYDEBUG);
 		}
 		catch(const std::exception& e)
@@ -576,6 +579,16 @@ static bool isChannel(struct s_server *ts, std::string channelName)
 	return (ts->channels.find(channelName) != ts->channels.end());
 }
 
+static bool isInChannel(struct s_server *ts, std::string channelName, std::string nick)
+{
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == nick)
+			return (true);
+	}
+	return (false);
+}
+
 		// std::string		getKey(void);
 		// void			setKey(std::string key);
 		// unsigned int	getModeFlags(void);
@@ -679,7 +692,28 @@ void irc_mode(Message* msg, struct s_server *ts)
 	}
 	else if (flags[1] == 'o')
 	{
-		std::cerr << "NOT supported...yet" << std::endl;
+		if (msg->getParams().size() < 3)
+		{
+			std::cerr << "NOT enough parameters" << std::endl;
+			return ;
+		}
+		std::string nick = msg->getParams()[2];
+		if (!isInChannel(ts, channelName, nick))
+		{
+			std::cerr << "Nick " << nick << " not in channel " << channelName << "." << std::endl;
+			return ;
+		}
+		
+		if (plus)
+		{
+			ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " added " + nick + " as an operator in the channel: " + channelName + "." , "", MYDEBUG);
+			channel->addOperator(ts->nicks[nick]->getSD());
+		}
+		else
+		{
+			ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " removed " + nick + " from operators in the channel: " + channelName + "." , "", MYDEBUG);
+			channel->removeOperator(ts->nicks[nick]->getSD());
+		}
 	}
 	else
 	{
@@ -1109,7 +1143,7 @@ void	init_server(t_server ts)
 	ts.commands["KICK"] = irc_kick;
 	ts.commands["AWAY"] = irc_away;
 	ts.commands["WHO"] = irc_who;
-
+	ts.commands["QUIT"] = irc_quit;
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;
 	// ts.commands[""] = irc_;

@@ -171,27 +171,82 @@
 
 <h4>Plan for 15.09.24 (09:30-11:30 Prague time)</h4>
 <ol>
-  <li>MODE +o</li>
-  <li>Operator priviledges and user status in channel or user class? identify users by sd?</li>
-  <li>QUIT</li>
-  <li>plan for next week</li>
+  <li><s>MODE +o</s></li>
+  <li><s>Operator priviledges and user status in channel or user class? identify users by sd?</s></li>
+  <li><s>Check if the server can run on other IP than localhost</s></li>
+  <li><s>plan for next week</s></li>
 </ol>
 
 <h4>Plan for 16.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>NICK</li>
-  <li>...</li>
+  <li>remove user from the channel</li>
+  <li>add user to the channel</li>
+  <li>remove user from the server (send error message)</li>
+  <li>QUIT</li>
+  <li>ERROR</li>
+</ol>
+
+<h4>Plan for 17.09.24 (9:30-11:30 Prague time)</h4>
+<ol>
+  <li>DEBUG - command (print info about Channel or User)</li>
+  <li>Update logic of replies so they always go through select</li>
+  <li>send_reply function used for other messages</li>
+</ol>
+
+<h4>Plan for 18.09.24 (16:30-18:30 Prague time)</h4>
+<ol>
+  <li>Get rid of exit and other? functions that are not allowed</li>
+  <li>Try-catch blocks for server breaking errors</li>
+</ol>
+
+
+<h4>Plan for 19.09.24 (9:30-11:30 Prague time)</h4>
+<ol>
+  <li>Proper command handling</li>
+  <li>Error codes</li>
+  <li>Logger/debugger used everywhere in the code</li>
+</ol>
+
+
+<h4>Plan for 20.09.24 (10:30-12:30 Prague time)</h4>
+<ol>
+  <li>Proper command handling</li>
+  <li>Error codes</li>
+  <li>Logger/debugger used everywhere in the code</li>
+</ol>
+
+
+<h4>Plan for 21.09.24 (14:30-16:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger goes through select()</li>
+  <li></li>
+</ol>
+
+<h4>Plan for 22.09.24 (10:30-12:30 Prague time)</h4>
+<ol>
+  <li></li>
+  <li></li>
+</ol>
+
+
+<h4>Plan for 23.09.24 (??? Prague time)</h4>
+<ol>
+  <li></li>
+  <li></li>
+</ol>
+
+
+<h4>Plan for 24.09.24 (??? Prague time)</h4>
+<ol>
+  <li></li>
+  <li></li>
 </ol>
 
 <h4>Plan for the next week</h4>
 <ol>
-  <li>Update logic of replies so they always go through select</li>
-  <li>send_reply function used for other messages</li>
-  <li>Too many socket descriptors over time</li>
+  <li>Add User class - User verified by password and with user details and nick maybe a child class of User</li>
   <li>Proper command handling</li>
   <li>Error codes</li>
-  <li>Get rid of exit and other? functions that are not allowed</li>
-  <li>Try-catch blocks for server breaking errors</li>
   <li>Logger/debugger used everywhere in the code</li>
   <li>Logger/debugger goes through select()</li>
 </ol>
@@ -200,12 +255,10 @@
 <ol>
   <li>Update client to test prefix, server validation of messages</li>
   <li>Create a second client. One will be automated another will take messages manually like telnet</li>
-  <li>Add User class - User verified by password and with user details and nick maybe a child class of User</li>
   <li>Read through the modern irc specification (especially commands)</li>
   <li>Proper password command check</li>
   <li>Process more commands make them work in all scenarios</li>
   <li>Fix/check memory leaks and free everything that needs freeing</li>
-  <li>Check if the server can run on other IP than localhost</li>
   <li>WHO</li>
   <li>PONG</li>
   <li>server pinging users?</li>
