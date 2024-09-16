@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/15 10:30:48 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/16 15:01:01 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class Channel
 		bool			isOperator(unsigned short sd);
 		void			addOperator(unsigned short sd);
 		void			removeOperator(unsigned short sd);
-		void			addUser(unsigned short sd);
+		int				addUser(unsigned short sd);
 		int				removeUser(unsigned short sd);// returns number of users in the channel
 
 	private:

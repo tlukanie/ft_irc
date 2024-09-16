@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/13 10:20:46 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/16 15:23:02 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ User::User(unsigned short sd, unsigned short port, std::string ip)
 		ft_uncolorize();
 		std::cout << std::endl;
 	}
+	this->_freedom = false;
 	this->_sd = sd;
 	this->_port = port;
 	this->_ip = ip;

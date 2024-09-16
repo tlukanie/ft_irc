@@ -179,11 +179,11 @@
 
 <h4>Plan for 16.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>remove user from the channel</li>
-  <li>add user to the channel</li>
-  <li>remove user from the server (send error message)</li>
-  <li>QUIT</li>
-  <li>ERROR</li>
+  <li><s>remove user from the channel</s></li>
+  <li><s>add user to the channel</s></li>
+  <li><s>remove user from the server (send error message)</s></li>
+  <li><s>QUIT</s></li>
+  <li><s>ERROR</s></li>
 </ol>
 
 <h4>Plan for 17.09.24 (9:30-11:30 Prague time)</h4>

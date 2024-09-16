@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/13 11:13:33 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/16 15:21:46 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class User
 		std::vector<uint8_t>	_data; //received data
 		std::vector<uint8_t>	_data_out; //data to send to client
 	private:
+		bool			_freedom; //set when user needs to be removed
 		// ??? number of users?
 		//static int	users;
 		// socket descriptor

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/15 10:32:34 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/16 15:01:23 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,9 +132,10 @@ void	Channel::removeOperator(unsigned short sd)
 	this->_usersInChannel[sd] = false;
 }
 
-void	Channel::addUser(unsigned short sd)
+int	Channel::addUser(unsigned short sd)
 {
 	this->_usersInChannel[sd] = false;
+	return (this->_usersInChannel.size());
 }
 
 int	Channel::removeUser(unsigned short sd)

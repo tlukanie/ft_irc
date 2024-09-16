@@ -28,6 +28,63 @@ size_t	ok_crlf_finder(std::vector<uint8_t> data)
 	return (0);
 }
 
+static int	remove_user_from_channel(struct s_server *ts, User *user, Channel *channel)
+{
+	std::string channelName = channel->getChannelName();
+	//remove user from multimap
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == user->getNick())
+		{
+			ok_debugger(&(ts->debugger), NOTICE, "Deleting user: ", it->second->getNick(), MYDEBUG);
+			ts->channel2user.erase(it);
+			break ;
+		}
+	}
+	// ts->user2channel.insert(std::pair<std::string, Channel*>(user->getNick(), ts->channels[channelName]));
+	//remove channel from multimap
+	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(user->getNick()); it != ts->user2channel.upper_bound(user->getNick()); it++)
+	{
+		if (it->second->getChannelName() == channelName)
+		{
+			ok_debugger(&(ts->debugger), NOTICE, "Deleting channel for user: ", channelName, MYDEBUG);
+			ts->user2channel.erase(it);
+			break ;
+		}
+	}
+	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, user));
+	//if no users in channel delete it
+	if (channel->removeUser(user->getSD()) == 0)
+	{
+		delete ts->channels[channelName];
+		ts->channels.erase(channelName);
+		ok_debugger(&(ts->debugger), INFO, "Deleting channel: ", channelName, MYDEBUG);
+	}
+	return (0);
+}
+
+static int	remove_user_from_server(struct s_server *ts, User *user)
+{
+	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(user->getNick()); it != ts->user2channel.upper_bound(user->getNick());)
+	{
+		std::multimap<std::string, Channel*>::iterator temp = it++;
+		remove_user_from_channel(ts, user, temp->second);
+	}
+	//user freedom = true;
+	return (0);
+}
+
+static int	add_user_to_channel(struct s_server *ts, User *user, Channel *channel)
+{
+	//add channel to multimap
+	ts->user2channel.insert(std::pair<std::string, Channel*>(user->getNick(), channel));
+	//add user to multimap
+	ts->channel2user.insert(std::pair<std::string, User*>(channel->getChannelName(), user));
+	if (channel->addUser(user->getSD()) == 1)
+		channel->addOperator(user->getSD());
+	return (0);
+}
+
 static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text, int flags)
 {
 	std::string	reply;
@@ -268,8 +325,12 @@ void irc_pong(Message* msg, struct s_server *ts)
 void irc_quit(Message* msg, struct s_server *ts)
 {
 	std::cout << MAGENTA_COLOUR "QUIT COMMAND not yet supported" NO_COLOUR << std::endl; 
-	(void)msg;
-	(void)ts;
+	// (void)msg;
+	// (void)ts;
+	remove_user_from_server(ts, ts->users[msg->getSD()]);
+	std::string	reply;
+	reply = "ERROR :Quitting channel";
+	send_reply(ts, msg->getSD(), NULL, reply, 0);
 	//user leave all the channels they are in
 	//send quitting message to all uers that share the channels
 }
@@ -317,6 +378,7 @@ void irc_join(Message* msg, struct s_server *ts)
 			std::cout << RED_COLOUR << channelName << NO_COLOUR << std::endl;
 			std::cout << REDBG_COLOUR " could not be created, because: " NO_COLOUR << std::endl;
 			std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+			return ;
 		}
 	}
 	else
@@ -324,12 +386,7 @@ void irc_join(Message* msg, struct s_server *ts)
 		ok_debugger(&(ts->debugger), DEBUG, "This channel already exists: ", channelName, MYDEBUG);
 	}
 		
-
-	//add channel to multimap
-	ts->user2channel.insert(std::pair<std::string, Channel*>(ts->users[msg->getSD()]->getNick(), ts->channels[channelName]));
-	//add user to multimap
-	ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->users[msg->getSD()]));
-
+	add_user_to_channel(ts, ts->users[msg->getSD()], ts->channels[channelName]);
 
 	// process the 4 parameters
 	// std::string	reply;
@@ -383,41 +440,7 @@ void irc_part(Message* msg, struct s_server *ts)
 			std::cout << "Reply message sent successfully" << std::endl;
 		}
 	}
-		
-
-	//remove user from multimap
-	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-	{
-		if (it->second->getNick() == ts->users[msg->getSD()]->getNick())
-		{
-			ok_debugger(&(ts->debugger), NOTICE, "Deleting user: ", it->second->getNick(), MYDEBUG);
-			ts->channel2user.erase(it);
-			break ;
-		}
-	}
-	// ts->user2channel.insert(std::pair<std::string, Channel*>(ts->users[msg->getSD()]->getNick(), ts->channels[channelName]));
-	//remove channel from multimap
-	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(ts->users[msg->getSD()]->getNick()); it != ts->user2channel.upper_bound(ts->users[msg->getSD()]->getNick()); it++)
-	{
-		if (it->second->getChannelName() == channelName)
-		{
-			ok_debugger(&(ts->debugger), NOTICE, "Deleting channel for user: ", channelName, MYDEBUG);
-			ts->user2channel.erase(it);
-			break ;
-		}
-	}
-	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->users[msg->getSD()]));
-	//if no users in channel delete it
-	if (ts->channel2user.find(channelName) == ts->channel2user.end())
-	{
-		delete ts->channels[channelName];
-		ts->channels.erase(channelName);
-		ok_debugger(&(ts->debugger), INFO, "Deleting channel: ", channelName, MYDEBUG);
-	}
-	// for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-	// {
-	// 	std::cout << "Users in channel: " << it->second->getNick() << std::endl;
-	// }
+	remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[channelName]);
 }
 
 //TOPIC
@@ -467,6 +490,12 @@ void irc_invite(Message* msg, struct s_server *ts)
 	}
 	std::string nick = msg->getParams()[0];
 	std::string channelName = msg->getParams()[1];
+
+	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	{
+		std::cerr << "NICK or CHannel does not exist" << std::endl;
+		return ;
+	}
 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
 	{
 		if (it->second->getNick() == nick)
@@ -477,21 +506,17 @@ void irc_invite(Message* msg, struct s_server *ts)
 		else
 			std::cerr << "User " << it->second->getNick() << " in the channel" << std::endl;
 	}
-	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
-	{
-		std::cerr << "NICK or CHannel does not exist" << std::endl;
-		return ;
-	}
 	std::string	reply;
 	reply = "341 INVITE " + ts->users[msg->getSD()]->getNick() + " " + nick + " " + channelName;
 	send_reply(ts, msg->getSD(), NULL, reply, 0);
 	reply = "JOIN :" + channelName;
 	send_reply_channel(ts, channelName, ts->nicks[nick], reply, 0);
 	send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply, 0);
-	//add channel to multimap
-	ts->user2channel.insert(std::pair<std::string, Channel*>(nick, ts->channels[channelName]));
-	//add user to multimap
-	ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->nicks[nick]));
+	// //add channel to multimap
+	// ts->user2channel.insert(std::pair<std::string, Channel*>(nick, ts->channels[channelName]));
+	// //add user to multimap
+	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->nicks[nick]));
+	add_user_to_channel(ts, ts->nicks[nick], ts->channels[channelName]);
 }
 
 //KICK
@@ -526,16 +551,17 @@ void irc_kick(Message* msg, struct s_server *ts)
 			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply, 0);
 			std::cerr << "Removing user from channel" << std::endl;
 			//remove user
-			ts->channel2user.erase(it);
-			for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.lower_bound(nick); iter != ts->user2channel.upper_bound(nick); iter++)
-			{
-				if (iter->second->getChannelName() == channelName)
-				{
-					ts->user2channel.erase(iter);
-					std::cerr << "Removing channel from user" << std::endl;
-					break ;
-				}
-			}
+			remove_user_from_channel(ts, ts->nicks[nick], ts->channels[channelName]);
+			// ts->channel2user.erase(it);
+			// for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.lower_bound(nick); iter != ts->user2channel.upper_bound(nick); iter++)
+			// {
+			// 	if (iter->second->getChannelName() == channelName)
+			// 	{
+			// 		ts->user2channel.erase(iter);
+			// 		std::cerr << "Removing channel from user" << std::endl;
+			// 		break ;
+			// 	}
+			// }
 			return ;
 		}
 	}
