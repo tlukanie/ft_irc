@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:08:26 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/13 10:54:01 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:26:17 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void		ok_debugger(s_debugger *debugger, DebugLvl globalLevel, std::string messag
 std::string	ok_display_reply(s_debugger *debugger, std::string reply);
 std::string	ok_display_buffer(s_debugger *debugger, std::string buff);
 std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> buff);
+std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff);
 std::string	ok_display_message(s_debugger *debugger, std::string msg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/16 15:01:01 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:42:34 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 
 # include "Message.hpp"
 # include "colours.hpp"
+# include "utils.hpp"
 
 # define CHANNEL_INVITE	1	// +i
 # define CHANNEL_TOPIC	2	// +t
@@ -56,6 +57,7 @@ class Channel
 		void			removeOperator(unsigned short sd);
 		int				addUser(unsigned short sd);
 		int				removeUser(unsigned short sd);// returns number of users in the channel
+		std::string		print(bool colour);
 
 	private:
 		std::string						_channelName;

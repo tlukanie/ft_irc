@@ -188,15 +188,15 @@
 
 <h4>Plan for 17.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
-  <li>DEBUG - command (print info about Channel or User)</li>
-  <li>Update logic of replies so they always go through select</li>
-  <li>send_reply function used for other messages</li>
+  <li><s>DEBUG - command (print info about Channel or User)</s></li>
+  <li><s>Get rid of exit and other? functions that are not allowed</s></li>
+  <li><s>Try-catch blocks for server breaking errors</s></li>
 </ol>
 
 <h4>Plan for 18.09.24 (16:30-18:30 Prague time)</h4>
 <ol>
-  <li>Get rid of exit and other? functions that are not allowed</li>
-  <li>Try-catch blocks for server breaking errors</li>
+  <li>Update logic of replies so they always go through select</li>
+  <li>send_reply function used for other messages</li>
 </ol>
 
 
@@ -231,15 +231,15 @@
 
 <h4>Plan for 23.09.24 (??? Prague time)</h4>
 <ol>
-  <li></li>
-  <li></li>
+  <li>Authorise users</li>
+  <li>Make sure nicks are unique</li>
 </ol>
 
 
 <h4>Plan for 24.09.24 (??? Prague time)</h4>
 <ol>
-  <li></li>
-  <li></li>
+  <li>Make buffers in user private</li>
+  <li>Check if all functions are allowed</li>
 </ol>
 
 <h4>Plan for the next week</h4>

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/16 15:01:23 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:54:59 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,4 +143,39 @@ int	Channel::removeUser(unsigned short sd)
 	if (this->_usersInChannel.find(sd) != this->_usersInChannel.end())
 		this->_usersInChannel.erase(sd);
 	return (this->_usersInChannel.size());
+}
+
+// std::string						_channelName;
+// std::string						_topic;
+// std::string						_key;	//password
+// unsigned int					_modeFlags;
+// int								_channelLimit;
+// std::map<unsigned short, bool>	_usersInChannel;	
+// # define CHANNEL_INVITE	1	// +i
+// # define CHANNEL_TOPIC	2	// +t
+// # define CHANNEL_KEY	4	// +k
+// # define CHANNEL_LIMIT	8	// +l
+std::string	Channel::print(bool colour)
+{
+	std::string	info;
+	std::string	clr;
+	std::string	clrbg;
+	std::string	end;
+
+	if (colour)
+	{
+		clr = CHANNEL_COLOUR;
+		clrbg = CHANNELBG_COLOUR;
+		end = NO_COLOUR;
+	}
+	info = "[" + clrbg + this->_channelName + end + "]\n";
+	info += "Topic: " + clr + this->_topic + end + "\n";
+	info += "Key: " + clr + this->_key + end + "\n";
+	info += "Channel limit: " + clr + ok_itostr(this->_channelLimit) + end + "\n";
+	info += "Invite only: " + clr + (this->_modeFlags & CHANNEL_INVITE ? "Y" : "N") + end + " | Topic by mods: " + clr + (this->_modeFlags & CHANNEL_TOPIC ? "Y" : "N") + end + " | Channel key: " + clr + (this->_modeFlags & CHANNEL_KEY ? "Y" : "N") + end + " | Channel limit: " + clr + (this->_modeFlags & CHANNEL_LIMIT ? "Y" : "N") + end + "\n";
+	for (std::map<unsigned short, bool>::iterator it = this->_usersInChannel.begin(); it != this->_usersInChannel.end(); it++)
+	{
+		info += "Sd: " + clr + ok_itostr(it->first) + end + (it->second ? " is a channel operator.\n" : " is not a channel operator.\n");
+	}
+	return (info);
 }

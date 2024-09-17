@@ -591,6 +591,7 @@ void irc_away(Message* msg, struct s_server *ts)
 
 
 
+
 // MODE 
 // MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on channel #Finnish.
 // MODE #42 +k oulu                ; Set the channel key to "oulu".
@@ -809,7 +810,33 @@ void irc_who(Message* msg, struct s_server *ts)
 }
 
 
-void	server_loop(t_server ts)
+//WHOIS == DEBUG
+void irc_whois(Message* msg, struct s_server *ts)
+{
+	std::cout << MAGENTA_COLOUR "WHOIS COMMAND is secret DEBUG" NO_COLOUR << std::endl;
+
+	if (!msg->getParams().size())
+	{
+		std::cerr << "NOT enough parameters" << std::endl;
+		//add reply error
+		return ;
+	}
+	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '@')
+	{
+		std::string channelName = msg->getParams()[0];
+		if (ts->channels.find(channelName) != ts->channels.end())
+			std::cout << ts->channels[channelName]->print(true) << std::endl;
+	}
+	else
+	{
+		std::string nick = msg->getParams()[0];
+		if (ts->nicks.find(nick) != ts->nicks.end())
+			std::cout << ts->nicks[nick]->print(true) << std::endl;
+	}
+}
+
+
+void	server_loop(t_server *ts)
 {
 	//set of socket descriptors 
 	fd_set readfds;
@@ -821,125 +848,126 @@ void	server_loop(t_server ts)
 	while(g_server_alive) 
 	{
 		if (DEEPDEBUG)
-			ok_debugger(&(ts.debugger), DEBUG, "While loop started...", "", MYDEBUG);
+			ok_debugger(&(ts->debugger), DEBUG, "While loop started...", "", MYDEBUG);
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
 		//add master socket to set 
-		FD_SET(ts.master_socket, &readfds); 
-		ts.max_sd = ts.master_socket; 
+		FD_SET(ts->master_socket, &readfds); 
+		ts->max_sd = ts->master_socket; 
 
 		//add connection sockets to set
 		//in the reading loop
-		// if (ts.state & READING_LOOP)
+		// if (ts->state & READING_LOOP)
 		// {
 		User * connection_ptr;
-		for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); it++)
+		for (std::map<int, User *>::iterator it = ts->users.begin(); it != ts->users.end(); it++)
 		{
 			//socket descriptor
-			ts.sd = it->first;
+			ts->sd = it->first;
 			connection_ptr = it->second;
 			// if (DEEPDEBUG)
-			// 	ok_debugger(&(ts.debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts.sd), MYDEBUG);
+			// 	ok_debugger(&(ts->debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts->sd), MYDEBUG);
 			if (connection_ptr->getReadingFlag())
 			{
-				FD_SET(ts.sd , &readfds);
+				FD_SET(ts->sd , &readfds);
 				// if (DEEPDEBUG)
-				// 	ok_debugger(&(ts.debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts.sd), MYDEBUG);
+				// 	ok_debugger(&(ts->debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts->sd), MYDEBUG);
 			}
 			else
 			{
-				FD_SET(ts.sd , &writefds);
+				FD_SET(ts->sd , &writefds);
 				// if (DEEPDEBUG)
-				// 	ok_debugger(&(ts.debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts.sd), MYDEBUG);
+				// 	ok_debugger(&(ts->debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts->sd), MYDEBUG);
 			}
-			if(ts.sd > ts.max_sd) 
-				ts.max_sd = ts.sd; 
+			if(ts->sd > ts->max_sd) 
+				ts->max_sd = ts->sd; 
 		}
-		// ok_debugger(&(ts.debugger), DEBUG, "Before select", "", MYDEBUG);
+		// ok_debugger(&(ts->debugger), DEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
-		// MAX(ts.master_socket, CONNECTIONS-highest key) + 1
+		// MAX(ts->master_socket, CONNECTIONS-highest key) + 1
 		// nfds   This argument should be set to the highest-numbered file 
 		// descriptor in any of the three sets, plus 1. The indicated file
 		// descriptors in each set are checked, up to this limit (but see
 		// BUGS).
-		ts.timeout.tv_sec = 15;
-		ts.timeout.tv_usec = 0;
-		ts.activity = select(ts.max_sd + 1, &readfds , &writefds , NULL , &ts.timeout);
-		// ok_debugger(&(ts.debugger), DEBUG, "After select", "", MYDEBUG);
+		ts->timeout.tv_sec = 15;
+		ts->timeout.tv_usec = 0;
+		ts->activity = select(ts->max_sd + 1, &readfds , &writefds , NULL , &ts->timeout);
+		// ok_debugger(&(ts->debugger), DEBUG, "After select", "", MYDEBUG);
 		//check later if allowed
-		if (ts.activity < 0) 
+		if (ts->activity < 0) 
 		{ 
-			ok_debugger(&(ts.debugger), ERROR, "Select error", ok_itostr(errno), MYDEBUG);
+			ok_debugger(&(ts->debugger), ERROR, "Select error", ok_itostr(errno), MYDEBUG);
 			continue ;
 		}
 		// IF SELECT RETURNS 0  MAYBE CONTINUE ???
 		// NEED TO CHECK THAT NO UNPROCESSED MESSAGES IN BUFFER
-		else if (!ts.activity)
+		else if (!ts->activity)
 			continue ;
 		//If something happened on the master socket , 
 		//then its an incoming connection 
-		if (FD_ISSET(ts.master_socket, &readfds)) 
+		if (FD_ISSET(ts->master_socket, &readfds)) 
 		{ 
-			if ((ts.new_socket = accept(ts.master_socket, 
-					(struct sockaddr *)&ts.address, (socklen_t*)&ts.addrlen))<0) 
+			if ((ts->new_socket = accept(ts->master_socket, 
+					(struct sockaddr *)&ts->address, (socklen_t*)&ts->addrlen))<0) 
 			{ 
-				ok_debugger(&(ts.debugger), ERROR, "Accept failed", ok_itostr(errno), MYDEBUG);
+				ok_debugger(&(ts->debugger), ERROR, "Accept failed", ok_itostr(errno), MYDEBUG);
 				// PROPER_EXIT
-				exit(EXIT_FAILURE); 
+				//exit(EXIT_FAILURE);
+				throw (std::runtime_error("Accept failed")); 
 			} 
 			
 			//inform user of socket number - used in send and receive commands 
 			//Information in constructor
-			ts.users.insert(std::pair<int, User*>(ts.new_socket, new User(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
+			ts->users.insert(std::pair<int, User*>(ts->new_socket, new User(ts->new_socket, ntohs(ts->address.sin_port), inet_ntoa(ts->address.sin_addr))));
 		} 
 			
 		//else its some IO operation on some other socket
 
 		//ITERATE OVER CONNECTIONS
 		// READING AND SENDING LOOP
-		// if (ts.state & READING_LOOP)
+		// if (ts->state & READING_LOOP)
 		// {
-		for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); /*iterating in loop*/)
+		for (std::map<int, User *>::iterator it = ts->users.begin(); it != ts->users.end(); /*iterating in loop*/)
 		{
 			std::map<int, User *>::iterator temp = it;
-			ts.sd = it->first;
+			ts->sd = it->first;
 			User * user_ptr = it->second;
 			it++;
 			// if (DEEPDEBUG)
-			// 	ok_debugger(&(ts.debugger), DEBUG, "Reading for loop ", ok_itostr(ts.sd), MYDEBUG);
+			// 	ok_debugger(&(ts->debugger), DEBUG, "Reading for loop ", ok_itostr(ts->sd), MYDEBUG);
 			//READ FROM READING FDS
-			if (FD_ISSET(ts.sd , &readfds)) 
+			if (FD_ISSET(ts->sd , &readfds)) 
 			{
-				// ok_debugger(&(ts.debugger), DEBUG, "SD is set: ", ok_itostr(ts.sd), MYDEBUG);
+				// ok_debugger(&(ts->debugger), DEBUG, "SD is set: ", ok_itostr(ts->sd), MYDEBUG);
 				//Check if it was for closing , and also read the 
 				//incoming message 
-				if ((ts.valread = recv(ts.sd , ts.buffer, 512, MSG_NOSIGNAL)) <= 0) 
+				if ((ts->valread = recv(ts->sd , ts->buffer, 512, MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
-					// getpeername(ts.sd, (struct sockaddr*)&ts.address, (socklen_t*)&ts.addrlen); 
-					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts.address.sin_addr)
-					// 	<< " , port : " << ntohs(ts.address.sin_port) << std::endl; 
+					// getpeername(ts->sd, (struct sockaddr*)&ts->address, (socklen_t*)&ts->addrlen); 
+					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
+					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
-					ok_debugger(&(ts.debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts.sd), MYDEBUG);
-					close(ts.sd);
+					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
+					close(ts->sd);
 					//REMOVE CONNECTION FROM MAP
 					if (user_ptr->getNick().size())
-						ts.nicks.erase(ts.nicks.find(user_ptr->getNick()));
+						ts->nicks.erase(ts->nicks.find(user_ptr->getNick()));
 					delete user_ptr;
-					ts.users.erase(temp);
+					ts->users.erase(temp);
 				} 
 				//Print the message that came in 
 				else
 				{
 					std::string	buff;
-					for (int i = 0; i < ts.valread; i++)
+					for (int i = 0; i < ts->valread; i++)
 					{
-						user_ptr->_data.push_back(ts.buffer[i]);
-						buff.push_back(ts.buffer[i]);
+						user_ptr->_data.push_back(ts->buffer[i]);
+						buff.push_back(ts->buffer[i]);
 					}
-					ok_debugger(&(ts.debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts.sd) + "]" + ok_display_buffer(&(ts.debugger), buff), MYDEBUG);
-					ok_debugger(&(ts.debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts.sd) + "]" + ok_display_real_buffer(&(ts.debugger), user_ptr->_data), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data), MYDEBUG);
 					//while CRLF in data
 					// get position of the crlf
 					// if data overflow flag
@@ -966,7 +994,7 @@ void	server_loop(t_server ts)
 						msg.assign(user_ptr->_data.begin(), user_ptr->_data.begin() + pos - 2);
 						if (DEEPDEBUG)
 						{
-							ok_debugger(&(ts.debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
+							ok_debugger(&(ts->debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
 							// std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
 							// std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
 						}
@@ -978,8 +1006,8 @@ void	server_loop(t_server ts)
 						// catch exception and throw away
 						try
 						{
-							ts.messages.insert(std::pair<int, Message*>(ts.sd, new Message(ts.sd, msg)));
-							// ts.state = SENDING_LOOP;
+							ts->messages.insert(std::pair<int, Message*>(ts->sd, new Message(ts->sd, msg)));
+							// ts->state = SENDING_LOOP;
 							user_ptr->unsetReadingFlag();
 						}
 						catch(const std::exception& e)
@@ -1015,16 +1043,16 @@ void	server_loop(t_server ts)
 					}
 				}
 			}
-			else if (FD_ISSET(ts.sd , &writefds))
+			else if (FD_ISSET(ts->sd , &writefds))
 			{
 				// SEND TO WRITING FDS
 				// SEND WITH YELLOW COLOUR
-					// for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop */)
+					// for (std::multimap<int, Message*>::iterator it = ts->messages.begin(); it != ts->messages.end(); /*iterating in the loop */)
 					// {
 				std::multimap<int, Message*>::iterator iter;
-				iter = ts.messages.find(ts.sd);
+				iter = ts->messages.find(ts->sd);
 				//if we processed all messages
-				if (iter == ts.messages.end())
+				if (iter == ts->messages.end())
 				{
 					user_ptr->setReadingFlag();
 					continue ;
@@ -1033,11 +1061,11 @@ void	server_loop(t_server ts)
 
 				// find if the command is in commands
 				//	execute
-				if (ts.commands.find(msg_ptr->getCommand()) != ts.commands.end())
+				if (ts->commands.find(msg_ptr->getCommand()) != ts->commands.end())
 				{
-					ok_debugger(&(ts.debugger), DEBUG, "Executing command:", "[" + ok_itostr(msg_ptr->getSD()) + "]" + ok_display_message(&(ts.debugger), msg_ptr->getMessage()), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Executing command:", "[" + ok_itostr(msg_ptr->getSD()) + "]" + ok_display_message(&(ts->debugger), msg_ptr->getMessage()), MYDEBUG);
 					//maybe run in try and catch block
-					ts.commands[msg_ptr->getCommand()](msg_ptr, &ts);
+					ts->commands[msg_ptr->getCommand()](msg_ptr, ts);
 				}
 				else
 				{
@@ -1046,7 +1074,7 @@ void	server_loop(t_server ts)
 				}
 				// std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
 				delete msg_ptr;
-				ts.messages.erase(iter);
+				ts->messages.erase(iter);
 			}
 			else
 			{
@@ -1055,10 +1083,17 @@ void	server_loop(t_server ts)
 			}
 		}
 	}
+}
+
+
+
+//clean server
+void	clean_server(t_server *ts)
+{
 	if (DEEPDEBUG)
-		ok_debugger(&(ts.debugger), WARNING, "Main loop terminating...", "", MYDEBUG);
+		ok_debugger(&(ts->debugger), WARNING, "Main loop terminating...", "", MYDEBUG);
 	// ITERATE OVER MAP AND DELETE EVERYTHING
-	for (std::map<int, User *>::iterator it = ts.users.begin(); it != ts.users.end(); /*iterating in the loop*/)
+	for (std::map<int, User *>::iterator it = ts->users.begin(); it != ts->users.end(); /*iterating in the loop*/)
 	{
 		if (DEEPDEBUG)
 		{
@@ -1070,9 +1105,9 @@ void	server_loop(t_server ts)
 		delete it->second;
 		std::map<int, User *>::iterator temp = it;
 		it++;
-		ts.users.erase(temp);
+		ts->users.erase(temp);
 	}
-	for (std::multimap<int, Message*>::iterator it = ts.messages.begin(); it != ts.messages.end(); /*iterating in the loop*/)
+	for (std::multimap<int, Message*>::iterator it = ts->messages.begin(); it != ts->messages.end(); /*iterating in the loop*/)
 	{
 		if (DEEPDEBUG)
 		{
@@ -1082,9 +1117,9 @@ void	server_loop(t_server ts)
 		delete it->second;
 		std::multimap<int, Message*>::iterator temp = it;
 		it++;
-		ts.messages.erase(temp);
+		ts->messages.erase(temp);
 	}
-	for (std::map<std::string, Channel *>::iterator it = ts.channels.begin(); it != ts.channels.end(); /*iterating in the loop*/)
+	for (std::map<std::string, Channel *>::iterator it = ts->channels.begin(); it != ts->channels.end(); /*iterating in the loop*/)
 	{
 		if (DEEPDEBUG)
 		{
@@ -1094,96 +1129,100 @@ void	server_loop(t_server ts)
 		delete it->second;
 		std::map<std::string, Channel *>::iterator temp = it;
 		it++;
-		ts.channels.erase(temp);
+		ts->channels.erase(temp);
 	}
 	//erase multimaps?
 }
 
 // create map of commands and pointers to functions to process them
-void	init_server(t_server ts)
+void	init_server(t_server *ts)
 {
-	ts.opt = TRUE;
+	ts->opt = TRUE;
 	//create a master socket 
-	if( (ts.master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
+	if( (ts->master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
 	{
-		ok_debugger(&(ts.debugger), ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
-		exit(EXIT_FAILURE); 
+		ok_debugger(&(ts->debugger), ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
+		//exit(EXIT_FAILURE);
+		throw (std::runtime_error("Socket failed")); 
 	} 
 	
 	//server starts by listening for new users
-	ts.state = READING_LOOP;
+	ts->state = READING_LOOP;
 
 	//wait for an activity on one of the sockets , timeout is not NULL
 	// so it is non blocking
 	//timeout set for 15 s 0 ms
-	ts.timeout.tv_sec = 15;
-	ts.timeout.tv_usec = 0;
+	ts->timeout.tv_sec = 15;
+	ts->timeout.tv_usec = 0;
 
 	//set master socket to allow multiple users , 
 	//this is just a good habit, it will work without this 
-	if( setsockopt(ts.master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&ts.opt, 
-		sizeof(ts.opt)) < 0 ) 
+	if( setsockopt(ts->master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&ts->opt, 
+		sizeof(ts->opt)) < 0 ) 
 	{ 
-		ok_debugger(&(ts.debugger), ERROR, "Setsockopt failed", ok_itostr(errno), MYDEBUG);
-		exit(EXIT_FAILURE); 
+		ok_debugger(&(ts->debugger), ERROR, "Setsockopt failed", ok_itostr(errno), MYDEBUG);
+		//exit(EXIT_FAILURE);
+		throw (std::runtime_error("Setsockopt failed")); 
 	} 
 	
 	//type of socket created 
-	ts.address.sin_family = AF_INET; 
-	ts.address.sin_addr.s_addr = INADDR_ANY; //is it localhost or any IP address on the machine?
-	ts.address.sin_port = htons(ts.port); 
+	ts->address.sin_family = AF_INET; 
+	ts->address.sin_addr.s_addr = INADDR_ANY; //is it localhost or any IP address on the machine?
+	ts->address.sin_port = htons(ts->port); 
 		
 	//bind the socket to localhost port 8888 
-	if (bind(ts.master_socket, (struct sockaddr *)&ts.address, sizeof(ts.address))<0) 
+	if (bind(ts->master_socket, (struct sockaddr *)&ts->address, sizeof(ts->address))<0) 
 	{ 
-		ok_debugger(&(ts.debugger), ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
-		exit(EXIT_FAILURE); 
+		ok_debugger(&(ts->debugger), ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
+		//exit(EXIT_FAILURE);
+		throw (std::runtime_error("Bind failed")); 
 	}
-	ok_debugger(&(ts.debugger), INFO, std::string("Listening on port: ") + ok_itostr(ts.port), "", MYDEBUG);
-
+	ok_debugger(&(ts->debugger), INFO, std::string("Listening on port: ") + ok_itostr(ts->port), "", MYDEBUG);
 	//try to specify maximum of 3 pending users for the master socket 
-	if (listen(ts.master_socket, 3) < 0) 
+	if (listen(ts->master_socket, 3) < 0) 
 	{ 
-		ok_debugger(&(ts.debugger), ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
-		exit(EXIT_FAILURE); 
+		ok_debugger(&(ts->debugger), ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
+		//exit(EXIT_FAILURE);
+		throw (std::runtime_error("Listen failed")); 
 	} 
 		
 	//accept the incoming connection 
-	ts.addrlen = sizeof(ts.address); 
-	ok_debugger(&(ts.debugger), INFO, "Waiting for users ...", "", MYDEBUG);
+	ts->addrlen = sizeof(ts->address); 
+	ok_debugger(&(ts->debugger), INFO, "Waiting for users ...", "", MYDEBUG);
 
 	//add commands
-	ts.commands["CAP"] = irc_cap;
-	ts.commands["PASS"] = irc_pass;
-	ts.commands["NICK"] = irc_nick;
-	ts.commands["USER"] = irc_user;
-	ts.commands["PING"] = irc_ping;
-	ts.commands["PONG"] = irc_pong;
-	ts.commands["MODE"] = irc_mode;
-	ts.commands["JOIN"] = irc_join;
-	ts.commands["PART"] = irc_part;
-	ts.commands["PRIVMSG"] = irc_privmsg;
-	ts.commands["NOTICE"] = irc_notice;
-	ts.commands["TOPIC"] = irc_topic;
-	ts.commands["INVITE"] = irc_invite;
-	ts.commands["KICK"] = irc_kick;
-	ts.commands["AWAY"] = irc_away;
-	ts.commands["WHO"] = irc_who;
-	ts.commands["QUIT"] = irc_quit;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
-	// ts.commands[""] = irc_;
+	ts->commands["CAP"] = irc_cap;
+	ts->commands["PASS"] = irc_pass;
+	ts->commands["NICK"] = irc_nick;
+	ts->commands["USER"] = irc_user;
+	ts->commands["PING"] = irc_ping;
+	ts->commands["PONG"] = irc_pong;
+	ts->commands["MODE"] = irc_mode;
+	ts->commands["JOIN"] = irc_join;
+	ts->commands["PART"] = irc_part;
+	ts->commands["PRIVMSG"] = irc_privmsg;
+	ts->commands["NOTICE"] = irc_notice;
+	ts->commands["TOPIC"] = irc_topic;
+	ts->commands["INVITE"] = irc_invite;
+	ts->commands["KICK"] = irc_kick;
+	ts->commands["AWAY"] = irc_away;
+	ts->commands["WHO"] = irc_who;
+	ts->commands["WHOIS"] = irc_whois; //debug
+	ts->commands["QUIT"] = irc_quit;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
+	// ts->commands[""] = irc_;
 
-	// ok_debugger(&(ts.debugger), DEBUG, "This is a debug message", "", MYDEBUG);
-	// ok_debugger(&(ts.debugger), INFO, "This is an info message", "", MYDEBUG);
-	// ok_debugger(&(ts.debugger), NOTICE, "This is a notice message", "", MYDEBUG);
-	// ok_debugger(&(ts.debugger), WARNING, "This is a warning message", "", MYDEBUG);
-	// ok_debugger(&(ts.debugger), ERROR, "This is an error message", "", MYDEBUG);
+	// ok_debugger(&(ts->debugger), DEBUG, "This is a debug message", "", MYDEBUG);
+	// ok_debugger(&(ts->debugger), INFO, "This is an info message", "", MYDEBUG);
+	// ok_debugger(&(ts->debugger), NOTICE, "This is a notice message", "", MYDEBUG);
+	// ok_debugger(&(ts->debugger), WARNING, "This is a warning message", "", MYDEBUG);
+	// ok_debugger(&(ts->debugger), ERROR, "This is an error message", "", MYDEBUG);
 	//main server loop
 	server_loop(ts);
 }
@@ -1439,7 +1478,17 @@ int	main(int argc , char *argv[])
 		ts.password = argv[2];
 	}
 	ok_debugger(&(ts.debugger), NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debugger.debuglvl), "", MYDEBUG);
-	init_server(ts);
+	try
+	{
+		init_server(&ts);
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		clean_server(&ts);
+		return (1);
+	}
+	clean_server(&ts);
 	//try init server
 	// catch
 	//	return 1;

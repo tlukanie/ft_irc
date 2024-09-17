@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/11 11:00:14 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:30:19 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,9 @@
 # define READING_LOOP 1
 # define SENDING_LOOP 2
 # define CRLF "\r\n"
+
+class User;
+class Channel;
 
 typedef struct s_debugger {
 	bool		date;

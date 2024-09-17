@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/16 15:21:46 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:28:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 
 # include "Message.hpp"
 # include "colours.hpp"
+# include "debugger.hpp"
+# include "utils.hpp"
 
 # define RECEIVING true
 # define SENDING false
@@ -69,6 +71,7 @@ class User
 		void			setServerName(std::string servername);
 		void			setRealName(std::string realname);
 		void			setAwayMessage(std::string awaymessage);
+		std::string		print(bool colour);
 		//methods
 		//extract message
 		//store in buffer

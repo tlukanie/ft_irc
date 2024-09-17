@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/13 10:53:39 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 11:10:56 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,6 +266,33 @@ std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> bu
 	if (debugger->colour)
 	{
 		str = "[" BLUE_COLOUR + ascii_buff + NO_COLOUR GREY_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_buff + "]";
+	}
+	return (str);
+}
+
+std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff)
+{
+	std::string	str;
+	std::string	ascii_buff;
+
+	for (std::vector<uint8_t>::iterator it = buff.begin(); it != buff.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_buff += *it;
+		else if (*it == '\n')
+			ascii_buff += "␤";
+		else if (*it == '\r')
+			ascii_buff += "␍";
+		else
+			ascii_buff += "�";
+	}
+	if (colour)
+	{
+		str = "[" BLUE_COLOUR + ascii_buff + NO_COLOUR "]";
 	}
 	else
 	{

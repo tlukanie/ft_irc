@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/16 15:23:02 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 11:05:45 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,9 @@ std::string	User::getNick(void)
 
 void	User::setNick(std::string nick)
 {
+	std::cout << "Changing nick: " << this->_nick << " to " << nick << "." << std::endl;
 	this->_nick = nick;
+	std::cout << "Nick is now: " << this->_nick << "." << std::endl;
 }
 
 std::string	User::getUserName(void)
@@ -200,3 +202,45 @@ void	User::unsetReadingFlag(void)
 	this->_reading_flag = false;
 }
 
+
+// bool			_freedom; //set when user needs to be removed
+// unsigned short	_sd;
+// unsigned short	_port;
+// std::string		_ip;
+// bool			_auth_flag; 
+// bool			_reading_flag;
+// bool			_data_overflow_flag;
+// int				_strikecount;
+// std::string		_nick;
+// std::string		_username;
+// std::string		_hostname;
+// std::string		_servername;
+// std::string		_realname;
+// std::string		_awaymessage;
+
+std::string	User::print(bool colour)
+{
+	std::string	info;
+	std::string	clr;
+	std::string	clrbg;
+	std::string	end;
+
+	if (colour)
+	{
+		clr = USER_COLOUR;
+		clrbg = USERBG_COLOUR;
+		end = NO_COLOUR;
+	}
+	info = "[" + clrbg + this->_nick + end + "]\n";
+	info += "sd: " + clr + ok_itostr(this->_sd) + end + " | IP: " + clr + this->_ip + end + " | Port: " + clr+ ok_itostr(this->_port) + end + "\n";
+	info += "Authorized: " + clr + (this->_auth_flag ? "Y" : "N") + end + " | Reading: " + clr + (this->_reading_flag ? "Y" : "N") + end + " | Data overflow: " + clr + (this->_data_overflow_flag ? "Y" : "N") + end + "\n";
+	info += "Strike counter: " + clr + ok_itostr(this->_strikecount) + end + "\n";
+	info += "Username: " + clr + this->_username + end + "\n";
+	info += "Hostname: " + clr + this->_hostname + end + "\n";
+	info += "Servername: " + clr + this->_servername + end + "\n";
+	info += "Real name: " + clr + this->_realname + end + "\n";
+	info += "Away message: " + clr + this->_awaymessage + end + "\n";
+	info += "Buffer In : " + ok_display_real_buffer(colour, this->_data) + "\n";
+	info += "Buffer Out: " + ok_display_real_buffer(colour, this->_data_out);
+	return (info);
+}

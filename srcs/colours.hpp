@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:22:51 by okraus            #+#    #+#             */
-/*   Updated: 2024/08/25 16:04:33 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/17 10:12:18 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,10 @@
 # define WHITE_COLOUR "\033[1;38:5:231m"
 # define GREY_COLOUR "\033[1;38:5:246m"
 # define BLACK_COLOUR "\033[1;38:5:0m"
+# define USERBG_COLOUR "\033[1;38:5:0;48:5:148m"
+# define USER_COLOUR "\033[1;38:5:148m"
+# define CHANNELBG_COLOUR "\033[1;38:5:0;48:5:147m"
+# define CHANNEL_COLOUR "\033[1;38:5:147m"
 # define NO_COLOUR "\033[0m"
 
 void		ft_colorize(uintptr_t i);
