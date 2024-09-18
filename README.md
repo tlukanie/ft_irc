@@ -195,8 +195,8 @@
 
 <h4>Plan for 18.09.24 (16:30-18:30 Prague time)</h4>
 <ol>
-  <li>Update logic of replies so they always go through select</li>
-  <li>send_reply function used for other messages</li>
+  <li><s>Update logic of replies so they always go through select</s></li>
+  <li><s>send_reply function used for other messages</s></li>
 </ol>
 
 

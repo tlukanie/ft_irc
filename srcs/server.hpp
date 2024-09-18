@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/17 10:30:19 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/18 17:25:30 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@
 
 # define READING_LOOP 1
 # define SENDING_LOOP 2
+# define BUFFER_SIZE 512
 # define CRLF "\r\n"
 
 class User;
@@ -80,6 +81,7 @@ typedef struct s_server {
 	int															new_socket;
 	int															activity;
 	int															valread;
+	int															valsent;
 	int															sd;
 	int															max_sd;
 	int															state;

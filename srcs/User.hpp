@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/17 10:28:04 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/18 17:22:23 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ class User
 		std::string		_ip;
 		// reading or writing mode
 		bool			_auth_flag; //valid password and unique nick and so on
-		bool			_reading_flag;
+		bool			_reading_flag; //maybe useless
 		// flag for invalid buffer (too much data without separator)
 		bool			_data_overflow_flag;
 		// strike count for number of invalid messages in a row???

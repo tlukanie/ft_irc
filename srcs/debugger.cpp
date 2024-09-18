@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/17 11:10:56 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/18 18:14:57 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,7 @@ std::string	ok_display_reply(s_debugger *debugger, std::string reply)
 	}
 	if (debugger->colour)
 	{
-		str = "[" YELLOW_COLOUR + ascii_reply + NO_COLOUR GREY_COLOUR "]";
+		str = "[" ORANGE_COLOUR + ascii_reply + NO_COLOUR GREY_COLOUR "]";
 	}
 	else
 	{
@@ -293,6 +293,33 @@ std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff)
 	if (colour)
 	{
 		str = "[" BLUE_COLOUR + ascii_buff + NO_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_buff + "]";
+	}
+	return (str);
+}
+
+std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> buff)
+{
+	std::string	str;
+	std::string	ascii_buff;
+
+	for (std::vector<uint8_t>::iterator it = buff.begin(); it != buff.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_buff += *it;
+		else if (*it == '\n')
+			ascii_buff += "␤";
+		else if (*it == '\r')
+			ascii_buff += "␍";
+		else
+			ascii_buff += "�";
+	}
+	if (colour)
+	{
+		str = "[" YELLOW_COLOUR + ascii_buff + NO_COLOUR GREY_COLOUR "]";
 	}
 	else
 	{

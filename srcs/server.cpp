@@ -85,7 +85,7 @@ static int	add_user_to_channel(struct s_server *ts, User *user, Channel *channel
 	return (0);
 }
 
-static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text, int flags)
+static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text)
 {
 	std::string	reply;
 
@@ -93,31 +93,27 @@ static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std
 		reply += ":" + Sender->getNick() + "!" + Sender->getUserName() + "@" + Sender->getIP() + " ";
 	reply += text + CRLF;
 	ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(sd) + "]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-	if(send(sd, reply.c_str(), reply.length(), flags) != (ssize_t)reply.length())
-	{ 
-		std::cerr << "send failed" << std::endl;
-	} 
-	else
+	for (std::string::iterator it = reply.begin(); it != reply.end(); it++)
 	{
-		std::cout << "Reply message sent successfully" << std::endl;
+		ts->users[sd]->_data_out.push_back(*it);
 	}
 }
 
-static void	send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
+static void	send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text)
 {
 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
 	{
-		send_reply(ts, it->second->getSD(), Sender, text, flags);
+		send_reply(ts, it->second->getSD(), Sender, text);
 	}
 }
 
-// static void	send_reply_others(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
+// static void	send_reply_others(struct s_server *ts, std::string channelName, User *Sender, std::string text)
 // {
 // 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
 // 	{
 // 		if (it->second->getNick() != ts->users[Sender->getSD()]->getNick())
 // 		{
-// 			send_reply(ts, it->second->getSD(), Sender, text, flags);
+// 			send_reply(ts, it->second->getSD(), Sender, text);
 // 		}
 // 	}
 // }
@@ -159,15 +155,8 @@ void irc_pass(Message* msg, struct s_server *ts)
 		// ERR_PASSWDMISMATCH (464)
 		std::cerr << RED_COLOUR "wrong password" NO_COLOUR << std::endl;
 		reply = ":IRC 464  :Wrong password try again" CRLF;
-		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);		
-		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-		{ 
-			std::cerr << "send failed" << std::endl;
-		} 
-		else
-		{
-			std::cout << "Reply message sent successfully" << std::endl;
-		}
+		send_reply(ts, msg->getSD(), NULL, reply);
+		//do properly?
 		close(msg->getSD());
 		ts->users.erase(ts->users.find(msg->getSD()));
 	}
@@ -226,16 +215,16 @@ void irc_nick(Message* msg, struct s_server *ts)
 		//send to all?
 		//:net!net@127.0.0.1 << need to be not hardcoded
 		reply = ":" + oldnick + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
-		reply += " NICK :" +  ts->users[msg->getSD()]->getNick() + CRLF;
-		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-		{ 
-			std::cerr << "send failed" << std::endl;
-		} 
-		else
-		{
-			std::cout << "Reply message sent successfully" << std::endl;
-		}
+		reply += " NICK :" +  ts->users[msg->getSD()]->getNick();
+		send_reply(ts, msg->getSD(), NULL, reply);
+		// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+		// { 
+		// 	std::cerr << "send failed" << std::endl;
+		// } 
+		// else
+		// {
+		// 	std::cout << "Reply message sent successfully" << std::endl;
+		// }
 	}
 
 	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
@@ -272,16 +261,16 @@ void irc_user(Message* msg, struct s_server *ts)
 	// process the 4 parameters
 	std::string	reply;
 	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
-	reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there" + CRLF;
-	ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-	{ 
-		std::cerr << "send failed" << std::endl;
-	} 
-	else
-	{
-		std::cout << "Reply message sent successfully" << std::endl;
-	}
+	reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+	send_reply(ts, msg->getSD(), NULL, reply);
+	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	// { 
+	// 	std::cerr << "send failed" << std::endl;
+	// } 
+	// else
+	// {
+	// 	std::cout << "Reply message sent successfully" << std::endl;
+	// }
 }
 
 // PING
@@ -297,17 +286,16 @@ void irc_ping(Message* msg, struct s_server *ts)
 
 	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
 	
-	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0] + CRLF;
-	ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-	
-	if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-	{ 
-		std::cerr << "send failed" << std::endl;
-	} 
-	else
-	{
-		std::cout << "Reply message sent successfully" << std::endl;
-	}
+	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0];
+	send_reply(ts, msg->getSD(), NULL, reply);
+	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	// { 
+	// 	std::cerr << "send failed" << std::endl;
+	// } 
+	// else
+	// {
+	// 	std::cout << "Reply message sent successfully" << std::endl;
+	// }
 }
 
 // PONG
@@ -329,8 +317,8 @@ void irc_quit(Message* msg, struct s_server *ts)
 	// (void)ts;
 	remove_user_from_server(ts, ts->users[msg->getSD()]);
 	std::string	reply;
-	reply = "ERROR :Quitting channel";
-	send_reply(ts, msg->getSD(), NULL, reply, 0);
+	reply = "ERROR :Quitting channel" CRLF;
+	send_reply(ts, msg->getSD(), NULL, reply);
 	//user leave all the channels they are in
 	//send quitting message to all uers that share the channels
 }
@@ -391,7 +379,7 @@ void irc_join(Message* msg, struct s_server *ts)
 	// process the 4 parameters
 	// std::string	reply;
 	// std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
-	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there" + CRLF;
+	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
 	// ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
 	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 	// { 
@@ -429,16 +417,16 @@ void irc_part(Message* msg, struct s_server *ts)
 	{
 		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelName, MYDEBUG);
 		reply = ":" + ts->users[msg->getSD()]->getNick() + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
-		reply += " PART " + channelName + " :" + (msg->getParams().size() > 1 ? msg->getParams()[1] : std::string("leaving")) + CRLF;
-		ok_debugger(&(ts->debugger), DEBUG, "[SD]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-		if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-		{ 
-			std::cerr << "send failed" << std::endl;
-		} 
-		else
-		{
-			std::cout << "Reply message sent successfully" << std::endl;
-		}
+		reply += " PART " + channelName + " :" + (msg->getParams().size() > 1 ? msg->getParams()[1] : std::string("leaving"));
+		send_reply(ts, msg->getSD(), NULL, reply);
+		// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+		// { 
+		// 	std::cerr << "send failed" << std::endl;
+		// } 
+		// else
+		// {
+		// 	std::cout << "Reply message sent successfully" << std::endl;
+		// }
 	}
 	remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[channelName]);
 }
@@ -464,7 +452,7 @@ void irc_topic(Message* msg, struct s_server *ts)
 	if (ts->channels.find(channelName) != ts->channels.end())
 	{
 		ts->channels[channelName]->setTopic(topic);
-		send_reply_channel(ts, channelName, ts->users[msg->getSD()], text, 0);
+		send_reply_channel(ts, channelName, ts->users[msg->getSD()], text);
 	}
 }
 
@@ -508,10 +496,10 @@ void irc_invite(Message* msg, struct s_server *ts)
 	}
 	std::string	reply;
 	reply = "341 INVITE " + ts->users[msg->getSD()]->getNick() + " " + nick + " " + channelName;
-	send_reply(ts, msg->getSD(), NULL, reply, 0);
+	send_reply(ts, msg->getSD(), NULL, reply);
 	reply = "JOIN :" + channelName;
-	send_reply_channel(ts, channelName, ts->nicks[nick], reply, 0);
-	send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply, 0);
+	send_reply_channel(ts, channelName, ts->nicks[nick], reply);
+	send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply);
 	// //add channel to multimap
 	// ts->user2channel.insert(std::pair<std::string, Channel*>(nick, ts->channels[channelName]));
 	// //add user to multimap
@@ -548,7 +536,8 @@ void irc_kick(Message* msg, struct s_server *ts)
 			reply = "KICK " + channelName + " " + nick;
 			if (msg->getParams().size() > 2)
 				reply += " :" + msg->getParams()[2];
-			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply, 0);
+			reply += CRLF;
+			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
 			std::cerr << "Removing user from channel" << std::endl;
 			//remove user
 			remove_user_from_channel(ts, ts->nicks[nick], ts->channels[channelName]);
@@ -579,13 +568,13 @@ void irc_away(Message* msg, struct s_server *ts)
 	{
 		ts->users[msg->getSD()]->setAwayMessage("");
 		//reply unwaway
-		send_reply(ts, msg->getSD(), NULL, "305 " + ts->users[msg->getSD()]->getNick() + " :You are no longer marked as being away", 0);
+		send_reply(ts, msg->getSD(), NULL, "305 " + ts->users[msg->getSD()]->getNick() + " :You are no longer marked as being away");
 	}
 	else if (msg->getParams().size() == 1)
 	{
 		ts->users[msg->getSD()]->setAwayMessage(msg->getParams()[0]);
 		//reply nowaway
-		send_reply(ts, msg->getSD(), NULL, "306 " + ts->users[msg->getSD()]->getNick() + " :You have been marked as being away", 0);
+		send_reply(ts, msg->getSD(), NULL, "306 " + ts->users[msg->getSD()]->getNick() + " :You have been marked as being away");
 	}
 }
 
@@ -781,7 +770,7 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 				
 				std::string	text;
 				text = "PRIVMSG " + channelName + " :" + msg->getParams()[1];
-				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text, 0);
+				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text);
 			}
 		}
 	}
@@ -868,15 +857,16 @@ void	server_loop(t_server *ts)
 			connection_ptr = it->second;
 			// if (DEEPDEBUG)
 			// 	ok_debugger(&(ts->debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts->sd), MYDEBUG);
-			if (connection_ptr->getReadingFlag())
+			//if something to send, move to writefds, otherwise be ready to read
+			if (connection_ptr->_data_out.size())
 			{
-				FD_SET(ts->sd , &readfds);
+				FD_SET(ts->sd , &writefds);
 				// if (DEEPDEBUG)
 				// 	ok_debugger(&(ts->debugger), DEBUG, "Setting reading sd: ", ok_itostr(ts->sd), MYDEBUG);
 			}
 			else
 			{
-				FD_SET(ts->sd , &writefds);
+				FD_SET(ts->sd , &readfds);
 				// if (DEEPDEBUG)
 				// 	ok_debugger(&(ts->debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts->sd), MYDEBUG);
 			}
@@ -936,13 +926,14 @@ void	server_loop(t_server *ts)
 			it++;
 			// if (DEEPDEBUG)
 			// 	ok_debugger(&(ts->debugger), DEBUG, "Reading for loop ", ok_itostr(ts->sd), MYDEBUG);
+			
 			//READ FROM READING FDS
 			if (FD_ISSET(ts->sd , &readfds)) 
 			{
 				// ok_debugger(&(ts->debugger), DEBUG, "SD is set: ", ok_itostr(ts->sd), MYDEBUG);
 				//Check if it was for closing , and also read the 
 				//incoming message 
-				if ((ts->valread = recv(ts->sd , ts->buffer, 512, MSG_NOSIGNAL)) <= 0) 
+				if ((ts->valread = recv(ts->sd , ts->buffer, BUFFER_SIZE, MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
 					// getpeername(ts->sd, (struct sockaddr*)&ts->address, (socklen_t*)&ts->addrlen); 
@@ -966,7 +957,7 @@ void	server_loop(t_server *ts)
 						user_ptr->_data.push_back(ts->buffer[i]);
 						buff.push_back(ts->buffer[i]);
 					}
-					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
+					// ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
 					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data), MYDEBUG);
 					//while CRLF in data
 					// get position of the crlf
@@ -1020,13 +1011,13 @@ void	server_loop(t_server *ts)
 					}
 
 
-					//if data >512 without CRLF
+					//if data >BUFFER_SIZE without CRLF
 					// clear the data from data
 					// set the  data overflow flag
 					// if it ends with \r
 					//   keep \r in the data
 
-					if (user_ptr->_data.size() > 512)
+					if (user_ptr->_data.size() > BUFFER_SIZE)
 					{
 						if (DEEPDEBUG)
 							std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
@@ -1045,18 +1036,49 @@ void	server_loop(t_server *ts)
 			}
 			else if (FD_ISSET(ts->sd , &writefds))
 			{
-				// SEND TO WRITING FDS
-				// SEND WITH YELLOW COLOUR
-					// for (std::multimap<int, Message*>::iterator it = ts->messages.begin(); it != ts->messages.end(); /*iterating in the loop */)
-					// {
-				std::multimap<int, Message*>::iterator iter;
-				iter = ts->messages.find(ts->sd);
-				//if we processed all messages
-				if (iter == ts->messages.end())
+				//send replies
+				std::string	outbuff(user_ptr->_data_out.begin(), user_ptr->_data_out.end());
+				ok_debugger(&(ts->debugger), DEBUG, "Sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_send_buffer(ts->debugger.colour, user_ptr->_data_out), MYDEBUG);
+				if ((ts->valsent = send(ts->sd , outbuff.c_str(), outbuff.size(), MSG_NOSIGNAL)) <= 0) 
+				{ 
+					//Somebody disconnected , get his details and print 
+					// getpeername(ts->sd, (struct sockaddr*)&ts->address, (socklen_t*)&ts->addrlen); 
+					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
+					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
+					//Close the socket and mark as 0 in list for reuse
+					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
+					close(ts->sd);
+					//REMOVE CONNECTION FROM MAP
+					if (user_ptr->getNick().size())
+						ts->nicks.erase(ts->nicks.find(user_ptr->getNick()));
+					delete user_ptr;
+					ts->users.erase(temp);
+				} 
+				//Print the message that came in 
+				else
 				{
-					user_ptr->setReadingFlag();
-					continue ;
+					user_ptr->_data_out.erase(user_ptr->_data_out.begin(), user_ptr->_data_out.begin() + ts->valsent);
+					//deque would be better for erasing front chunks
+					//ok_debugger(&(ts->debugger), DEBUG, "After sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data_out), MYDEBUG);
 				}
+			}
+			else
+			{
+				//fd is not ready
+				//check for pending messages and timeout???
+			}
+		}
+		//iterate over messages
+		{
+			// SEND TO WRITING FDS
+			// SEND WITH YELLOW COLOUR
+				// for (std::multimap<int, Message*>::iterator it = ts->messages.begin(); it != ts->messages.end(); /*iterating in the loop */)
+				// {
+			std::multimap<int, Message*>::iterator iter;
+			std::multimap<int, Message*>::iterator temp_it;
+			iter = ts->messages.begin();
+			while (iter != ts->messages.end())
+			{
 				Message * msg_ptr = iter->second;
 
 				// find if the command is in commands
@@ -1074,12 +1096,8 @@ void	server_loop(t_server *ts)
 				}
 				// std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
 				delete msg_ptr;
-				ts->messages.erase(iter);
-			}
-			else
-			{
-				//fd is not ready
-				//check for pending messages and timeout???
+				temp_it = iter++;
+				ts->messages.erase(temp_it);
 			}
 		}
 	}
