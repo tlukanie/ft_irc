@@ -204,6 +204,8 @@
 <ol>
   <li>Proper command handling</li>
   <li>Error codes</li>
+  <li>☐ irc_nick</li>
+  <li>☐ irc_user</li>
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
@@ -211,6 +213,7 @@
 <ol>
   <li>Proper command handling</li>
   <li>Error codes</li>
+  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
@@ -273,3 +276,25 @@
   <li>new</li>
   <li>new</li>
 </ol>
+
+☐
+☑
+☒ 
+☐ irc_cap
+☐ irc_pass
+☐ irc_nick <-
+☐ irc_user <-
+☐ irc_ping
+☐ irc_pong
+☐ irc_mode
+☐ irc_join
+☐ irc_part
+☐ irc_privmsg
+☐ irc_notice
+☐ irc_topic
+☐ irc_invite
+☐ irc_kick
+☐ irc_away
+☐ irc_who
+☐ irc_whois
+☐ irc_quit
