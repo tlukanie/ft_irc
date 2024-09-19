@@ -619,7 +619,7 @@ void irc_kick(Message* msg, struct s_server *ts)
 			reply = "KICK " + channelName + " " + nick;
 			if (msg->getParams().size() > 2)
 				reply += " :" + msg->getParams()[2];
-			reply += CRLF;
+			// reply += CRLF;
 			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
 			std::cerr << "Removing user from channel" << std::endl;
 			//remove user
