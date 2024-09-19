@@ -204,7 +204,7 @@
 
 <h4>Plan for 19.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling & error codes:</li>
+  <li><s>Proper command handling & error codes:</s></li>
   <ul>
     <li>☑ irc_nick</li>
     <li>☑ irc_user</li>
