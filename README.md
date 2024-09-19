@@ -213,7 +213,7 @@
 
 <h4>Plan for 20.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <<li>Proper command handling & error codes:</li>
+  <li>Proper command handling & error codes:</li>
   <ul>
     <li> irc_pass</li>
     <li> irc_join</li>
