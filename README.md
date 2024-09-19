@@ -205,10 +205,7 @@
   <li>Proper command handling</li>
   <li>Error codes</li>
   <li>Logger/debugger used everywhere in the code</li>
-  
 </ol>
--   [ ] Task 1
--   [x] Completed Task
 
 <h4>Plan for 20.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
@@ -226,8 +223,9 @@
 
 <h4>Plan for 22.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li></li>
-  <li></li>
+  <li>☐ test 1</li>
+  <li>☑ test 2</li>
+  <li>☒ test 3</li>
 </ol>
 
 
