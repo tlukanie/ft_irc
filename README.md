@@ -203,8 +203,10 @@
 <h4>Plan for 19.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
   <li>Proper command handling</li>
-  <li>[ ]Error codes</li>
+  <li>Error codes</li>
   <li>Logger/debugger used everywhere in the code</li>
+  -   [ ] Task 1
+  -   [x] Completed Task
 </ol>
 
 
