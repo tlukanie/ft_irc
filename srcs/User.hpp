@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/18 17:22:23 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/19 10:55:30 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@
 
 # define RECEIVING true
 # define SENDING false
+
+# define PASSWORD 1
+# define NICK 2
+# define USER 4
 
 # ifndef DEEPDEBUG
 #  define DEEPDEBUG 1
@@ -56,13 +60,14 @@ class User
 		std::string		getRealName(void);
 		std::string		getAwayMessage(void);
 		bool			getOverflowFlag(void);
+		unsigned int	getAuthFlags(void);
 		bool			getAuthFlag(void);
 		bool			getReadingFlag(void);
 		
 		void			setOverflowFlag(void);
 		void			unsetOverflowFlag(void);
-		void			setAuthFlag(void);
-		void			unsetAuthFlag(void);
+		void			addAuthFlag(unsigned int flag);
+		// void			removeAuthFlag(unsigned int flag);
 		void			setReadingFlag(void);
 		void			unsetReadingFlag(void);
 		void			setNick(std::string nick);
@@ -91,7 +96,8 @@ class User
 		// ip address
 		std::string		_ip;
 		// reading or writing mode
-		bool			_auth_flag; //valid password and unique nick and so on
+		unsigned int	_authFlags; //valid password and unique nick and so on
+		bool			_authFlag;
 		bool			_reading_flag; //maybe useless
 		// flag for invalid buffer (too much data without separator)
 		bool			_data_overflow_flag;

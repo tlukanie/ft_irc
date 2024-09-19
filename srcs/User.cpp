@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/17 11:05:45 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/19 11:03:27 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ User::User(void)
 	this->_sd = 0;
 	this->_port = 0;
 	this->_ip = "";
+	this->_authFlag = false;
+	this->_authFlags = 0;
 	this->_reading_flag = true;
 	this->_data_overflow_flag = false;
 	this->_strikecount = 0;
@@ -172,20 +174,27 @@ void	User::unsetOverflowFlag(void)
 	this->_data_overflow_flag = false;
 }
 
+unsigned int	User::getAuthFlags(void)
+{
+	return (this->_authFlags);
+}
+
 bool	User::getAuthFlag(void)
 {
-	return (this->_auth_flag);
+	return (this->_authFlag);
 }
 
-void	User::setAuthFlag(void)
+void	User::addAuthFlag(unsigned int flag)
 {
-	this->_auth_flag = true;
+	this->_authFlags |= flag;
+	if ((this->_authFlags & PASSWORD) && (this->_authFlags & NICK) && (this->_authFlags & USER))
+		this->_authFlag = true;
 }
 
-void	User::unsetAuthFlag(void)
-{
-	this->_auth_flag = false;
-}
+// void	User::removeAuthFlag(unsigned int flag)
+// {
+// 	this->_authFlags &= ~flag;
+// }
 
 bool	User::getReadingFlag(void)
 {
@@ -233,7 +242,7 @@ std::string	User::print(bool colour)
 	}
 	info = "[" + clrbg + this->_nick + end + "]\n";
 	info += "sd: " + clr + ok_itostr(this->_sd) + end + " | IP: " + clr + this->_ip + end + " | Port: " + clr+ ok_itostr(this->_port) + end + "\n";
-	info += "Authorized: " + clr + (this->_auth_flag ? "Y" : "N") + end + " | Reading: " + clr + (this->_reading_flag ? "Y" : "N") + end + " | Data overflow: " + clr + (this->_data_overflow_flag ? "Y" : "N") + end + "\n";
+	info += "Authorized: " + clr + (this->_authFlag ? "Y" : "N") + end + " | Reading: " + clr + (this->_reading_flag ? "Y" : "N") + end + " | Data overflow: " + clr + (this->_data_overflow_flag ? "Y" : "N") + end + "\n";
 	info += "Strike counter: " + clr + ok_itostr(this->_strikecount) + end + "\n";
 	info += "Username: " + clr + this->_username + end + "\n";
 	info += "Hostname: " + clr + this->_hostname + end + "\n";

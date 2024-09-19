@@ -148,7 +148,8 @@ void irc_pass(Message* msg, struct s_server *ts)
 	// ERR_ALREADYREGISTERED (462)
 	if (msg->getParams()[0] == ts->password)
 	{
-		std::cout << GREEN_COLOUR "correct password" NO_COLOUR << std::endl; 
+		std::cout << GREEN_COLOUR "correct password" NO_COLOUR << std::endl;
+		ts->users[msg->getSD()]->addAuthFlag(PASSWORD);
 	}
 	else
 	{
@@ -163,6 +164,27 @@ void irc_pass(Message* msg, struct s_server *ts)
 	
 }
 
+# define LOWER "abcdefghijklmnopqrstuvwxyz"
+# define UPPER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# define DIGITS "0123456789"
+# define SPECIAL "[]{}^`|_\\"
+
+static bool	isValidNick(std::string	nick)
+{
+	std::string validFirst = LOWER UPPER SPECIAL;
+	std::string	validRest = validFirst + "-" DIGITS;
+	if (!nick.size() || nick.size() > 32)
+		return (false);
+	if (validFirst.find(nick[0]) == std::string::npos)
+		return (false);
+	for (size_t i = 1; i < nick.size(); i++)
+	{
+		if (validRest.find(nick[i]) == std::string::npos)
+			return (false);
+	}
+	return (true);
+}
+
 // NICK net
 //CHECK IF NICK IS UNIQUE
 // https://modern.ircdocs.horse/#nick-message
@@ -174,7 +196,7 @@ void irc_pass(Message* msg, struct s_server *ts)
 // ERR_NONICKNAMEGIVEN (431)
 // ERR_ERRONEUSNICKNAME (432)
 // ERR_NICKNAMEINUSE (433)
-// ERR_NICKCOLLISION (436)
+// ERR_NICKCOLLISION (436) //not needed by us
 // Command Example:
 
 
@@ -191,23 +213,56 @@ void irc_nick(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 	std::string	oldnick;
-	std::string	newnick = msg->getParams()[0];
 
+	std::cout << MAGENTA_COLOUR "NICK COMMAND is now fully supported" NO_COLOUR << std::endl;
+	// std::cout << MAGENTA_COLOUR "User " << msg->getSD()
+	// << " setting nick " << newnick << NO_COLOUR << std::endl;
 	if (ts->users[msg->getSD()]->getNick().size())
 		oldnick = ts->users[msg->getSD()]->getNick();
-	std::cout << MAGENTA_COLOUR "NICK COMMAND is not fully supported" NO_COLOUR << std::endl;
-	// later check if nick is in use and valid string
-
+	//check if parameter
+	if (!msg->getParams().size())
+	{
+		reply = "431 ";
+		if (oldnick.size())
+			reply += oldnick + " ";
+		else
+			reply += ts->users[msg->getSD()]->getIP() + " ";
+		reply += ":No nickname given";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	std::string	newnick = msg->getParams()[0];
+	if (!isValidNick(newnick))
+	{
+		reply = "432 ";
+		if (oldnick.size())
+			reply += oldnick + " ";
+		else
+			reply += ts->users[msg->getSD()]->getIP() + " ";
+		reply += newnick + " :Erroneus nickname";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	if (ts->nicks.find(newnick) != ts->nicks.end())
+	{
+		reply = "433 ";
+		if (oldnick.size())
+			reply += oldnick + " ";
+		else
+			reply += ts->users[msg->getSD()]->getIP() + " ";
+		reply += newnick + " :Nickname is already in use";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
 	//setting the first (and only?) parameter as a nick in the map of users
 	//accessed by the socket descriptor gained from the message class
-	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
-	<< " setting nick " << newnick << NO_COLOUR << std::endl;
 
 	ts->users[msg->getSD()]->setNick(newnick);
 	if (oldnick.size())
 	{
 		ts->nicks.erase(ts->nicks.find(oldnick));
 	}
+	
 	ts->nicks.insert(std::pair<std::string, User*>(newnick, ts->users[msg->getSD()]));
 	// ts.users.insert(std::pair<int, User*>(ts.new_socket, new User(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
 	if (ts->users[msg->getSD()]->getNick().size())
@@ -225,6 +280,15 @@ void irc_nick(Message* msg, struct s_server *ts)
 		// {
 		// 	std::cout << "Reply message sent successfully" << std::endl;
 		// }
+	}
+	if (!oldnick.size())
+	{
+		ts->users[msg->getSD()]->addAuthFlag(NICK);
+		if (ts->users[msg->getSD()]->getAuthFlag())
+		{
+			reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+			send_reply(ts, msg->getSD(), NULL, reply);
+		}
 	}
 
 	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
@@ -247,11 +311,26 @@ void irc_nick(Message* msg, struct s_server *ts)
 // ERR_ALREADYREGISTERED (462)
 void irc_user(Message* msg, struct s_server *ts)
 {
+	std::string	reply;
+	std::cout << MAGENTA_COLOUR "USER COMMAND is now fully supported" NO_COLOUR << std::endl;
 	// we need to check that there are 4 parameters?
-	if (msg->getParams().size() != 4)
+	if (msg->getParams().size() != 4 || !msg->getParams()[0].size())
 	{
-		std::cerr << "NOT 4 parameters" << std::endl;
-		//add reply error
+		reply = "461 ";
+		if (!ts->users[msg->getSD()]->getNick().size())
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+		else
+			reply += ts->users[msg->getSD()]->getIP() + " ";
+		reply += "USER :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	if (ts->users[msg->getSD()]->getAuthFlag())
+	{
+		reply = "462 ";
+		reply += ts->users[msg->getSD()]->getNick();
+		reply += " :You may not register again";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
 	ts->users[msg->getSD()]->setUserName(msg->getParams()[0]);
@@ -259,11 +338,15 @@ void irc_user(Message* msg, struct s_server *ts)
 	ts->users[msg->getSD()]->setServerName(msg->getParams()[2]);
 	ts->users[msg->getSD()]->setRealName(msg->getParams()[3]);
 	// process the 4 parameters
-	std::string	reply;
-	std::cout << MAGENTA_COLOUR "USER COMMAND is not fully supported" NO_COLOUR << std::endl;
-	reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-	send_reply(ts, msg->getSD(), NULL, reply);
-	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
+	ts->users[msg->getSD()]->addAuthFlag(USER);
+	if (ts->users[msg->getSD()]->getAuthFlag())
+	{
+		reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+		send_reply(ts, msg->getSD(), NULL, reply);
+	}
+	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+	// send_reply(ts, msg->getSD(), NULL, reply);
+	// // if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
 	// { 
 	// 	std::cerr << "send failed" << std::endl;
 	// } 

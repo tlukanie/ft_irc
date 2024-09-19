@@ -10,6 +10,8 @@
 <p>https://modern.ircdocs.horse/</p>
 <h3>Could be needed for file transfers (bonus part)</h3>
 <p>https://en.wikipedia.org/wiki/Direct_Client-to-Client</p>
+<h3>IRC server</h3>
+<p>https://ubuntu.com/tutorials/irc-server#8-congratulations</p>
 
 <p>/connect localhost 5555 aaa</p>
 <h4>Plan for 30.06.24 (DONE)</h4> 
@@ -202,17 +204,21 @@
 
 <h4>Plan for 19.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling</li>
-  <li>Error codes</li>
-  <li>☐ irc_nick</li>
-  <li>☐ irc_user</li>
-  <li>Logger/debugger used everywhere in the code</li>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☑ irc_nick</li>
+    <li>☑ irc_user</li>
+  </ul>
 </ol>
 
 <h4>Plan for 20.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling</li>
-  <li>Error codes</li>
+  <<li>Proper command handling & error codes:</li>
+  <ul>
+    <li> irc_pass</li>
+    <li> irc_join</li>
+	<li> irc_part</li>
+  </ul>
   <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
@@ -221,11 +227,20 @@
 <h4>Plan for 21.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
   <li>Logger/debugger goes through select()</li>
-  <li></li>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li> irc_nick</li>
+    <li> irc_user</li>
+  </ul>
 </ol>
 
 <h4>Plan for 22.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☑ irc_nick</li>
+    <li>☑ irc_user</li>
+  </ul>
   <li>☐ test 1</li>
   <li>☑ test 2</li>
   <li>☒ test 3</li>
@@ -282,8 +297,8 @@
 ☒ 
 ☐ irc_cap
 ☐ irc_pass
-☐ irc_nick <-
-☐ irc_user <-
+☑ irc_nick
+☑ irc_user
 ☐ irc_ping
 ☐ irc_pong
 ☐ irc_mode
