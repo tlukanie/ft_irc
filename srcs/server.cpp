@@ -28,6 +28,21 @@ size_t	ok_crlf_finder(std::vector<uint8_t> data)
 	return (0);
 }
 
+static bool isChannel(struct s_server *ts, std::string channelName)
+{
+	return (ts->channels.find(channelName) != ts->channels.end());
+}
+
+static bool isInChannel(struct s_server *ts, std::string channelName, std::string nick)
+{
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (it->second->getNick() == nick)
+			return (true);
+	}
+	return (false);
+}
+
 static int	remove_user_from_channel(struct s_server *ts, User *user, Channel *channel)
 {
 	std::string channelName = channel->getChannelName();
@@ -673,20 +688,6 @@ void irc_away(Message* msg, struct s_server *ts)
 //https://modern.ircdocs.horse/#mode-message
 //https://modern.ircdocs.horse/#channel-modes
 
-static bool isChannel(struct s_server *ts, std::string channelName)
-{
-	return (ts->channels.find(channelName) != ts->channels.end());
-}
-
-static bool isInChannel(struct s_server *ts, std::string channelName, std::string nick)
-{
-	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-	{
-		if (it->second->getNick() == nick)
-			return (true);
-	}
-	return (false);
-}
 
 		// std::string		getKey(void);
 		// void			setKey(std::string key);

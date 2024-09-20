@@ -204,6 +204,8 @@
 
 <h4>Plan for 19.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
+  <li><s>Authorise users</s></li>
+  <li><s>Make sure nicks are unique</s></li>
   <li><s>Proper command handling & error codes:</s></li>
   <ul>
     <li>☑ irc_nick</li>
@@ -224,13 +226,16 @@
 </ol>
 
 
+
 <h4>Plan for 21.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
   <li>Logger/debugger goes through select()</li>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li> irc_nick</li>
-    <li> irc_user</li>
+    <li> irc_privmsg</li>
+    <li> irc_topic</li>
+	<li> irc_invite</li>
+    <li> irc_kick</li>
   </ul>
 </ol>
 
@@ -238,8 +243,8 @@
 <ol>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☑ irc_nick</li>
-    <li>☑ irc_user</li>
+    <li>☐ irc_ping</li>
+    <li> irc_mode</li>
   </ul>
   <li>☐ test 1</li>
   <li>☑ test 2</li>
@@ -249,8 +254,13 @@
 
 <h4>Plan for 23.09.24 (??? Prague time)</h4>
 <ol>
-  <li>Authorise users</li>
-  <li>Make sure nicks are unique</li>
+
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☐ irc_away</li>
+    <li>☐ irc_who</li>
+    <li>☐ irc_quit</li>
+  </ul>
 </ol>
 
 
@@ -258,6 +268,12 @@
 <ol>
   <li>Make buffers in user private</li>
   <li>Check if all functions are allowed</li>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☐ irc_cap</li>
+    <li>☐ irc_notice</li>
+    <li>☐ irc_whois</li>
+  </ul>
 </ol>
 
 <h4>Plan for the next week</h4>
