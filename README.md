@@ -215,23 +215,21 @@
 
 <h4>Plan for 20.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling & error codes:</li>
+  <li><s>Proper command handling & error codes:</s></li>
   <ul>
-    <li> irc_pass</li>
-    <li> irc_join</li>
-	<li> irc_part</li>
+    <li>☑ irc_pass</li>
+    <li>☑ irc_join</li>
   </ul>
-  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
-  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 
 
-<h4>Plan for 21.09.24 (14:30-16:30 Prague time)</h4>
+<h4>Plan for 21.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
   <li>Logger/debugger goes through select()</li>
   <li>Proper command handling & error codes:</li>
   <ul>
+	<li> irc_part</li>
     <li> irc_privmsg</li>
     <li> irc_topic</li>
 	<li> irc_invite</li>
@@ -249,6 +247,8 @@
   <li>☐ test 1</li>
   <li>☑ test 2</li>
   <li>☒ test 3</li>
+  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
+  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 

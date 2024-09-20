@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/17 10:54:59 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/20 11:37:41 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,11 @@ void	Channel::removeModeFlags(unsigned int flag)
 int		Channel::getChannelLimit(void)
 {
 	return (this->_channelLimit);
+}
+
+int		Channel::getUsers(void)
+{
+	return (this->_usersInChannel.size());
 }
 
 void	Channel::setChannelLimit(int channelLimit)

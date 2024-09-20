@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/19 11:03:27 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/20 12:14:57 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ User::User(unsigned short sd, unsigned short port, std::string ip)
 	this->_sd = sd;
 	this->_port = port;
 	this->_ip = ip;
+	this->_authFlag = false;
+	this->_authFlags = 0;
 	this->_reading_flag = true;
 	this->_data_overflow_flag = false;
 	this->_strikecount = 0;
