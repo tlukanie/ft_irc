@@ -469,6 +469,22 @@ void irc_join(Message* msg, struct s_server *ts)
 		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
+	//special case
+	if (msg->getParams()[0] == "0")
+	{
+		//leave all channels
+		for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(ts->users[msg->getSD()]->getNick()); it != ts->user2channel.upper_bound(ts->users[msg->getSD()]->getNick()); /*Iterating in the loop*/)
+		{
+			std::multimap<std::string, Channel*>::iterator temp;
+			temp = it++;
+			reply += "PART " + temp->second->getChannelName() + " :leaving";
+			
+			//send reply to channel
+			send_reply_channel(ts, temp->second->getChannelName(), ts->users[msg->getSD()], reply);
+			remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[temp->second->getChannelName()]);
+		}
+		return ;
+	}
 	std::vector<std::string>	channelNames = ok_split(msg->getParams()[0], ',');
 	std::vector<std::string>	keys;
 	if (msg->getParams().size() > 1)
@@ -476,7 +492,7 @@ void irc_join(Message* msg, struct s_server *ts)
 	for (size_t i = 0; i < channelNames.size(); i++)
 	{
 		//check if the channel name valid
-		if (channelNames[i].size() < 2 || (channelNames[i][0] != '#' && channelNames[i][0] != '@'))
+		if (channelNames[i].size() < 2 || (channelNames[i][0] != '#' && channelNames[i][0] != '&'))
 		{
 			reply = "476 ";
 			reply += channelNames[i] + " ";
@@ -717,7 +733,7 @@ void irc_topic(Message* msg, struct s_server *ts)
 
 void irc_invite(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "INVITE COMMAND not fully supported" NO_COLOUR << std::endl;
+	std::cout << MAGENTA_COLOUR "INVITE COMMAND now fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	std::string reply;
@@ -732,7 +748,6 @@ void irc_invite(Message* msg, struct s_server *ts)
 	}
 	std::string nick = msg->getParams()[0];
 	std::string channelName = msg->getParams()[1];
-
 	//401
 	if (ts->nicks.find(nick) == ts->nicks.end())
 	{
@@ -817,49 +832,81 @@ void irc_invite(Message* msg, struct s_server *ts)
 //    :WiZ!jto@tolsun.oulu.fi KICK #Finnish John
 void irc_kick(Message* msg, struct s_server *ts)
 {
+	std::string reply;
 	std::cout << MAGENTA_COLOUR "KICK COMMAND not fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
-		//add reply error
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "KICK :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	std::string channelName = msg->getParams()[0];
-	std::string nick = msg->getParams()[1];
-	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	std::string					channelName = msg->getParams()[0];
+	std::vector<std::string>	nicks = ok_split(msg->getParams()[1], ',');
+	std::string reason;
+	//403
+	if (ts->channels.find(channelName) == ts->channels.end())
 	{
-		std::cerr << "NICK or CHannel does not exist" << std::endl;
+		reply = "403 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":No such channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	//442
+	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		if (it->second->getNick() == nick)
+		reply = "442 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not on that channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	//482
+	if (!ts->channels[channelName]->isOperator(msg->getSD()))
+	{
+		reply = "482 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not channel operator";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	for (size_t i = 0; i < nicks.size(); i++)
+	{
+		//401
+		if (ts->nicks.find(nicks[i]) == ts->nicks.end())
 		{
-			//inform channel
-			std::string	reply;
-			reply = "KICK " + channelName + " " + nick;
-			if (msg->getParams().size() > 2)
-				reply += " :" + msg->getParams()[2];
-			send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
-			std::cerr << "Removing user from channel" << std::endl;
-			//remove user
-			remove_user_from_channel(ts, ts->nicks[nick], ts->channels[channelName]);
-			// ts->channel2user.erase(it);
-			// for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.lower_bound(nick); iter != ts->user2channel.upper_bound(nick); iter++)
-			// {
-			// 	if (iter->second->getChannelName() == channelName)
-			// 	{
-			// 		ts->user2channel.erase(iter);
-			// 		std::cerr << "Removing channel from user" << std::endl;
-			// 		break ;
-			// 	}
-			// }
-			return ;
+			reply = "401 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += nicks[i] + " ";
+			reply += ":No such nickname";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			continue ;
 		}
+		//441
+		if (!(ts->channels[channelName]->hasUser(ts->nicks[nicks[i]]->getSD())))
+		{
+			reply = "441 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += nicks[i] + " ";
+			reply += channelName + " ";
+			reply += ":They are not on that channel";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			continue ;
+		}
+		reply = "KICK " + channelName + " " + nicks[i];
+		if (msg->getParams().size() > 2)
+			reply += " :" + msg->getParams()[2];
+		send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
+		remove_user_from_channel(ts, ts->nicks[nicks[i]], ts->channels[channelName]);
 	}
-	//user not in channel
 }
 
 
@@ -1040,46 +1087,113 @@ void irc_mode(Message* msg, struct s_server *ts)
 //PRIVMSG
 //https://modern.ircdocs.horse/#privmsg-message
 //:user123!net@127.0.0.1 PRIVMSG #aaa :hello there
+//not sending messages to chanops only, yet...
 
 void irc_privmsg(Message* msg, struct s_server *ts)
 {
+	std::string	reply;
 	std::cout << MAGENTA_COLOUR "PRIVMSG COMMAND not fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
-	if (msg->getParams().size() < 2)
+	if (!msg->getParams().size())
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
-		//add reply error
+		reply = "411 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += ":No recipient given PRIVMSG";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	//message to channel vs message to user
-	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '@')
+	if (msg->getParams().size() < 2)
 	{
-		std::string channelName = msg->getParams()[0];
-		//reply channel
-		//check if channel exists
-		if (ts->channels.find(channelName) == ts->channels.end())
-		{
-			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel:", channelName, MYDEBUG);
-			return ;
-		}
-		//send reply to all other users in the channel
-		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-		{
-			if (it->second->getNick() != ts->users[msg->getSD()]->getNick())
-			{
-				
-				std::string	text;
-				text = "PRIVMSG " + channelName + " :" + msg->getParams()[1];
-				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text);
-			}
-		}
+		reply = "412 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += ":No text to send";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
 	}
-	else
+	std::vector<std::string>	targets = ok_split(msg->getParams()[0], ',');
+	std::string					text = msg->getParams()[1];
+
+	for (size_t i = 0; i < targets.size(); i++)
 	{
-		//reply user
+		reply = "PRIVMSG " + targets[i] + " :" + text;
+		if (!targets[i].size())
+		{
+			//411
+			reply = "411 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += ":No recipient given PRIVMSG";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			continue ;
+		}
+		if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
+		{
+			//403
+			if (ts->channels.find(targets[i]) == ts->channels.end())
+			{
+				reply = "403 ";
+				reply += ts->users[msg->getSD()]->getNick() + " ";
+				reply += targets[i] + " ";
+				reply += ":No such channel";
+				send_reply(ts, msg->getSD(), NULL, reply);
+				continue ;
+			}
+			send_reply_channel(ts, targets[i], ts->users[msg->getSD()], reply);
+		}
+		else
+		{
+			//401
+			if (ts->nicks.find(targets[i]) == ts->nicks.end())
+			{
+				reply = "401 ";
+				reply += ts->users[msg->getSD()]->getNick() + " ";
+				reply += targets[i] + " ";
+				reply += ":No such nickname";
+				send_reply(ts, msg->getSD(), NULL, reply);
+				continue ;
+			}
+			send_reply(ts, ts->nicks[targets[i]]->getSD(), ts->users[msg->getSD()], reply);
+		}
 	}
 }
+
+
+
+
+
+
+
+
+
+// 	//message to channel vs message to user
+// 	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
+// 	{
+		
+// 		std::string channelName = msg->getParams()[0];
+// 		//reply channel
+// 		//check if channel exists
+// 		if (ts->channels.find(channelName) == ts->channels.end())
+// 		{
+// 			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel:", channelName, MYDEBUG);
+// 			return ;
+// 		}
+// 		//send reply to all other users in the channel
+// 		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+// 		{
+// 			if (it->second->getNick() != ts->users[msg->getSD()]->getNick())
+// 			{
+				
+// 				std::string	text;
+// 				text = "PRIVMSG " + channelName + " :" + msg->getParams()[1];
+// 				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text);
+// 			}
+// 		}
+// 	}
+// 	else
+// 	{
+// 		//reply user
+// 	}
+// }
 
 //NOTICE
 //https://modern.ircdocs.horse/#notice-message
@@ -1112,7 +1226,7 @@ void irc_whois(Message* msg, struct s_server *ts)
 		//add reply error
 		return ;
 	}
-	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '@')
+	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
 	{
 		std::string channelName = msg->getParams()[0];
 		if (ts->channels.find(channelName) != ts->channels.end())

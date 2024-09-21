@@ -224,23 +224,16 @@
 
 
 
-<h4>Plan for 21.09.24 (10:30-12:30 Prague time)</h4>
+<h4>Plan for 21.09.24 (10:30-12:30 && 16:50-18:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling & error codes:</li>
+  <li><s>Proper command handling & error codes:</s></li>
   <ul>
 	<li>☑ irc_part</li>
     <li>☑ irc_topic</li>
 	<li>☑ irc_invite</li>
-  </ul>
-</ol>
-
-<h4>Plan for 21.09.24 (16:30-18:30 Prague time)</h4>
-<ol>
-  <li>Proper command handling & error codes:</li>
-  <ul>
-    <li> irc_kick</li>
-    <li> irc_privmsg</li>
-	<li> irc_join "0"</li>
+    <li>☑ irc_kick</li>
+    <li>☑ irc_privmsg</li>
+	<li>☑ irc_join "0"</li>
   </ul>
 </ol>
 
@@ -258,8 +251,7 @@
   <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
-
-<h4>Plan for 23.09.24 (??? Prague time)</h4>
+<h4>Plan for 23.09.24 (8:30-10:30 Prague time)</h4>
 <ol>
 
   <li>Proper command handling & error codes:</li>
@@ -328,11 +320,11 @@
 ☐ irc_mode
 ☑ irc_join
 ☑ irc_part
-☐ irc_privmsg
+☑ irc_privmsg
 ☐ irc_notice
 ☑ irc_topic
 ☑ irc_invite
-☐ irc_kick
+☑ irc_kick
 ☐ irc_away
 ☐ irc_who
 ☐ irc_whois
