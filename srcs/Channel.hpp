@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/20 11:37:02 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/21 10:57:46 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class Channel
 		int				getUsers(void);
 		void			setChannelLimit(int channelLimit);
 		bool			isOperator(unsigned short sd);
+		bool			hasUser(unsigned short sd);
 		void			addOperator(unsigned short sd);
 		void			removeOperator(unsigned short sd);
 		int				addUser(unsigned short sd);

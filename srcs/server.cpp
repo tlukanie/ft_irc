@@ -482,7 +482,7 @@ void irc_join(Message* msg, struct s_server *ts)
 			reply += channelNames[i] + " ";
 			reply += ":Bad Channel Mask";
 			send_reply(ts, msg->getSD(), NULL, reply);
-			break ;
+			continue ;
 		}
 		//if the channel does not exist
 		if (ts->channels.find(channelNames[i]) == ts->channels.end())
@@ -511,7 +511,7 @@ void irc_join(Message* msg, struct s_server *ts)
 				reply += channelNames[i] + " ";
 				reply += ":Cannot join channel (+i)";
 				send_reply(ts, msg->getSD(), NULL, reply);
-				break ;
+				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelNames[i]]->getUsers() >= ts->channels[channelNames[i]]->getChannelLimit())
 			{
@@ -520,7 +520,7 @@ void irc_join(Message* msg, struct s_server *ts)
 				reply += channelNames[i] + " ";
 				reply += ":Cannot join channel (+l)";
 				send_reply(ts, msg->getSD(), NULL, reply);
-				break ;
+				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_KEY))
 			{
@@ -531,7 +531,7 @@ void irc_join(Message* msg, struct s_server *ts)
 					reply += channelNames[i] + " ";
 					reply += ":Cannot join channel (+k)";
 					send_reply(ts, msg->getSD(), NULL, reply);
-					break ;
+					continue ;
 				}
 			}
 			ok_debugger(&(ts->debugger), DEBUG, "This channel already exists: ", channelNames[i], MYDEBUG);
@@ -542,11 +542,14 @@ void irc_join(Message* msg, struct s_server *ts)
 		reply = "JOIN :" + channelNames[i];
 		send_reply_channel(ts, channelNames[i], ts->users[msg->getSD()], reply);
 		//332
-		reply = "332 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelNames[i] + " ";
-		reply += ":" + ts->channels[channelNames[i]]->getTopic();
-		send_reply(ts, msg->getSD(), NULL, reply);
+		if (ts->channels[channelNames[i]]->getTopic().size())
+		{
+			reply = "332 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += channelNames[i] + " ";
+			reply += ":" + ts->channels[channelNames[i]]->getTopic();
+			send_reply(ts, msg->getSD(), NULL, reply);
+		}
 		//353
 		reply = "353 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
@@ -560,19 +563,6 @@ void irc_join(Message* msg, struct s_server *ts)
 		}
 		reply.resize(reply.size() - 1);
 ;		send_reply(ts, msg->getSD(), NULL, reply);
-		//353
-		
-		// for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelNames[i]); it != ts->channel2user.upper_bound(channelNames[i]); it++)
-		// {
-		// 	reply = "353 ";
-		// 	reply += ts->users[msg->getSD()]->getNick() + " ";
-		// 	reply += channelNames[i] + " ";
-		// 	reply += ":";
-		// 	if (ts->channels[channelNames[i]]->isOperator(it->second->getSD()))
-		// 		reply += "@";
-		// 	reply += it->second->getNick() + " ";
-		// 	send_reply(ts, msg->getSD(), NULL, reply);
-		// }
 		// 366
 		reply = "366 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
@@ -587,6 +577,7 @@ void irc_join(Message* msg, struct s_server *ts)
 void irc_part(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
+	
 	std::cout << MAGENTA_COLOUR "PART COMMAND not fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
@@ -598,32 +589,40 @@ void irc_part(Message* msg, struct s_server *ts)
 		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	std::string	channelName = msg->getParams()[0];
 	//check if the channel name valid
 	//check if user can join the channel
-
-	//if the channel does not exist
-	if (ts->channels.find(channelName) == ts->channels.end())
+	std::vector<std::string>	channelNames = ok_split(msg->getParams()[0], ',');
+	std::string	reason;
+	if (msg->getParams().size() > 1)
+		reason = msg->getParams()[1];
+	for (size_t i = 0; i < channelNames.size(); i++)
 	{
-		ok_debugger(&(ts->debugger), WARNING, "Cannot leave non-existing channel: ", channelName, MYDEBUG);
-		return ;
+		//if the channel does not exist
+		if (ts->channels.find(channelNames[i]) == ts->channels.end())
+		{
+			reply = "403 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += channelNames[i] + " ";
+			reply += ":No such channel";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			continue ;
+		}
+		if (!(ts->channels[channelNames[i]]->hasUser(msg->getSD())))
+		{
+			reply = "442 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += channelNames[i] + " ";
+			reply += ":You are not on that channel";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			continue ;
+		}
+		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelNames[i], MYDEBUG);
+		reply += "PART " + channelNames[i] + " :" + (reason.size() ? reason : std::string(ts->users[msg->getSD()]->getNick() + " leaving channel " + channelNames[i]));
+		
+		//send reply to channel
+		send_reply_channel(ts, channelNames[i], ts->users[msg->getSD()], reply);
+		remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[channelNames[i]]);
 	}
-	else
-	{
-		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelName, MYDEBUG);
-		reply = ":" + ts->users[msg->getSD()]->getNick() + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
-		reply += " PART " + channelName + " :" + (msg->getParams().size() > 1 ? msg->getParams()[1] : std::string("leaving"));
-		send_reply(ts, msg->getSD(), NULL, reply);
-		// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-		// { 
-		// 	std::cerr << "send failed" << std::endl;
-		// } 
-		// else
-		// {
-		// 	std::cout << "Reply message sent successfully" << std::endl;
-		// }
-	}
-	remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[channelName]);
 }
 
 //TOPIC
@@ -633,24 +632,77 @@ void irc_part(Message* msg, struct s_server *ts)
 
 void irc_topic(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "TOPIC COMMAND not fully supported" NO_COLOUR << std::endl;
+	std::cout << MAGENTA_COLOUR "TOPIC COMMAND now fully supported" NO_COLOUR << std::endl;
+	std::string	reply;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	//send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
-	if (msg->getParams().size() < 2)
+	if (!msg->getParams().size())
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
-		//add reply error
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "TOPIC :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
 	std::string channelName = msg->getParams()[0];
-	std::string topic = msg->getParams()[1];
-	std::string text = "TOPIC " + channelName + " :" + topic;
-	if (ts->channels.find(channelName) != ts->channels.end())
+	std::string topic;
+	if (msg->getParams().size() > 1)
+		topic = msg->getParams()[1];
+
+	if (ts->channels.find(channelName) == ts->channels.end())
 	{
-		ts->channels[channelName]->setTopic(topic);
-		send_reply_channel(ts, channelName, ts->users[msg->getSD()], text);
+		reply = "403 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":No such channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
 	}
+	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
+	{
+		reply = "442 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not on that channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	if (msg->getParams().size() == 1)
+	{
+		if (ts->channels[channelName]->getTopic().size())
+		{
+			reply = "332 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += channelName + " ";
+			reply += ":" + ts->channels[channelName]->getTopic();
+			send_reply(ts, msg->getSD(), NULL, reply);
+			return ;
+		}
+		else
+		{
+			reply = "331 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += channelName + " ";
+			reply += ":No topic is set";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			return ;
+		}
+	}
+	// setting topic
+	//482
+	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_TOPIC) && !ts->channels[channelName]->isOperator(msg->getSD()))
+	{
+		reply = "482 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not channel operator";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	reply = "TOPIC " + channelName + " :" + topic;
+	ts->channels[channelName]->setTopic(topic);
+	send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
 }
 
 //INVITE
@@ -668,42 +720,95 @@ void irc_invite(Message* msg, struct s_server *ts)
 	std::cout << MAGENTA_COLOUR "INVITE COMMAND not fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	std::string reply;
 	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
-		//add reply error
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "INVITE :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
 	std::string nick = msg->getParams()[0];
 	std::string channelName = msg->getParams()[1];
 
-	if (ts->nicks.find(nick) == ts->nicks.end() || ts->channels.find(channelName) == ts->channels.end())
+	//401
+	if (ts->nicks.find(nick) == ts->nicks.end())
 	{
-		std::cerr << "NICK or CHannel does not exist" << std::endl;
+		reply = "401 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += nick + " ";
+		reply += ":No such nickname";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	//403
+	if (ts->channels.find(channelName) == ts->channels.end())
 	{
-		if (it->second->getNick() == nick)
-		{
-			std::cerr << "User already in the channel" << std::endl;
-			return ;
-		}
-		else
-			std::cerr << "User " << it->second->getNick() << " in the channel" << std::endl;
+		reply = "403 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":No such channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
 	}
-	std::string	reply;
-	reply = "341 INVITE " + ts->users[msg->getSD()]->getNick() + " " + nick + " " + channelName;
+	//442
+	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
+	{
+		reply = "442 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not on that channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	//443
+	if (ts->channels[channelName]->hasUser(ts->nicks[nick]->getSD()))
+	{
+		reply = "443 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += nick + " ";
+		reply += channelName + " ";
+		reply += ":is already on channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	//482
+	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_INVITE) && !ts->channels[channelName]->isOperator(msg->getSD()))
+	{
+		reply = "482 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not channel operator";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelName]->getUsers() >= ts->channels[channelName]->getChannelLimit())
+	{
+		reply = "482 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":The channel is full";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	//341
+	reply = "341 ";
+	reply += ts->users[msg->getSD()]->getNick() + " ";
+	reply += nick + " ";
+	reply += channelName;
 	send_reply(ts, msg->getSD(), NULL, reply);
+	//invite message
+	reply = "INVITE ";
+	reply += nick + " ";
+	reply += channelName;
+	send_reply(ts, ts->nicks[nick]->getSD(), ts->users[msg->getSD()], reply);
+	// not sure about the part below?
 	reply = "JOIN :" + channelName;
-	send_reply_channel(ts, channelName, ts->nicks[nick], reply);
-	send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply);
-	// //add channel to multimap
-	// ts->user2channel.insert(std::pair<std::string, Channel*>(nick, ts->channels[channelName]));
-	// //add user to multimap
-	// ts->channel2user.insert(std::pair<std::string, User*>(channelName, ts->nicks[nick]));
 	add_user_to_channel(ts, ts->nicks[nick], ts->channels[channelName]);
+	send_reply_channel(ts, channelName, ts->nicks[nick], reply);
+	// send_reply(ts, ts->nicks[nick]->getSD(), ts->nicks[nick], reply);
 }
 
 //KICK

@@ -224,16 +224,23 @@
 
 
 
-<h4>Plan for 21.09.24 (9:30-11:30 Prague time)</h4>
+<h4>Plan for 21.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>Logger/debugger goes through select()</li>
   <li>Proper command handling & error codes:</li>
   <ul>
-	<li> irc_part</li>
-    <li> irc_privmsg</li>
-    <li> irc_topic</li>
-	<li> irc_invite</li>
+	<li>☑ irc_part</li>
+    <li>☑ irc_topic</li>
+	<li>☑ irc_invite</li>
+  </ul>
+</ol>
+
+<h4>Plan for 21.09.24 (16:30-18:30 Prague time)</h4>
+<ol>
+  <li>Proper command handling & error codes:</li>
+  <ul>
     <li> irc_kick</li>
+    <li> irc_privmsg</li>
+	<li> irc_join "0"</li>
   </ul>
 </ol>
 
@@ -266,6 +273,7 @@
 
 <h4>Plan for 24.09.24 (??? Prague time)</h4>
 <ol>
+  <li>Logger/debugger goes through select()</li>
   <li>Make buffers in user private</li>
   <li>Check if all functions are allowed</li>
   <li>Proper command handling & error codes:</li>
@@ -312,18 +320,18 @@
 ☑
 ☒ 
 ☐ irc_cap
-☐ irc_pass
+☑ irc_pass
 ☑ irc_nick
 ☑ irc_user
 ☐ irc_ping
 ☐ irc_pong
 ☐ irc_mode
-☐ irc_join
-☐ irc_part
+☑ irc_join
+☑ irc_part
 ☐ irc_privmsg
 ☐ irc_notice
-☐ irc_topic
-☐ irc_invite
+☑ irc_topic
+☑ irc_invite
 ☐ irc_kick
 ☐ irc_away
 ☐ irc_who

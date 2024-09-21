@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/20 11:37:41 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/21 10:58:34 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,13 @@ bool	Channel::isOperator(unsigned short sd)
 	if (this->_usersInChannel.find(sd) != this->_usersInChannel.end())
 		return (this->_usersInChannel[sd]);
 	return (false); //should not happen?
+}
+
+bool	Channel::hasUser(unsigned short sd)
+{
+	if (this->_usersInChannel.find(sd) != this->_usersInChannel.end())
+		return (true);
+	return (false);
 }
 
 void	Channel::addOperator(unsigned short sd)
