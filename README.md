@@ -241,14 +241,9 @@
 <ol>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☐ irc_ping</li>
-    <li> irc_mode</li>
+    <li>☑ irc_ping</li>
+    <li>☑ irc_mode</li>
   </ul>
-  <li>☐ test 1</li>
-  <li>☑ test 2</li>
-  <li>☒ test 3</li>
-  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
-  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 <h4>Plan for 23.09.24 (8:30-10:30 Prague time)</h4>
@@ -260,6 +255,8 @@
     <li>☐ irc_who</li>
     <li>☐ irc_quit</li>
   </ul>
+  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
+  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 
@@ -268,11 +265,13 @@
   <li>Logger/debugger goes through select()</li>
   <li>Make buffers in user private</li>
   <li>Check if all functions are allowed</li>
+  <li>421</li>
   <li>Proper command handling & error codes:</li>
   <ul>
     <li>☐ irc_cap</li>
     <li>☐ irc_notice</li>
     <li>☐ irc_whois</li>
+    <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
   </ul>
 </ol>
 
@@ -306,6 +305,9 @@
   <li>new</li>
   <li>new</li>
   <li>new</li>
+  <li>☐ test 1</li>
+  <li>☑ test 2</li>
+  <li>☒ test 3</li>
 </ol>
 
 ☐

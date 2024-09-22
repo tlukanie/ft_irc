@@ -191,6 +191,7 @@ void irc_pass(Message* msg, struct s_server *ts)
 # define UPPER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 # define DIGITS "0123456789"
 # define SPECIAL "[]{}^`|_\\"
+# define KEY "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
 
 static bool	isValidNick(std::string	nick)
 {
@@ -203,6 +204,19 @@ static bool	isValidNick(std::string	nick)
 	for (size_t i = 1; i < nick.size(); i++)
 	{
 		if (validRest.find(nick[i]) == std::string::npos)
+			return (false);
+	}
+	return (true);
+}
+
+static bool	isValidKey(std::string	key)
+{
+	std::string valid = KEY;
+	if (!key.size() || key.size() > 32)
+		return (false);
+	for (size_t i = 0; i < key.size(); i++)
+	{
+		if (valid.find(key[i]) == std::string::npos)
 			return (false);
 	}
 	return (true);
@@ -394,19 +408,21 @@ void irc_ping(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 
+
 	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
+	//this check may not be needed
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	if (!msg->getParams().size())
+	{
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "PING :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
 	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0];
 	send_reply(ts, msg->getSD(), NULL, reply);
-	// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-	// { 
-	// 	std::cerr << "send failed" << std::endl;
-	// } 
-	// else
-	// {
-	// 	std::cout << "Reply message sent successfully" << std::endl;
-	// }
 }
 
 // PONG
@@ -666,7 +682,7 @@ void irc_topic(Message* msg, struct s_server *ts)
 	if (msg->getParams().size() > 1)
 		topic = msg->getParams()[1];
 
-	if (ts->channels.find(channelName) == ts->channels.end())
+	if (!isChannel(ts, channelName))
 	{
 		reply = "403 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
@@ -759,7 +775,7 @@ void irc_invite(Message* msg, struct s_server *ts)
 		return ;
 	}
 	//403
-	if (ts->channels.find(channelName) == ts->channels.end())
+	if (!isChannel(ts, channelName))
 	{
 		reply = "403 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
@@ -849,7 +865,7 @@ void irc_kick(Message* msg, struct s_server *ts)
 	std::vector<std::string>	nicks = ok_split(msg->getParams()[1], ',');
 	std::string reason;
 	//403
-	if (ts->channels.find(channelName) == ts->channels.end())
+	if (!isChannel(ts, channelName))
 	{
 		reply = "403 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
@@ -931,7 +947,22 @@ void irc_away(Message* msg, struct s_server *ts)
 	}
 }
 
-
+static bool	ok_containsDuplicate(const std::string &text)
+{
+	std::string	copy = text;
+	size_t		size = text.size();
+	if (size > 256)
+		size = 256;
+	for	(size_t i = 0; i < size; i++)
+	{
+		for	(size_t j = 0; j < size; j++)
+		{
+			if (i != j && copy[i] == text[j])
+				return (true);
+		}
+	}
+	return (false);
+}
 
 
 // MODE 
@@ -958,130 +989,290 @@ void irc_away(Message* msg, struct s_server *ts)
 //   :irc.example.com 329 dan #foobar 1620807422
 void irc_mode(Message* msg, struct s_server *ts)
 {
+	std::string	reply;
 	std::cout << MAGENTA_COLOUR "MODE COMMAND not really supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	if (!msg->getParams().size())
+	{
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "MODE :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
 	Channel *channel;
+	std::string channelName = msg->getParams()[0];
+	//403
+	if (!isChannel(ts, channelName))
+	{
+		reply = "403 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":No such channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	channel = ts->channels[channelName];
 	if (msg->getParams().size() < 2)
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
+		//324
+		reply = "324 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		if (channel->getModeFlags())
+			reply += "+";
+		if (channel->getModeFlags() & CHANNEL_INVITE)
+			reply += "i";
+		if (channel->getModeFlags() & CHANNEL_TOPIC)
+			reply += "t";
+		if (channel->getModeFlags() & CHANNEL_LIMIT)
+			reply += "l";
+		if (channel->getModeFlags() & CHANNEL_KEY)
+			reply += "k";
+		if (channel->getModeFlags() & CHANNEL_LIMIT)
+			reply += " " + ok_itostr(channel->getChannelLimit());
+		if (channel->getModeFlags() & CHANNEL_KEY)
+			reply += " fake_key";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		//329 (not yet)
 		return ;
 	}
-	std::string channelName = msg->getParams()[0];
-	std::string	flags = msg->getParams()[1];
-	if (!channelName.size() || flags.size() < 2 || !isChannel(ts, channelName)
-		|| (flags[0] != '+' && flags[0] != '-'))
+	std::string					modestring = msg->getParams()[1];
+	std::string					modestringReturn;
+	std::vector<std::string>	paramsRetrun;
+	size_t						n = 2;
+	//501
+	if (modestring.size() < 2 || (modestring[0] != '+' && modestring[0] != '-'))
 	{
-		std::cerr << "NOT good parameters" << std::endl;
+		reply = "501 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += ":Unknown MODE flag";
+		send_reply(ts, msg->getSD(), NULL, reply);
 		return ;
 	}
-	bool	plus = (flags[0] == '+');
+	//442
+	if (!(channel->hasUser(msg->getSD())))
+	{
+		reply = "442 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not on that channel";
+		send_reply(ts, msg->getSD(), NULL, reply);
+	}
+	//482
+	if (!ts->channels[channelName]->isOperator(msg->getSD()))
+	{
+		reply = "482 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += channelName + " ";
+		reply += ":You are not channel operator";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	// 400 incorrect string
+	if (ok_containsDuplicate(modestring))
+	{
+		reply = "400 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "MODE :Duplicate in the modestring";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	//USER MODE not handled
+
+	//696 bad key or channel limit
 	//check channel as param[0]
 	//check plus or minus as param [1][0]
 	//check param[1][1]
-	channel = ts->channels[channelName];
-	if (flags[1] == 'i')
+	bool	plus;
+	bool	plus2;
+	for (size_t i = 0; i < modestring.size(); i++)
 	{
-		if (plus)
+		if (modestring[i] == '+')
+			plus = true;
+		else if (modestring[i] == '-')
+			plus = false;
+		else if (modestring[i] == 'i')
 		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is now invite only.", "", MYDEBUG);
-			channel->addModeFlags(CHANNEL_INVITE);
-		}
-		else
-		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is no longer invite only.", "", MYDEBUG);
-			channel->removeModeFlags(CHANNEL_INVITE);
-		}
-	}
-	else if (flags[1] == 't')
-	{
-		if (plus)
-		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by moderators only.", "", MYDEBUG);
-			channel->addModeFlags(CHANNEL_TOPIC);
-		}
-		else
-		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by anyone.", "", MYDEBUG);
-			channel->removeModeFlags(CHANNEL_TOPIC);
-		}
-	}
-	else if (flags[1] == 'k')
-	{
-		if (plus)
-		{
-			if (msg->getParams().size() < 3)
+			if (plus)
 			{
-				std::cerr << "NOT enough parameters" << std::endl;
-				return ;
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is now invite only.", "", MYDEBUG);
+				channel->addModeFlags(CHANNEL_INVITE);
+				if (!modestringReturn.size() || !plus2)
+					modestringReturn += "+";
+				plus2 = true;
 			}
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " locked by key:", msg->getParams()[2], MYDEBUG);
-			channel->setKey(msg->getParams()[2]);
-			channel->addModeFlags(CHANNEL_KEY);
-		}
-		else
-		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " unlocked.", "", MYDEBUG);
-			channel->setKey("");
-			channel->removeModeFlags(CHANNEL_KEY);
-		}
-	}
-	else if (flags[1] == 'l')
-	{
-		if (plus)
-		{
-			if (msg->getParams().size() < 3)
+			else
 			{
-				std::cerr << "NOT enough parameters" << std::endl;
-				return ;
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " is no longer invite only.", "", MYDEBUG);
+				channel->removeModeFlags(CHANNEL_INVITE);
+				if (!modestringReturn.size() || plus2)
+					modestringReturn += "-";
+				plus2 = false;
 			}
-			int	limit = ok_strtoi<int>(msg->getParams()[2]);
-			if (limit < 2 || limit > 256)
+			modestringReturn += "i";
+		}
+		else if (modestring[i] == 't')
+		{
+			if (plus)
 			{
-				std::cerr << "Invalid limit: " << limit << std::endl;
-				return ;
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by moderators only.", "", MYDEBUG);
+				channel->addModeFlags(CHANNEL_TOPIC);
+				if (!modestringReturn.size() || !plus2)
+					modestringReturn += "+";
+				plus2 = true;
 			}
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " limited to " + ok_itostr(limit) + " users.", "", MYDEBUG);
-			channel->setChannelLimit(limit);
-			channel->addModeFlags(CHANNEL_LIMIT);
+			else
+			{
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " topic is setable by anyone.", "", MYDEBUG);
+				channel->removeModeFlags(CHANNEL_TOPIC);
+				if (!modestringReturn.size() || plus2)
+					modestringReturn += "-";
+				plus2 = false;
+			}
+			modestringReturn += "t";
+		}
+		else if (modestring[i] == 'k')
+		{
+			if (plus)
+			{
+				if (msg->getParams().size() < n + 1 || !msg->getParams()[n].size())
+				{
+					reply = "461 ";
+					reply += ts->users[msg->getSD()]->getNick() + " ";
+					reply += "MODE :Not enough parameters";
+					send_reply(ts, msg->getSD(), NULL, reply);
+					break ;
+				}
+				if (!isValidKey(msg->getParams()[n]))
+				{
+					reply = "696 ";
+					reply += ts->users[msg->getSD()]->getNick() + " ";
+					reply += channelName + " ";
+					reply += "k ";
+					reply += msg->getParams()[n] + " ";
+					reply += ":Invalid key";
+					send_reply(ts, msg->getSD(), NULL, reply);
+					break ;
+				}
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " locked by key:", msg->getParams()[n], MYDEBUG);
+				channel->setKey(msg->getParams()[n++]);
+				channel->addModeFlags(CHANNEL_KEY);
+				if (!modestringReturn.size() || !plus2)
+					modestringReturn += "+";
+				plus2 = true;
+				paramsRetrun.push_back("fake-key");
+			}
+			else
+			{
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " unlocked.", "", MYDEBUG);
+				channel->setKey("");
+				channel->removeModeFlags(CHANNEL_KEY);
+				if (!modestringReturn.size() || plus2)
+					modestringReturn += "-";
+				plus2 = false;
+			}
+			modestringReturn += "k";
+		}
+		else if (modestring[i] == 'l')
+		{
+			if (plus)
+			{
+				if (msg->getParams().size() < n + 1 || !msg->getParams()[n].size())
+				{
+					reply = "461 ";
+					reply += ts->users[msg->getSD()]->getNick() + " ";
+					reply += "MODE :Not enough parameters";
+					send_reply(ts, msg->getSD(), NULL, reply);
+					break ;
+				}
+				int	limit = ok_strtoi<int>(msg->getParams()[n++]);
+				if (limit < 2 || limit > 64)
+				{
+					reply = "696 ";
+					reply += ts->users[msg->getSD()]->getNick() + " ";
+					reply += channelName + " ";
+					reply += "l ";
+					reply += msg->getParams()[n - 1] + " ";
+					reply += ":the limit has to be between 2 - 64 users per channel";
+					send_reply(ts, msg->getSD(), NULL, reply);
+					break ;
+				}
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " limited to " + ok_itostr(limit) + " users.", "", MYDEBUG);
+				channel->setChannelLimit(limit);
+				channel->addModeFlags(CHANNEL_LIMIT);
+				if (!modestringReturn.size() || !plus2)
+					modestringReturn += "+";
+				plus2 = true;
+				paramsRetrun.push_back(ok_itostr(limit));
+			}
+			else
+			{
+				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " not limited.", "", MYDEBUG);
+				channel->setChannelLimit(0);
+				channel->removeModeFlags(CHANNEL_LIMIT);
+				if (!modestringReturn.size() || plus2)
+					modestringReturn += "-";
+				plus2 = false;
+			}
+			modestringReturn += "l";
+		}
+		else if (modestring[i] == 'o')
+		{
+			if (msg->getParams().size() < n + 1)
+			{
+				reply = "461 ";
+				reply += ts->users[msg->getSD()]->getNick() + " ";
+				reply += "MODE :Not enough parameters";
+				send_reply(ts, msg->getSD(), NULL, reply);
+				break ;
+			}
+			std::string nick = msg->getParams()[n++];
+			if (!isInChannel(ts, channelName, nick))
+			{
+				reply = "441 ";
+				reply += ts->users[msg->getSD()]->getNick() + " ";
+				reply += nick + " ";
+				reply += channelName + " ";
+				reply += ":They are not on that channel";
+				send_reply(ts, msg->getSD(), NULL, reply);
+				continue ;
+			}
+			if (plus)
+			{
+				ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " added " + nick + " as an operator in the channel: " + channelName + "." , "", MYDEBUG);
+				channel->addOperator(ts->nicks[nick]->getSD());
+				if (!modestringReturn.size() || !plus2)
+					modestringReturn += "+";
+				plus2 = true;
+			}
+			else
+			{
+				ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " removed " + nick + " from operators in the channel: " + channelName + "." , "", MYDEBUG);
+				channel->removeOperator(ts->nicks[nick]->getSD());
+				if (!modestringReturn.size() || plus2)
+					modestringReturn += "-";
+				plus2 = false;
+			}
+			modestringReturn += "o";
+			paramsRetrun.push_back(nick);
 		}
 		else
 		{
-			ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " not limited.", "", MYDEBUG);
-			channel->setChannelLimit(0);
-			channel->removeModeFlags(CHANNEL_LIMIT);
+			reply = "501 ";
+			reply += ts->users[msg->getSD()]->getNick() + " ";
+			reply += ":Unknown MODE flag";
+			send_reply(ts, msg->getSD(), NULL, reply);
+			break ;
 		}
 	}
-	else if (flags[1] == 'o')
-	{
-		if (msg->getParams().size() < 3)
-		{
-			std::cerr << "NOT enough parameters" << std::endl;
-			return ;
-		}
-		std::string nick = msg->getParams()[2];
-		if (!isInChannel(ts, channelName, nick))
-		{
-			std::cerr << "Nick " << nick << " not in channel " << channelName << "." << std::endl;
-			return ;
-		}
-		
-		if (plus)
-		{
-			ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " added " + nick + " as an operator in the channel: " + channelName + "." , "", MYDEBUG);
-			channel->addOperator(ts->nicks[nick]->getSD());
-		}
-		else
-		{
-			ok_debugger(&(ts->debugger), DEBUG, ts->users[msg->getSD()]->getNick() + " removed " + nick + " from operators in the channel: " + channelName + "." , "", MYDEBUG);
-			channel->removeOperator(ts->nicks[nick]->getSD());
-		}
-	}
-	else
-	{
-		std::cerr << "NOT good parameters" << std::endl;
-		return ;
-	}
+	reply = "MODE ";
+	reply += channelName + " ";
+	reply += modestringReturn;
+	for (size_t i = 0; i < paramsRetrun.size(); i++)
+		reply += " " + paramsRetrun[i];
+	send_reply_channel(ts, channelName, ts->users[msg->getSD()], reply);
 }
 
 //PRIVMSG
@@ -1172,7 +1363,7 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 // 		std::string channelName = msg->getParams()[0];
 // 		//reply channel
 // 		//check if channel exists
-// 		if (ts->channels.find(channelName) == ts->channels.end())
+// 		if (!isChannel(ts, channelName))
 // 		{
 // 			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel:", channelName, MYDEBUG);
 // 			return ;
