@@ -239,7 +239,7 @@
 
 <h4>Plan for 22.09.24 (10:30-12:30 Prague time)</h4>
 <ol>
-  <li>Proper command handling & error codes:</li>
+  <li><s>Proper command handling & error codes:</s></li>
   <ul>
     <li>☑ irc_ping</li>
     <li>☑ irc_mode</li>
@@ -248,40 +248,97 @@
 
 <h4>Plan for 23.09.24 (8:30-10:30 Prague time)</h4>
 <ol>
-
+  <li><s>Make a plan for the week</s></li>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☐ irc_away</li>
     <li>☐ irc_who</li>
     <li>☐ irc_quit</li>
   </ul>
   <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
-  <li>Logger/debugger used everywhere in the code</li>
 </ol>
 
 
-<h4>Plan for 24.09.24 (??? Prague time)</h4>
+<h4>Plan for 24.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>Logger/debugger goes through select()</li>
-  <li>Make buffers in user private</li>
-  <li>Check if all functions are allowed</li>
   <li>421</li>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☐ irc_cap</li>
     <li>☐ irc_notice</li>
     <li>☐ irc_whois</li>
     <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
   </ul>
 </ol>
 
+<h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
+<ol>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☐ irc_cap</li>
+    <li>☐ irc_away</li>
+  </ul>
+</ol>
+
+<h4>Plan for 26.09.24 (8:30-10:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger goes through select()</li>
+  <li>Make buffers in user private</li>
+  <li>Check if all functions are allowed</li>
+</ol>
+
+<h4>Plan for 26.09.24 (11:30-13:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger used everywhere in the code</li>
+  <li>irc_pong</li>
+  <li>server pinging users?</li>
+</ol>
+
+<h4>Plan for 27.09.24 (9:30-11:30 Prague time)</h4>
+<ol>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
+</ol>
+
+<h4>Plan for 28.09.24 (??? Prague time)</h4>
+<ol>
+  <li>Transfer files</li>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
+</ol>
+
+<h4>Plan for 29.09.24 (??? Prague time)</h4>
+<ol>
+  <li>Make a plan for the next week:</li>
+  <li>Logger/debugger used everywhere in the code</li>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
+</ol>
+
+
+<h4>Plan for 30.09.24 (8:30-10:30 Prague time)</h4>
+<ol>
+  <li>Logger/debugger used everywhere in the code</li>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
+</ol>
+
 <h4>Plan for the next week</h4>
 <ol>
-  <li>Add User class - User verified by password and with user details and nick maybe a child class of User</li>
-  <li>Proper command handling</li>
+  <li>Proper command testing</li>
   <li>Error codes</li>
   <li>Logger/debugger used everywhere in the code</li>
-  <li>Logger/debugger goes through select()</li>
+  <li>Create a second client. (bot)</li>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
@@ -289,14 +346,8 @@
   <li>Update client to test prefix, server validation of messages</li>
   <li>Create a second client. One will be automated another will take messages manually like telnet</li>
   <li>Read through the modern irc specification (especially commands)</li>
-  <li>Proper password command check</li>
-  <li>Process more commands make them work in all scenarios</li>
+  <li>Test if one client is sleeping (Ctrl+z)</li>
   <li>Fix/check memory leaks and free everything that needs freeing</li>
-  <li>WHO</li>
-  <li>PONG</li>
-  <li>server pinging users?</li>
-  <li>NOTICE ?</li>
-  <li>Transfer files</li>
   <li>Bot (magic 8ball "magic8bot") from our client</li>
   <li>new</li>
   <li>new</li>
