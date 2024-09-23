@@ -33,6 +33,11 @@ static bool isChannel(struct s_server *ts, std::string channelName)
 	return (ts->channels.find(channelName) != ts->channels.end());
 }
 
+static bool isNick(struct s_server *ts, std::string nick)
+{
+	return (ts->nicks.find(nick) != ts->nicks.end());
+}
+
 static bool isInChannel(struct s_server *ts, std::string channelName, std::string nick)
 {
 	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
@@ -585,6 +590,7 @@ void irc_join(Message* msg, struct s_server *ts)
 		//353
 		reply = "353 ";
 		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "= ";
 		reply += channelNames[i] + " ";
 		reply += ":";
 		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelNames[i]); it != ts->channel2user.upper_bound(channelNames[i]); it++)
@@ -1395,13 +1401,88 @@ void irc_notice(Message* msg, struct s_server *ts)
 		return ;
 }
 
+// "<client> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
+//RPL_WHOREPLY
+static void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick)
+{
+	std::string	reply;
+	std::string channel = channelName;
+	reply = "352 ";
+	reply += client + " ";
+	if (!channel.size())
+	{
+		std::cout << "nick: " << nick << std::endl; 
+		std::multimap<std::string, Channel*>::iterator it = ts->user2channel.find(nick);
+		if (it != ts->user2channel.end())
+			channel += it->second->getChannelName();
+		else
+			channel += "*";
+		for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.begin(); iter != ts->user2channel.end(); iter++)
+			std::cout << "nick: " << it->first << " | chennel: " << it->second->getChannelName() << std::endl;
+	}
+	reply += channel + " ";
+	reply += ts->nicks[nick]->getUserName() + " ";
+	// if (ts->nicks[nick]->getIP()[0] == ':')
+	// 	reply += "0";
+	// reply += ts->nicks[nick]->getIP() + " ";
+	reply += nick + " ";
+	reply += ts->servername + " ";
+	reply += nick + " ";
+	reply += "H";
+	if (channel != "*" && ts->channels[channel]->isOperator(ts->nicks[nick]->getSD()))
+		reply += "@";
+	reply += " ";
+	reply += ":1 " + ts->nicks[nick]->getRealName();
+	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
+}
+
+
+//RPL_ENDOFWHO
+static void	ok_send_315(struct s_server *ts, std::string client, std::string mask)
+{
+	std::string	reply;
+	reply = "315 ";
+	reply += client + " ";
+	reply += mask + " ";
+	reply += ":End of WHO list";
+	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
+}
+
 //WHO
 // https://modern.ircdocs.horse/#who-message
 void irc_who(Message* msg, struct s_server *ts)
 {
+	std::string	reply;
 	std::cout << MAGENTA_COLOUR "WHO COMMAND not supported" NO_COLOUR << std::endl; 
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	if (!msg->getParams().size())
+	{
+		reply = "461 ";
+		reply += ts->users[msg->getSD()]->getNick() + " ";
+		reply += "WHO :Not enough parameters";
+		send_reply(ts, msg->getSD(), NULL, reply);
+		return ;
+	}
+	std::string	mask = msg->getParams()[0];
+	if (mask[0] == '#' || mask[0] == '&')
+	{
+		if (isChannel(ts, mask))
+		{
+			for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(mask); it != ts->channel2user.upper_bound(mask); it++)
+			{
+				ok_send_352(ts, ts->users[msg->getSD()]->getNick(), mask, it->second->getNick());
+			}
+		}
+	}
+	else
+	{
+		if (isNick(ts, mask))
+		{
+			ok_send_352(ts, ts->users[msg->getSD()]->getNick(), "", mask);
+		}
+	}
+	ok_send_315(ts, ts->users[msg->getSD()]->getNick(), mask);
 }
 
 
@@ -1429,6 +1510,13 @@ void irc_whois(Message* msg, struct s_server *ts)
 		if (ts->nicks.find(nick) != ts->nicks.end())
 			std::cout << ts->nicks[nick]->print(true) << std::endl;
 	}
+
+	//if not a channel
+		//no such nick 401
+	//if channel
+		//402
+
+
 }
 
 
@@ -1949,6 +2037,7 @@ static int ft_read_config(t_server *ts)
 	std::string		key;
 	std::string		value;
 
+	ts->servername = "bestirc";
 	if (file.fail() || !file.is_open())
 		return (1);
 	while (std::getline(file, line))
@@ -1974,6 +2063,10 @@ static int ft_read_config(t_server *ts)
 		else if (key == "IP")
 		{
 			//not implemented
+		}
+		else if (key == "SERVERNAME")
+		{
+			ts->servername = value;
 		}
 		else if (key == "PASSWORD")
 		{

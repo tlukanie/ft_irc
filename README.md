@@ -249,12 +249,10 @@
 <h4>Plan for 23.09.24 (8:30-10:30 Prague time)</h4>
 <ol>
   <li><s>Make a plan for the week</s></li>
-  <li>Proper command handling & error codes:</li>
+  <li><s>Proper command handling & error codes:</s></li>
   <ul>
-    <li>☐ irc_who</li>
-    <li>☐ irc_quit</li>
+    <li>☑ irc_who</li>
   </ul>
-  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
 </ol>
 
 
@@ -271,6 +269,11 @@
 
 <h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
 <ol>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☐ irc_quit</li>
+  </ul>
+  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
   <li>Proper command handling & error codes:</li>
   <ul>
     <li>☐ irc_cap</li>
@@ -294,6 +297,7 @@
 
 <h4>Plan for 27.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
+  <li>Const variables from getters</li>
   <li>Proper command testing</li>
   <ul>
     <li>☐ irc_</li>
