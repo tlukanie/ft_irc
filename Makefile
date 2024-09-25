@@ -6,20 +6,28 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/09 14:49:54 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/25 12:12:30 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	ircserv
-SRC_DIR	=	srcs/
-FILES	=	server.cpp colours.cpp debugger.cpp User.cpp Message.cpp utils.cpp Channel.cpp
-SRCS	=	$(addprefix $(SRC_DIR), $(FILES))
+SRCS	=	srcs/ircserv.cpp \
+			srcs/classes/Channel.cpp \
+			srcs/classes/Message.cpp \
+			srcs/classes/User.cpp \
+			srcs/utils/colours.cpp \
+			srcs/utils/debugger.cpp \
+			srcs/utils/utils.cpp
 OBJ_DIR	=	objs/
-OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:%.cpp=%.o))
+OBJS	=	$(SRCS:%.cpp=%.o)
 CLIENT	=	client
 C_SRCS	=	TestingClient1.cpp
 C_OBJS	=	TestingClient1.o
-HEADERS	=	srcs/server.hpp srcs/colours.hpp srcs/debugger.hpp srcs/User.hpp srcs/Channel.hpp srcs/Message.hpp srcs/utils.hpp srcs/enums.hpp
+HEADERS	=	includes/ircserv.hpp \
+			includes/enums.hpp \
+			srcs/classes/Channel.hpp \
+			srcs/classes/Message.hpp \
+			srcs/classes/User.hpp
 CPP		=	c++
 FLAGS	=	-g -Wall -Wextra -Werror -std=c++98
 
@@ -34,8 +42,8 @@ $(CLIENT): $(C_OBJS)
 %.o: %.cpp $(HEADERS)
 	$(CPP) $(FLAGS) -c $< -o $@
 
-objs/%.o: srcs/%.cpp | objdir
-	$(CPP) $(FLAGS) -c $< -o $@
+# objs/%.o: srcs/%.cpp | objdir
+# 	$(CPP) $(FLAGS) -c $< -o $@
 
 objdir:
 	mkdir -p $(OBJ_DIR)

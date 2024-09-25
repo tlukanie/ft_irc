@@ -269,15 +269,8 @@
 
 <h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
 <ol>
-  <li>Send quit message to users if we close sd (connection lost?)</li>
-  <li>Proper command handling & error codes:</li>
-  <ul>
-    <li>☐ irc_privmsg (other users)</li>
-    <li>☐ irc_cap</li>
-    <li>☐ irc_away</li>
-    <li>☐ irc_whois</li>
-    <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
-  </ul>
+  <li><s>Send quit message to users if we close sd (connection lost?)</s></li>
+  <li>Clean code</li>
 </ol>
 
 <h4>Plan for 26.09.24 (8:30-10:30 Prague time)</h4>
@@ -333,6 +326,14 @@
   <ul>
     <li>☐ irc_</li>
     <li>☐ irc_</li>
+  </ul>
+  <li>Proper command handling & error codes:</li>
+  <ul>
+    <li>☐ irc_privmsg (other users?)</li>
+    <li>☐ irc_cap</li>
+    <li>☐ irc_away</li>
+    <li>☐ irc_whois</li>
+    <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
   </ul>
 </ol>
 

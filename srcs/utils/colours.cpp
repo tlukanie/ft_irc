@@ -6,12 +6,12 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:23:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/05/19 16:04:05 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/25 12:04:42 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include "colours.hpp"
+#include "../../includes/ircserv.hpp"
 
 void	ft_colorize(uintptr_t i)
 {

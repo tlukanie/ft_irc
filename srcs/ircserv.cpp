@@ -1,7 +1,7 @@
 //Example code: A simple server side code, which echos back the received message. 
 //Handle multiple socket users with select and fd_set on Linux 
 
-#include "server.hpp"
+#include "../includes/ircserv.hpp"
 
 static bool		g_server_alive = true;
 
@@ -91,7 +91,7 @@ static int	remove_user_from_channel(struct s_server *ts, User *user, Channel *ch
 	{
 		if (it->second->getChannelName() == channelName)
 		{
-			ok_debugger(&(ts->debugger), NOTICE, "Deleting channel for user: ", channelName, MYDEBUG);
+			ok_debugger(&(ts->debugger), NOTICE, "Erasing channel for user: ", channelName, MYDEBUG);
 			ts->user2channel.erase(it);
 			break ;
 		}
@@ -1700,6 +1700,7 @@ void	server_loop(t_server *ts)
 					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
 					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
+					remove_user_from_server(ts, user_ptr, "Quit: Connection closed by client");
 					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed recv): ", ok_itostr(ts->sd), MYDEBUG);
 					close(ts->sd);
 					//REMOVE CONNECTION FROM MAP
@@ -1806,6 +1807,7 @@ void	server_loop(t_server *ts)
 					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
 					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
+					remove_user_from_server(ts, user_ptr, "Quit: Connection closed by client");
 					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed send): ", ok_itostr(ts->sd), MYDEBUG);
 					close(ts->sd);
 					//REMOVE CONNECTION FROM MAP

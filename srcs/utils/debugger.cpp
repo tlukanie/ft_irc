@@ -6,11 +6,11 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/18 18:14:57 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/25 12:04:37 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "debugger.hpp"
+#include "../../includes/ircserv.hpp"
 
 static std::string	get_date(void)
 {
