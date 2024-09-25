@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/19 10:55:30 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/24 15:49:17 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ class User
 		// void			removeAuthFlag(unsigned int flag);
 		void			setReadingFlag(void);
 		void			unsetReadingFlag(void);
+		bool			getFreedom(void);
+		void			setFree(void);
 		void			setNick(std::string nick);
 		void			setUserName(std::string username);
 		void			setHostName(std::string hostname);

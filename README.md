@@ -255,29 +255,28 @@
   </ul>
 </ol>
 
-
 <h4>Plan for 24.09.24 (14:30-16:30 Prague time)</h4>
 <ol>
-  <li>421</li>
+  <li><s>421</s></li>
+  <li><s>File transfer</s></li>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☐ irc_notice</li>
-    <li>☐ irc_whois</li>
-    <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
+    <li>☑ irc_notice</li>
+    <li>☑ irc_quit</li>
   </ul>
+  <li><s>Remove user properly, set freedom true and send just one ERROR message before closing connection<s></li>
 </ol>
 
 <h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
 <ol>
+  <li>Send quit message to users if we close sd (connection lost?)</li>
   <li>Proper command handling & error codes:</li>
   <ul>
-    <li>☐ irc_quit</li>
-  </ul>
-  <li>Remove user properly, set freedom true and send just one ERROR message before closing connection</li>
-  <li>Proper command handling & error codes:</li>
-  <ul>
+    <li>☐ irc_privmsg (other users)</li>
     <li>☐ irc_cap</li>
     <li>☐ irc_away</li>
+    <li>☐ irc_whois</li>
+    <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
   </ul>
 </ol>
 
@@ -378,11 +377,11 @@
 ☑ irc_join
 ☑ irc_part
 ☑ irc_privmsg
-☐ irc_notice
+☑ irc_notice
 ☑ irc_topic
 ☑ irc_invite
 ☑ irc_kick
 ☐ irc_away
-☐ irc_who
+☑ irc_who
 ☐ irc_whois
-☐ irc_quit
+☑ irc_quit

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/20 12:14:57 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/24 15:50:48 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,17 @@ unsigned short	User::getSD(void)
 {
 	return (this->_sd);
 }
+
+bool	User::getFreedom(void)
+{
+	return (this->_freedom);
+}
+
+void	User::setFree(void)
+{
+	this->_freedom = true;
+}
+
 
 std::string	User::getIP(void)
 {

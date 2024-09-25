@@ -48,6 +48,30 @@ static bool isInChannel(struct s_server *ts, std::string channelName, std::strin
 	return (false);
 }
 
+static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text)
+{
+	std::string	reply;
+
+	if (ts->users[sd]->getFreedom())
+		return ;
+	if (Sender)
+		reply += ":" + Sender->getNick() + "!" + Sender->getUserName() + "@" + Sender->getIP() + " ";
+	reply += text + CRLF;
+	ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(sd) + "]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
+	for (std::string::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		ts->users[sd]->_data_out.push_back(*it);
+	}
+}
+
+static void	send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text)
+{
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		send_reply(ts, it->second->getSD(), Sender, text);
+	}
+}
+
 static int	remove_user_from_channel(struct s_server *ts, User *user, Channel *channel)
 {
 	std::string channelName = channel->getChannelName();
@@ -83,14 +107,20 @@ static int	remove_user_from_channel(struct s_server *ts, User *user, Channel *ch
 	return (0);
 }
 
-static int	remove_user_from_server(struct s_server *ts, User *user)
+static int	remove_user_from_server(struct s_server *ts, User *user, std::string reason)
 {
+	user->setFree();
+	std::string	reply;
+
+	reply = "QUIT";
+	if (reason.size())
+		reply += " :" + reason;
 	for (std::multimap<std::string, Channel*>::iterator it = ts->user2channel.lower_bound(user->getNick()); it != ts->user2channel.upper_bound(user->getNick());)
 	{
 		std::multimap<std::string, Channel*>::iterator temp = it++;
+		send_reply_channel(ts, temp->second->getChannelName(), user, reply);
 		remove_user_from_channel(ts, user, temp->second);
 	}
-	//user freedom = true;
 	return (0);
 }
 
@@ -105,27 +135,6 @@ static int	add_user_to_channel(struct s_server *ts, User *user, Channel *channel
 	return (0);
 }
 
-static void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text)
-{
-	std::string	reply;
-
-	if (Sender)
-		reply += ":" + Sender->getNick() + "!" + Sender->getUserName() + "@" + Sender->getIP() + " ";
-	reply += text + CRLF;
-	ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(sd) + "]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
-	for (std::string::iterator it = reply.begin(); it != reply.end(); it++)
-	{
-		ts->users[sd]->_data_out.push_back(*it);
-	}
-}
-
-static void	send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text)
-{
-	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-	{
-		send_reply(ts, it->second->getSD(), Sender, text);
-	}
-}
 
 // static void	send_reply_others(struct s_server *ts, std::string channelName, User *Sender, std::string text)
 // {
@@ -447,10 +456,14 @@ void irc_quit(Message* msg, struct s_server *ts)
 	std::cout << MAGENTA_COLOUR "QUIT COMMAND not yet supported" NO_COLOUR << std::endl; 
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
-	remove_user_from_server(ts, ts->users[msg->getSD()]);
+	std::string	reason;
+	reason = "Quit: ";
+	if (msg->getParams().size())
+		reason += msg->getParams()[0];
 	std::string	reply;
 	reply = "ERROR :Quitting channel";
 	send_reply(ts, msg->getSD(), NULL, reply);
+	remove_user_from_server(ts, ts->users[msg->getSD()], reason);
 	//user leave all the channels they are in
 	//send quitting message to all uers that share the channels
 }
@@ -1394,15 +1407,57 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 
 //NOTICE
 //https://modern.ircdocs.horse/#notice-message
+
 void irc_notice(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "NOTICE COMMAND not supported yet" NO_COLOUR << std::endl; 
+	std::string	reply;
+	std::cout << MAGENTA_COLOUR "NOTICE COMMAND now fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
+	if (!msg->getParams().size())
+	{
+		//411
+		return ;
+	}
+	if (msg->getParams().size() < 2)
+	{
+		//412
+		return ;
+	}
+	std::vector<std::string>	targets = ok_split(msg->getParams()[0], ',');
+	std::string					text = msg->getParams()[1];
+
+	for (size_t i = 0; i < targets.size(); i++)
+	{
+		reply = "NOTICE " + targets[i] + " :" + text;
+		if (!targets[i].size())
+		{
+			//411
+			continue ;
+		}
+		if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
+		{
+			//403
+			if (ts->channels.find(targets[i]) == ts->channels.end())
+			{
+				continue ;
+			}
+			send_reply_channel(ts, targets[i], ts->users[msg->getSD()], reply);
+		}
+		else
+		{
+			//401
+			if (ts->nicks.find(targets[i]) == ts->nicks.end())
+			{
+				continue ;
+			}
+			send_reply(ts, ts->nicks[targets[i]]->getSD(), ts->users[msg->getSD()], reply);
+		}
+	}
 }
 
 // "<client> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
-//RPL_WHOREPLY
+//RPL_WHOREPLY (352)
 static void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick)
 {
 	std::string	reply;
@@ -1436,8 +1491,7 @@ static void	ok_send_352(struct s_server *ts, std::string client, std::string cha
 	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
 }
 
-
-//RPL_ENDOFWHO
+//RPL_ENDOFWHO (315)
 static void	ok_send_315(struct s_server *ts, std::string client, std::string mask)
 {
 	std::string	reply;
@@ -1445,6 +1499,17 @@ static void	ok_send_315(struct s_server *ts, std::string client, std::string mas
 	reply += client + " ";
 	reply += mask + " ";
 	reply += ":End of WHO list";
+	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
+}
+
+//ERR_UNKNOWNCOMMAND (421)
+static void	ok_send_421(struct s_server *ts, std::string client, std::string command)
+{
+	std::string	reply;
+	reply = "421 ";
+	reply += client + " ";
+	reply += command + " ";
+	reply += ":Unknown command";
 	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
 }
 
@@ -1635,7 +1700,7 @@ void	server_loop(t_server *ts)
 					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
 					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
-					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed recv): ", ok_itostr(ts->sd), MYDEBUG);
 					close(ts->sd);
 					//REMOVE CONNECTION FROM MAP
 					if (user_ptr->getNick().size())
@@ -1741,7 +1806,7 @@ void	server_loop(t_server *ts)
 					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
 					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
-					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed send): ", ok_itostr(ts->sd), MYDEBUG);
 					close(ts->sd);
 					//REMOVE CONNECTION FROM MAP
 					if (user_ptr->getNick().size())
@@ -1756,6 +1821,16 @@ void	server_loop(t_server *ts)
 					//deque would be better for erasing front chunks
 					//ok_debugger(&(ts->debugger), DEBUG, "After sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data_out), MYDEBUG);
 				}
+				if (ts->users[ts->sd]->getFreedom() && !user_ptr->_data_out.size())
+				{ 
+					ok_debugger(&(ts->debugger), DEBUG, "Freeing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
+					close(ts->sd);
+					//REMOVE CONNECTION FROM MAP
+					if (user_ptr->getNick().size())
+						ts->nicks.erase(ts->nicks.find(user_ptr->getNick()));
+					delete user_ptr;
+					ts->users.erase(temp);
+				} 
 			}
 			else
 			{
@@ -1786,7 +1861,8 @@ void	server_loop(t_server *ts)
 				}
 				else
 				{
-					std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
+					ok_send_421(ts, ts->users[msg_ptr->getSD()]->getNick(), msg_ptr->getCommand());
+					// std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
 					//strike count of invalid messages
 				}
 				// std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
