@@ -264,7 +264,7 @@
     <li>☑ irc_notice</li>
     <li>☑ irc_quit</li>
   </ul>
-  <li><s>Remove user properly, set freedom true and send just one ERROR message before closing connection<s></li>
+  <li><s>Remove user properly, set freedom true and send just one ERROR message before closing connection</s></li>
 </ol>
 
 <h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
