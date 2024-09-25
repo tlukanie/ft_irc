@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:14:12 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/25 12:31:12 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,8 @@ typedef struct s_server {
 	t_debugger													debugger;
 }	t_server;
 
+void	irc_mode(Message* msg, struct s_server *ts);
+
 # include <iostream>
 # include <sstream>
 # include <stdint.h>
@@ -180,6 +182,12 @@ std::string	ok_display_message(s_debugger *debugger, std::string msg);
 # include <sstream>
 
 
+# define LOWER "abcdefghijklmnopqrstuvwxyz"
+# define UPPER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# define DIGITS "0123456789"
+# define SPECIAL "[]{}^`|_\\"
+# define KEY "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
+
 template <typename T> T	ok_strtoi(std::string str)
 {
 	std::stringstream	temp;
@@ -200,8 +208,26 @@ template <typename T> std::string	ok_itostr(T num)
 	return (str);
 }
 
-int	ft_usage(void);
-int	ft_usage_port(void);
-int	ft_usage_debug(void);
+int							ft_usage(void);
+int							ft_usage_port(void);
+int							ft_usage_debug(void);
+size_t						ok_crlf_finder(std::vector<uint8_t> data);
+bool						isChannel(struct s_server *ts, std::string channelName);
+bool						isNick(struct s_server *ts, std::string nick);
+bool						isInChannel(struct s_server *ts, std::string channelName, std::string nick);
+void						send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text);
+void						send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text);
+int							remove_user_from_channel(struct s_server *ts, User *user, Channel *channel);
+int							remove_user_from_server(struct s_server *ts, User *user, std::string reason);
+int							add_user_to_channel(struct s_server *ts, User *user, Channel *channel);
+bool						isValidNick(std::string	nick);
+bool						isValidKey(std::string	key);
+std::vector<std::string>	ok_split(std::string str, char c);
+bool						ok_containsDuplicate(const std::string &text);
+
+void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
+void	ok_send_315(struct s_server *ts, std::string client, std::string mask);
+void	ok_send_421(struct s_server *ts, std::string client, std::string command);
+
 
 #endif

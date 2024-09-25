@@ -267,28 +267,23 @@
   <li><s>Remove user properly, set freedom true and send just one ERROR message before closing connection</s></li>
 </ol>
 
-<h4>Plan for 25.09.24 (11:30-13:30 Prague time)</h4>
+<h4>Plan for 25.09.24 (11:30-12:45 Prague time)</h4>
 <ol>
   <li><s>Send quit message to users if we close sd (connection lost?)</s></li>
-  <li>Clean code</li>
+  <li><s>Clean code - updated makefile and folder structure</s></li>
 </ol>
 
-<h4>Plan for 26.09.24 (8:30-10:30 Prague time)</h4>
+<h4>Plan for 26.09.24 (8:30-10:00 && 11:30-13:30 Prague time)</h4>
 <ol>
-  <li>Logger/debugger goes through select()</li>
   <li>Make buffers in user private</li>
+  <li>Logger/debugger goes through select()</li>
+  <li>Clean code - numeric replies</li>
   <li>Check if all functions are allowed</li>
-</ol>
-
-<h4>Plan for 26.09.24 (11:30-13:30 Prague time)</h4>
-<ol>
-  <li>Logger/debugger used everywhere in the code</li>
-  <li>irc_pong</li>
-  <li>server pinging users?</li>
 </ol>
 
 <h4>Plan for 27.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
+  <li>Clean code  - numeric replies</li>
   <li>Const variables from getters</li>
   <li>Proper command testing</li>
   <ul>
@@ -310,6 +305,7 @@
 <h4>Plan for 29.09.24 (??? Prague time)</h4>
 <ol>
   <li>Make a plan for the next week:</li>
+  <li>Logger/debugger used everywhere in the code</li>
   <li>Logger/debugger used everywhere in the code</li>
   <li>Proper command testing</li>
   <ul>
@@ -335,6 +331,8 @@
     <li>☐ irc_whois</li>
     <li>unix time for topic and mode https://stackoverflow.com/questions/6012663/get-unix-timestamp-with-c</li>
   </ul>
+  <li>irc_pong</li>
+  <li>server pinging users?</li>
 </ol>
 
 <h4>Plan for the next week</h4>

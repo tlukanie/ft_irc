@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/25 12:12:30 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/25 12:37:37 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,10 @@ SRCS	=	srcs/ircserv.cpp \
 			srcs/classes/Channel.cpp \
 			srcs/classes/Message.cpp \
 			srcs/classes/User.cpp \
+			srcs/commands/irc_mode.cpp \
 			srcs/utils/colours.cpp \
 			srcs/utils/debugger.cpp \
+			srcs/utils/numeric_replies.cpp \
 			srcs/utils/utils.cpp
 OBJ_DIR	=	objs/
 OBJS	=	$(SRCS:%.cpp=%.o)
