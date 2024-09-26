@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
+/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:33 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 09:40:47 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 14:17:10 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,22 +42,24 @@ void irc_pass(Message* msg, struct s_server *ts)
 
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += "PASS :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += "PASS :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	// ERR_ALREADYREGISTERED (462)
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		reply = "462 ";
-		if (!ts->users[msg->getSD()]->getNick().size())
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-		else
-			reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += ":You may not reregister";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "462 ";
+		// if (!ts->users[msg->getSD()]->getNick().size())
+		// 	reply += ts->users[msg->getSD()]->getNick() + " ";
+		// else
+		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += ":You may not reregister";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_462(ts, msg->getSD());
 		return ;
 	}
 	if (msg->getParams()[0] == ts->password)
@@ -114,36 +116,39 @@ void irc_nick(Message* msg, struct s_server *ts)
 	//check if parameter
 	if (!msg->getParams().size())
 	{
-		reply = "431 ";
-		if (oldnick.size())
-			reply += oldnick + " ";
-		else
-			reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += ":No nickname given";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "431 ";
+		// if (oldnick.size())
+		// 	reply += oldnick + " ";
+		// else
+		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += ":No nickname given";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		ok_send_431(ts, msg->getSD());
 		return ;
 	}
 	std::string	newnick = msg->getParams()[0];
 	if (!isValidNick(newnick))
 	{
-		reply = "432 ";
-		if (oldnick.size())
-			reply += oldnick + " ";
-		else
-			reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += newnick + " :Erroneus nickname";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "432 ";
+		// if (oldnick.size())
+		// 	reply += oldnick + " ";
+		// else
+		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += newnick + " :Erroneus nickname";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		ok_send_432(ts, msg->getSD(), newnick);
 		return ;
 	}
 	if (ts->nicks.find(newnick) != ts->nicks.end())
 	{
-		reply = "433 ";
-		if (oldnick.size())
-			reply += oldnick + " ";
-		else
-			reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += newnick + " :Nickname is already in use";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "433 ";
+		// if (oldnick.size())
+		// 	reply += oldnick + " ";
+		// else
+		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += newnick + " :Nickname is already in use";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		ok_send_433(ts, msg->getSD(), newnick);
 		return ;
 	}
 	//setting the first (and only?) parameter as a nick in the map of users
@@ -178,8 +183,9 @@ void irc_nick(Message* msg, struct s_server *ts)
 		ts->users[msg->getSD()]->addAuthFlag(NICK);
 		if (ts->users[msg->getSD()]->getAuthFlag())
 		{
-			reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			tl_send_001(ts, msg->getSD());
 		}
 	}
 
@@ -210,21 +216,23 @@ void irc_user(Message* msg, struct s_server *ts)
 	// we need to check that there are 4 parameters?
 	if (msg->getParams().size() != 4 || !msg->getParams()[0].size())
 	{
-		reply = "461 ";
-		if (!ts->users[msg->getSD()]->getNick().size())
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-		else
-			reply += ts->users[msg->getSD()]->getIP() + " ";
-		reply += "USER :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// if (!ts->users[msg->getSD()]->getNick().size())
+		// 	reply += ts->users[msg->getSD()]->getNick() + " ";
+		// else
+		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
+		// reply += "USER :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		reply = "462 ";
-		reply += ts->users[msg->getSD()]->getNick();
-		reply += " :You may not register again";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "462 ";
+		// reply += ts->users[msg->getSD()]->getNick();
+		// reply += " :You may not register again";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_462(ts, msg->getSD());
 		return ;
 	}
 	ts->users[msg->getSD()]->setUserName(msg->getParams()[0]);
@@ -235,8 +243,9 @@ void irc_user(Message* msg, struct s_server *ts)
 	ts->users[msg->getSD()]->addAuthFlag(USER);
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_001(ts, msg->getSD());
 	}
 	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
 	// send_reply(ts, msg->getSD(), NULL, reply);
@@ -268,10 +277,11 @@ void irc_ping(Message* msg, struct s_server *ts)
 		return ;
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "PING :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "PING :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0];
@@ -324,10 +334,11 @@ void irc_join(Message* msg, struct s_server *ts)
 		return ;
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "JOIN :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "JOIN :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	//special case
@@ -461,10 +472,11 @@ void irc_part(Message* msg, struct s_server *ts)
 		return ;
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "PART :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "PART :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	//check if the channel name valid
@@ -517,10 +529,11 @@ void irc_topic(Message* msg, struct s_server *ts)
 	//send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "TOPIC :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "TOPIC :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string channelName = msg->getParams()[0];
@@ -602,10 +615,11 @@ void irc_invite(Message* msg, struct s_server *ts)
 	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "INVITE :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "INVITE :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string nick = msg->getParams()[0];
@@ -701,10 +715,11 @@ void irc_kick(Message* msg, struct s_server *ts)
 	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "KICK :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "KICK :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string					channelName = msg->getParams()[0];
@@ -968,10 +983,11 @@ void irc_who(Message* msg, struct s_server *ts)
 		return ;
 	if (!msg->getParams().size())
 	{
-		reply = "461 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "WHO :Not enough parameters";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "461 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "WHO :Not enough parameters";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string	mask = msg->getParams()[0];

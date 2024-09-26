@@ -278,14 +278,14 @@
   <li><s>Make buffers in user private</s></li>
   <li><s>Logger/debugger goes through select()</s></li>
   <li><s>Fixed segfault when trying to get nick for unknown reply of unregistered user</s></li>
-  <li>Clean code - numeric replies</li>
-  <li>Check if all functions are allowed</li>
+  <li><s>Clean code - numeric replies</s></li>
 </ol>
 
 <h4>Plan for 27.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
   <li>Clean code  - numeric replies</li>
   <li>Const variables from getters</li>
+  <li>Check if all functions are allowed</li>
   <li>Proper command testing</li>
   <ul>
     <li>☐ irc_</li>

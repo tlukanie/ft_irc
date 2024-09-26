@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
+/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 09:48:32 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 14:13:45 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,8 +226,24 @@ std::vector<std::string>	ok_split(std::string str, char c);
 bool						ok_containsDuplicate(const std::string &text);
 std::string					getClient(struct s_server *ts, unsigned short sd);
 
-void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
+
+void	tl_send_001(struct s_server *ts, unsigned short sd);
 void	ok_send_315(struct s_server *ts, std::string client, std::string mask);
+void	tl_send_324(struct s_server *ts, unsigned short sd, Channel *channel);
+void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
+void	tl_send_400(struct s_server *ts, unsigned short sd, std::string command, std::string info);
+void	tl_send_403(struct s_server *ts, unsigned short sd, std::string channelName);
 void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command);
+void	ok_send_431(struct s_server *ts, unsigned short sd);
+void	ok_send_432(struct s_server *ts, unsigned short sd, std::string nick);
+void	ok_send_433(struct s_server *ts, unsigned short sd, std::string nick);
+void	tl_send_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
+void	tl_send_442(struct s_server *ts, unsigned short sd, std::string channelName);
+void	tl_send_461(struct s_server *ts, unsigned short sd, std::string command);
+void	tl_send_462(struct s_server *ts, unsigned short sd);
+void	tl_send_482(struct s_server *ts, unsigned short sd, std::string channelName);
+void	tl_send_501(struct s_server *ts, unsigned short sd);
+void	ok_send_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description);
+
 
 #endif
