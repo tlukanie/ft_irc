@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/01 13:37:36 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:27:49 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 09:48:11 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::strin
 	ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(sd) + "]", ok_display_reply(&(ts->debugger), reply), MYDEBUG);
 	for (std::string::iterator it = reply.begin(); it != reply.end(); it++)
 	{
-		ts->users[sd]->_data_out.push_back(*it);
+		ts->users[sd]->getDataOut().push_back(*it);
 	}
 }
 
@@ -228,4 +228,12 @@ bool	ok_containsDuplicate(const std::string &text)
 		}
 	}
 	return (false);
+}
+
+std::string	getClient(struct s_server *ts, unsigned short sd)
+{
+	if (ts->users[sd]->getNick().size())
+		return (ts->users[sd]->getNick());
+	else
+		return (ts->users[sd]->getIP());
 }

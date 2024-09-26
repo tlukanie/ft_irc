@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/24 15:50:48 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 09:31:53 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,16 @@ bool	User::getFreedom(void)
 void	User::setFree(void)
 {
 	this->_freedom = true;
+}
+
+std::vector<uint8_t>	&User::getDataIn(void)
+{
+	return (this->_dataIn);
+}
+
+std::vector<uint8_t>	&User::getDataOut(void)
+{
+	return (this->_dataOut);
 }
 
 
@@ -262,7 +272,7 @@ std::string	User::print(bool colour)
 	info += "Servername: " + clr + this->_servername + end + "\n";
 	info += "Real name: " + clr + this->_realname + end + "\n";
 	info += "Away message: " + clr + this->_awaymessage + end + "\n";
-	info += "Buffer In : " + ok_display_real_buffer(colour, this->_data) + "\n";
-	info += "Buffer Out: " + ok_display_real_buffer(colour, this->_data_out);
+	info += "Buffer In : " + ok_display_real_buffer(colour, this->_dataIn) + "\n";
+	info += "Buffer Out: " + ok_display_real_buffer(colour, this->_dataOut);
 	return (info);
 }

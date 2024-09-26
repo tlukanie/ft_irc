@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:33 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:30:21 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 09:40:47 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1041,8 +1041,8 @@ void	server_loop(t_server *ts)
 	// FD_SET(ts.master_socket, &readfds);
 	while(g_server_alive) 
 	{
-		if (DEEPDEBUG)
-			ok_debugger(&(ts->debugger), DEBUG, "While loop started...", "", MYDEBUG);
+		// if (DEEPDEBUG)
+		// 	ok_debugger(&(ts->debugger), DEBUG, "While loop started...", "", MYDEBUG);
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
@@ -1050,6 +1050,12 @@ void	server_loop(t_server *ts)
 		FD_SET(ts->master_socket, &readfds); 
 		ts->max_sd = ts->master_socket; 
 
+		if (ts->debugger.log.size())
+		{
+			FD_SET(ts->debugger.fd, &writefds);
+			if(ts->debugger.fd > ts->max_sd)
+				ts->max_sd = ts->debugger.fd;
+		}
 		//add connection sockets to set
 		//in the reading loop
 		// if (ts->state & READING_LOOP)
@@ -1063,7 +1069,7 @@ void	server_loop(t_server *ts)
 			// if (DEEPDEBUG)
 			// 	ok_debugger(&(ts->debugger), DEBUG, "First for loop reading sd ", ok_itostr(ts->sd), MYDEBUG);
 			//if something to send, move to writefds, otherwise be ready to read
-			if (connection_ptr->_data_out.size())
+			if (connection_ptr->getDataOut().size())
 			{
 				FD_SET(ts->sd , &writefds);
 				// if (DEEPDEBUG)
@@ -1075,8 +1081,8 @@ void	server_loop(t_server *ts)
 				// if (DEEPDEBUG)
 				// 	ok_debugger(&(ts->debugger), DEBUG, "Setting writing sd: ", ok_itostr(ts->sd), MYDEBUG);
 			}
-			if(ts->sd > ts->max_sd) 
-				ts->max_sd = ts->sd; 
+			if(ts->sd > ts->max_sd)
+				ts->max_sd = ts->sd;
 		}
 		// ok_debugger(&(ts->debugger), DEBUG, "Before select", "", MYDEBUG);
 		//function to find nfds goes here
@@ -1160,11 +1166,12 @@ void	server_loop(t_server *ts)
 					std::string	buff;
 					for (int i = 0; i < ts->valread; i++)
 					{
-						user_ptr->_data.push_back(ts->buffer[i]);
+						user_ptr->getDataIn().push_back(ts->buffer[i]);
 						buff.push_back(ts->buffer[i]);
 					}
+					std::cout << "BUFFER SIZE: " << user_ptr->getDataIn().size() << std::endl;
 					// ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
-					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->getDataIn()), MYDEBUG);
 					//while CRLF in data
 					// get position of the crlf
 					// if data overflow flag
@@ -1178,24 +1185,24 @@ void	server_loop(t_server *ts)
 					//   increase error message counter
 
 					size_t	pos;
-					while ((pos = ok_crlf_finder(user_ptr->_data)))
+					while ((pos = ok_crlf_finder(user_ptr->getDataIn())))
 					{
 						if (user_ptr->getOverflowFlag())
 						{
-							user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
+							user_ptr->getDataIn().erase(user_ptr->getDataIn().begin(), user_ptr->getDataIn().begin() + pos);
 							user_ptr->unsetOverflowFlag();
 							continue ;
 						}
 						std::string msg;
 						// pos - 2 because CRLF is not needed in the string, it was verified here
-						msg.assign(user_ptr->_data.begin(), user_ptr->_data.begin() + pos - 2);
+						msg.assign(user_ptr->getDataIn().begin(), user_ptr->getDataIn().begin() + pos - 2);
 						if (DEEPDEBUG)
 						{
 							ok_debugger(&(ts->debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
 							// std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
 							// std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
 						}
-						user_ptr->_data.erase(user_ptr->_data.begin(), user_ptr->_data.begin() + pos);
+						user_ptr->getDataIn().erase(user_ptr->getDataIn().begin(), user_ptr->getDataIn().begin() + pos);
 
 						// try construct message
 						// if success
@@ -1223,19 +1230,19 @@ void	server_loop(t_server *ts)
 					// if it ends with \r
 					//   keep \r in the data
 
-					if (user_ptr->_data.size() > BUFFER_SIZE)
+					if (user_ptr->getDataIn().size() > BUFFER_SIZE)
 					{
 						if (DEEPDEBUG)
 							std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
 						user_ptr->setOverflowFlag();
-						if (*(user_ptr->_data.rbegin()) == '\r')
+						if (*(user_ptr->getDataIn().rbegin()) == '\r')
 						{
-							user_ptr->_data.clear();
-							user_ptr->_data.push_back('\r');
+							user_ptr->getDataIn().clear();
+							user_ptr->getDataIn().push_back('\r');
 						}
 						else
 						{
-							user_ptr->_data.clear();
+							user_ptr->getDataIn().clear();
 						}
 					}
 				}
@@ -1243,8 +1250,8 @@ void	server_loop(t_server *ts)
 			else if (FD_ISSET(ts->sd , &writefds))
 			{
 				//send replies
-				std::string	outbuff(user_ptr->_data_out.begin(), user_ptr->_data_out.end());
-				ok_debugger(&(ts->debugger), DEBUG, "Sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_send_buffer(ts->debugger.colour, user_ptr->_data_out), MYDEBUG);
+				std::string	outbuff(user_ptr->getDataOut().begin(), user_ptr->getDataOut().end());
+				ok_debugger(&(ts->debugger), DEBUG, "Sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_send_buffer(ts->debugger.colour, user_ptr->getDataOut()), MYDEBUG);
 				if ((ts->valsent = send(ts->sd , outbuff.c_str(), outbuff.size(), MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
@@ -1264,11 +1271,11 @@ void	server_loop(t_server *ts)
 				//Print the message that came in 
 				else
 				{
-					user_ptr->_data_out.erase(user_ptr->_data_out.begin(), user_ptr->_data_out.begin() + ts->valsent);
+					user_ptr->getDataOut().erase(user_ptr->getDataOut().begin(), user_ptr->getDataOut().begin() + ts->valsent);
 					//deque would be better for erasing front chunks
-					//ok_debugger(&(ts->debugger), DEBUG, "After sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->_data_out), MYDEBUG);
+					//ok_debugger(&(ts->debugger), DEBUG, "After sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->getDataOut()), MYDEBUG);
 				}
-				if (ts->users[ts->sd]->getFreedom() && !user_ptr->_data_out.size())
+				if (ts->users[ts->sd]->getFreedom() && !user_ptr->getDataOut().size())
 				{ 
 					ok_debugger(&(ts->debugger), DEBUG, "Freeing connection on sd: ", ok_itostr(ts->sd), MYDEBUG);
 					close(ts->sd);
@@ -1308,7 +1315,7 @@ void	server_loop(t_server *ts)
 				}
 				else
 				{
-					ok_send_421(ts, ts->users[msg_ptr->getSD()]->getNick(), msg_ptr->getCommand());
+					ok_send_421(ts, msg_ptr->getSD(), msg_ptr->getCommand());
 					// std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
 					//strike count of invalid messages
 				}
@@ -1316,6 +1323,24 @@ void	server_loop(t_server *ts)
 				delete msg_ptr;
 				temp_it = iter++;
 				ts->messages.erase(temp_it);
+			}
+		}
+		//print debugs
+		if (FD_ISSET(ts->debugger.fd , &writefds))
+		{
+			ssize_t wb;//number of written bytes
+			wb = write(ts->debugger.fd, ts->debugger.log.c_str(), ts->debugger.log.size());
+			if (wb < 0)
+			{
+				//error ignored for now
+			}
+			else if ((size_t)wb <= ts->debugger.log.size())
+			{
+				ts->debugger.log.erase(0,wb);
+			}
+			else
+			{
+				//?????
 			}
 		}
 	}
@@ -1366,6 +1391,16 @@ void	clean_server(t_server *ts)
 		std::map<std::string, Channel *>::iterator temp = it;
 		it++;
 		ts->channels.erase(temp);
+	}
+	ssize_t	wb;
+	wb = write(ts->debugger.fd, ts->debugger.log.c_str(), ts->debugger.log.size());
+	if (wb < 0)
+	{
+		std::cerr << "failed write" << std::endl;
+	}
+	else if ((size_t)wb <= ts->debugger.log.size())
+	{
+		ts->debugger.log.erase(0,wb);
 	}
 	//erase multimaps?
 }

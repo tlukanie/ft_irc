@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:31:12 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 09:48:32 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,15 +58,15 @@ class Channel;
 class Message;
 
 typedef struct s_debugger {
-	bool		date;
-	bool		time;
-	bool		utime;
-	int			precision;
-	bool		colour;
-	bool		extra;
-	int			fd;
-	DebugLvl	debuglvl;
-	std::string	log; //log to be printed;
+	bool						date;
+	bool						time;
+	bool						utime;
+	int							precision;
+	bool						colour;
+	bool						extra;
+	int							fd;
+	DebugLvl					debuglvl;
+	std::string					log; //log to be printed;
 }	t_debugger;
 
 typedef struct s_server {
@@ -224,10 +224,10 @@ bool						isValidNick(std::string	nick);
 bool						isValidKey(std::string	key);
 std::vector<std::string>	ok_split(std::string str, char c);
 bool						ok_containsDuplicate(const std::string &text);
+std::string					getClient(struct s_server *ts, unsigned short sd);
 
 void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
 void	ok_send_315(struct s_server *ts, std::string client, std::string mask);
-void	ok_send_421(struct s_server *ts, std::string client, std::string command);
-
+void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command);
 
 #endif

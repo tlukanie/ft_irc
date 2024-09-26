@@ -275,8 +275,9 @@
 
 <h4>Plan for 26.09.24 (8:30-10:00 && 11:30-13:30 Prague time)</h4>
 <ol>
-  <li>Make buffers in user private</li>
-  <li>Logger/debugger goes through select()</li>
+  <li><s>Make buffers in user private</s></li>
+  <li><s>Logger/debugger goes through select()</s></li>
+  <li><s>Fixed segfault when trying to get nick for unknown reply of unregistered user</s></li>>
   <li>Clean code - numeric replies</li>
   <li>Check if all functions are allowed</li>
 </ol>
@@ -339,6 +340,8 @@
 <ol>
   <li>Proper command testing</li>
   <li>Error codes</li>
+  <li>.../li>
+  <li>Logger/debugger outputs to a file (option to append timestamp to filename)</li>
   <li>Logger/debugger used everywhere in the code</li>
   <li>Create a second client. (bot)</li>
 </ol>

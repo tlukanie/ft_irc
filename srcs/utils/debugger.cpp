@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:04:37 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 08:56:02 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ void	ok_debugger(s_debugger *debugger, DebugLvl debugLevel, std::string message,
 	output += level + text;
 	if (debugger->colour)
 		output += NO_COLOUR;
-	std::cout << output << std::endl;
+	debugger->log += output + "\n";
 }
 
 // std::string	ok_display_buffer(s_debugger *debugger, octets_t octet)

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:23:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:30:37 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/26 09:46:40 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,14 @@ void	ok_send_315(struct s_server *ts, std::string client, std::string mask)
 }
 
 //ERR_UNKNOWNCOMMAND (421)
-void	ok_send_421(struct s_server *ts, std::string client, std::string command)
+void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command)
 {
 	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
 	reply = "421 ";
 	reply += client + " ";
 	reply += command + " ";
 	reply += ":Unknown command";
-	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
+	send_reply(ts, sd, NULL, reply);
 }
