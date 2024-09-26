@@ -340,7 +340,7 @@
 <ol>
   <li>Proper command testing</li>
   <li>Error codes</li>
-  <li>.../li>
+  <li>...</li>
   <li>Logger/debugger outputs to a file (option to append timestamp to filename)</li>
   <li>Logger/debugger used everywhere in the code</li>
   <li>Create a second client. (bot)</li>
