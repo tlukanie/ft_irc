@@ -277,7 +277,7 @@
 <ol>
   <li><s>Make buffers in user private</s></li>
   <li><s>Logger/debugger goes through select()</s></li>
-  <li><s>Fixed segfault when trying to get nick for unknown reply of unregistered user</s></li>>
+  <li><s>Fixed segfault when trying to get nick for unknown reply of unregistered user</s></li>
   <li>Clean code - numeric replies</li>
   <li>Check if all functions are allowed</li>
 </ol>
