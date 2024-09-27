@@ -283,7 +283,11 @@
 
 <h4>Plan for 27.09.24 (9:30-11:30 Prague time)</h4>
 <ol>
-  <li>Clean code - numeric replies</li>
+  <li><s>Clean code - numeric replies</s></li>
+</ol>
+
+<h4>Plan for 28.09.24 (11:30 - 13:30 && 15:30 - 17:30 Prague time)</h4>
+<ol>
   <li>Clean code - command files</li>
   <li>Const variables from getters</li>
   <li>Check if all functions are allowed</li>
@@ -292,10 +296,6 @@
     <li>☐ irc_</li>
     <li>☐ irc_</li>
   </ul>
-</ol>
-
-<h4>Plan for 28.09.24 (??? Prague time)</h4>
-<ol>
   <li>Transfer files</li>
   <li>Proper command testing</li>
   <ul>
@@ -304,7 +304,7 @@
   </ul>
 </ol>
 
-<h4>Plan for 29.09.24 (??? Prague time)</h4>
+<h4>Plan for 29.09.24 (9:30 - 11:30 && 13:30 - 15:30 Prague time)</h4>
 <ol>
   <li>Make a plan for the next week:</li>
   <li>Logger/debugger used everywhere in the code</li>
@@ -317,7 +317,7 @@
 </ol>
 
 
-<h4>Plan for 30.09.24 (8:30-10:30 Prague time)</h4>
+<h4>Plan for 30.09.24 (???)</h4>
 <ol>
   <li>Logger/debugger used everywhere in the code</li>
   <li>Proper command testing</li>
