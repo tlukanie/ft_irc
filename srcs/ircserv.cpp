@@ -6,7 +6,7 @@
 /*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:33 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 14:17:10 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/27 12:10:06 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -366,10 +366,11 @@ void irc_join(Message* msg, struct s_server *ts)
 		//check if the channel name valid
 		if (channelNames[i].size() < 2 || (channelNames[i][0] != '#' && channelNames[i][0] != '&'))
 		{
-			reply = "476 ";
-			reply += channelNames[i] + " ";
-			reply += ":Bad Channel Mask";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "476 ";
+			// reply += channelNames[i] + " ";
+			// reply += ":Bad Channel Mask";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			tl_send_476(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
 		//if the channel does not exist
@@ -394,31 +395,34 @@ void irc_join(Message* msg, struct s_server *ts)
 			//check if user can join the channel
 			if (ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_INVITE)
 			{
-				reply = "473 ";
-				reply += ts->users[msg->getSD()]->getNick() + " ";
-				reply += channelNames[i] + " ";
-				reply += ":Cannot join channel (+i)";
-				send_reply(ts, msg->getSD(), NULL, reply);
+				// reply = "473 ";
+				// reply += ts->users[msg->getSD()]->getNick() + " ";
+				// reply += channelNames[i] + " ";
+				// reply += ":Cannot join channel (+i)";
+				// send_reply(ts, msg->getSD(), NULL, reply);
+				tl_send_473(ts, msg->getSD(), channelNames[i]);
 				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelNames[i]]->getUsers() >= ts->channels[channelNames[i]]->getChannelLimit())
 			{
-				reply = "471 ";
-				reply += ts->users[msg->getSD()]->getNick() + " ";
-				reply += channelNames[i] + " ";
-				reply += ":Cannot join channel (+l)";
-				send_reply(ts, msg->getSD(), NULL, reply);
+				// reply = "471 ";
+				// reply += ts->users[msg->getSD()]->getNick() + " ";
+				// reply += channelNames[i] + " ";
+				// reply += ":Cannot join channel (+l)";
+				// send_reply(ts, msg->getSD(), NULL, reply);
+				tl_send_471(ts, msg->getSD(), channelNames[i]);
 				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_KEY))
 			{
 				if (keys.size() <= i || keys[i] != ts->channels[channelNames[i]]->getKey())
 				{
-					reply = "475 ";
-					reply += ts->users[msg->getSD()]->getNick() + " ";
-					reply += channelNames[i] + " ";
-					reply += ":Cannot join channel (+k)";
-					send_reply(ts, msg->getSD(), NULL, reply);
+					// reply = "475 ";
+					// reply += ts->users[msg->getSD()]->getNick() + " ";
+					// reply += channelNames[i] + " ";
+					// reply += ":Cannot join channel (+k)";
+					// send_reply(ts, msg->getSD(), NULL, reply);
+					tl_send_475(ts, msg->getSD(), channelNames[i]);
 					continue ;
 				}
 			}
@@ -432,32 +436,35 @@ void irc_join(Message* msg, struct s_server *ts)
 		//332
 		if (ts->channels[channelNames[i]]->getTopic().size())
 		{
-			reply = "332 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += channelNames[i] + " ";
-			reply += ":" + ts->channels[channelNames[i]]->getTopic();
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "332 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += channelNames[i] + " ";
+			// reply += ":" + ts->channels[channelNames[i]]->getTopic();
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			rpl_topic_332(ts, msg->getSD(), channelNames[i]);
 		}
 		//353
-		reply = "353 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += "= ";
-		reply += channelNames[i] + " ";
-		reply += ":";
-		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelNames[i]); it != ts->channel2user.upper_bound(channelNames[i]); it++)
-		{
-			if (ts->channels[channelNames[i]]->isOperator(it->second->getSD()))
-				reply += "@";
-			reply += it->second->getNick() + " ";
-		}
-		reply.resize(reply.size() - 1);
-;		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "353 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += "= ";
+		// reply += channelNames[i] + " ";
+		// reply += ":";
+		// for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelNames[i]); it != ts->channel2user.upper_bound(channelNames[i]); it++)
+		// {
+		// 	if (ts->channels[channelNames[i]]->isOperator(it->second->getSD()))
+		// 		reply += "@";
+		// 	reply += it->second->getNick() + " ";
+		// }
+		// reply.resize(reply.size() - 1);
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		rpl_namreply_353(ts, msg->getSD(), channelNames[i]);
 		// 366
-		reply = "366 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelNames[i] + " ";
-		reply += ":End of /NAMES list";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "366 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelNames[i] + " ";
+		// reply += ":End of /NAMES list";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		rpl_endofnames_366(ts, msg->getSD(), channelNames[i]);
 	}
 }
 
@@ -490,20 +497,22 @@ void irc_part(Message* msg, struct s_server *ts)
 		//if the channel does not exist
 		if (ts->channels.find(channelNames[i]) == ts->channels.end())
 		{
-			reply = "403 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += channelNames[i] + " ";
-			reply += ":No such channel";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "403 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += channelNames[i] + " ";
+			// reply += ":No such channel";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			tl_send_403(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
 		if (!(ts->channels[channelNames[i]]->hasUser(msg->getSD())))
 		{
-			reply = "442 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += channelNames[i] + " ";
-			reply += ":You are not on that channel";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "442 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += channelNames[i] + " ";
+			// reply += ":You are not on that channel";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			tl_send_442(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
 		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelNames[i], MYDEBUG);
@@ -543,40 +552,44 @@ void irc_topic(Message* msg, struct s_server *ts)
 
 	if (!isChannel(ts, channelName))
 	{
-		reply = "403 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":No such channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "403 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":No such channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		reply = "442 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not on that channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "442 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not on that channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if (msg->getParams().size() == 1)
 	{
 		if (ts->channels[channelName]->getTopic().size())
 		{
-			reply = "332 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += channelName + " ";
-			reply += ":" + ts->channels[channelName]->getTopic();
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "332 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += channelName + " ";
+			// reply += ":" + ts->channels[channelName]->getTopic();
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			rpl_topic_332(ts, msg->getSD(), channelName);
 			return ;
 		}
 		else
 		{
-			reply = "331 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += channelName + " ";
-			reply += ":No topic is set";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "331 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += channelName + " ";
+			// reply += ":No topic is set";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			rpl_notopic_331(ts, msg->getSD(), channelName);
 			return ;
 		}
 	}
@@ -584,11 +597,12 @@ void irc_topic(Message* msg, struct s_server *ts)
 	//482
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_TOPIC) && !ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		reply = "482 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not channel operator";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "482 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not channel operator";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	reply = "TOPIC " + channelName + " :" + topic;
@@ -627,69 +641,76 @@ void irc_invite(Message* msg, struct s_server *ts)
 	//401
 	if (ts->nicks.find(nick) == ts->nicks.end())
 	{
-		reply = "401 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += nick + " ";
-		reply += ":No such nickname";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "401 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += nick + " ";
+		// reply += ":No such nickname";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		err_nosuchnick_401(ts, msg->getSD(), nick);
 		return ;
 	}
 	//403
 	if (!isChannel(ts, channelName))
 	{
-		reply = "403 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":No such channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "403 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":No such channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//442
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		reply = "442 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not on that channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "442 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not on that channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//443
 	if (ts->channels[channelName]->hasUser(ts->nicks[nick]->getSD()))
 	{
-		reply = "443 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += nick + " ";
-		reply += channelName + " ";
-		reply += ":is already on channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "443 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += nick + " ";
+		// reply += channelName + " ";
+		// reply += ":is already on channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		err_useronchannel_443(ts, msg->getSD(), nick, channelName);
 		return ;
 	}
 	//482
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_INVITE) && !ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		reply = "482 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not channel operator";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "482 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not channel operator";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelName]->getUsers() >= ts->channels[channelName]->getChannelLimit())
 	{
-		reply = "482 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":The channel is full";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "471 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":The channel is full";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_471(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//341
-	reply = "341 ";
-	reply += ts->users[msg->getSD()]->getNick() + " ";
-	reply += nick + " ";
-	reply += channelName;
-	send_reply(ts, msg->getSD(), NULL, reply);
+	// reply = "341 ";
+	// reply += ts->users[msg->getSD()]->getNick() + " ";
+	// reply += nick + " ";
+	// reply += channelName;
+	// send_reply(ts, msg->getSD(), NULL, reply);
+	rpl_inviting_341(ts, msg->getSD(), nick, channelName);
 	//invite message
 	reply = "INVITE ";
 	reply += nick + " ";
@@ -728,31 +749,34 @@ void irc_kick(Message* msg, struct s_server *ts)
 	//403
 	if (!isChannel(ts, channelName))
 	{
-		reply = "403 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":No such channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "403 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":No such channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//442
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		reply = "442 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not on that channel";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "442 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not on that channel";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//482
 	if (!ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		reply = "482 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += channelName + " ";
-		reply += ":You are not channel operator";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "482 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += channelName + " ";
+		// reply += ":You are not channel operator";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		tl_send_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	for (size_t i = 0; i < nicks.size(); i++)
@@ -760,22 +784,24 @@ void irc_kick(Message* msg, struct s_server *ts)
 		//401
 		if (ts->nicks.find(nicks[i]) == ts->nicks.end())
 		{
-			reply = "401 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += nicks[i] + " ";
-			reply += ":No such nickname";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "401 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += nicks[i] + " ";
+			// reply += ":No such nickname";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			err_nosuchnick_401(ts, msg->getSD(), nicks[i]);
 			continue ;
 		}
 		//441
 		if (!(ts->channels[channelName]->hasUser(ts->nicks[nicks[i]]->getSD())))
 		{
-			reply = "441 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += nicks[i] + " ";
-			reply += channelName + " ";
-			reply += ":They are not on that channel";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "441 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += nicks[i] + " ";
+			// reply += channelName + " ";
+			// reply += ":They are not on that channel";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			tl_send_441(ts, msg->getSD(), nicks[i], channelName);
 			continue ;
 		}
 		reply = "KICK " + channelName + " " + nicks[i];
@@ -822,18 +848,20 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 		return ;
 	if (!msg->getParams().size())
 	{
-		reply = "411 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += ":No recipient given PRIVMSG";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "411 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += ":No recipient given PRIVMSG";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		err_norecipient_411(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	if (msg->getParams().size() < 2)
 	{
-		reply = "412 ";
-		reply += ts->users[msg->getSD()]->getNick() + " ";
-		reply += ":No text to send";
-		send_reply(ts, msg->getSD(), NULL, reply);
+		// reply = "412 ";
+		// reply += ts->users[msg->getSD()]->getNick() + " ";
+		// reply += ":No text to send";
+		// send_reply(ts, msg->getSD(), NULL, reply);
+		err_notexttosend_412(ts, msg->getSD());
 		return ;
 	}
 	std::vector<std::string>	targets = ok_split(msg->getParams()[0], ',');
@@ -845,10 +873,11 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 		if (!targets[i].size())
 		{
 			//411
-			reply = "411 ";
-			reply += ts->users[msg->getSD()]->getNick() + " ";
-			reply += ":No recipient given PRIVMSG";
-			send_reply(ts, msg->getSD(), NULL, reply);
+			// reply = "411 ";
+			// reply += ts->users[msg->getSD()]->getNick() + " ";
+			// reply += ":No recipient given PRIVMSG";
+			// send_reply(ts, msg->getSD(), NULL, reply);
+			err_norecipient_411(ts, msg->getSD(), msg->getCommand());
 			continue ;
 		}
 		if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
@@ -856,11 +885,12 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 			//403
 			if (ts->channels.find(targets[i]) == ts->channels.end())
 			{
-				reply = "403 ";
-				reply += ts->users[msg->getSD()]->getNick() + " ";
-				reply += targets[i] + " ";
-				reply += ":No such channel";
-				send_reply(ts, msg->getSD(), NULL, reply);
+				// reply = "403 ";
+				// reply += ts->users[msg->getSD()]->getNick() + " ";
+				// reply += targets[i] + " ";
+				// reply += ":No such channel";
+				// send_reply(ts, msg->getSD(), NULL, reply);
+				tl_send_403(ts, msg->getSD(), targets[i]);
 				continue ;
 			}
 			send_reply_channel(ts, targets[i], ts->users[msg->getSD()], reply);
@@ -870,11 +900,12 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 			//401
 			if (ts->nicks.find(targets[i]) == ts->nicks.end())
 			{
-				reply = "401 ";
-				reply += ts->users[msg->getSD()]->getNick() + " ";
-				reply += targets[i] + " ";
-				reply += ":No such nickname";
-				send_reply(ts, msg->getSD(), NULL, reply);
+				// reply = "401 ";
+				// reply += ts->users[msg->getSD()]->getNick() + " ";
+				// reply += targets[i] + " ";
+				// reply += ":No such nickname";
+				// send_reply(ts, msg->getSD(), NULL, reply);
+				err_nosuchnick_401(ts, msg->getSD(), targets[i]);
 				continue ;
 			}
 			send_reply(ts, ts->nicks[targets[i]]->getSD(), ts->users[msg->getSD()], reply);

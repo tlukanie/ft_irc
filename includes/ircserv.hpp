@@ -6,7 +6,7 @@
 /*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 14:13:45 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/27 12:07:53 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,17 +230,30 @@ std::string					getClient(struct s_server *ts, unsigned short sd);
 void	tl_send_001(struct s_server *ts, unsigned short sd);
 void	ok_send_315(struct s_server *ts, std::string client, std::string mask);
 void	tl_send_324(struct s_server *ts, unsigned short sd, Channel *channel);
+void	rpl_notopic_331(struct s_server *ts, unsigned short sd, std::string channelName);
+void	rpl_topic_332(struct s_server *ts, unsigned short sd, std::string channelName);
+void	rpl_inviting_341(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
 void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
+void	rpl_namreply_353(struct s_server *ts, unsigned short sd, std::string channelName);
+void	rpl_endofnames_366(struct s_server *ts, unsigned short sd, std::string channelName);
 void	tl_send_400(struct s_server *ts, unsigned short sd, std::string command, std::string info);
+void	err_nosuchnick_401(struct s_server *ts, unsigned short sd, std::string nick);
 void	tl_send_403(struct s_server *ts, unsigned short sd, std::string channelName);
+void	err_norecipient_411(struct s_server *ts, unsigned short sd, std::string command);
+void	err_notexttosend_412(struct s_server *ts, unsigned short sd);
 void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command);
 void	ok_send_431(struct s_server *ts, unsigned short sd);
 void	ok_send_432(struct s_server *ts, unsigned short sd, std::string nick);
 void	ok_send_433(struct s_server *ts, unsigned short sd, std::string nick);
 void	tl_send_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
 void	tl_send_442(struct s_server *ts, unsigned short sd, std::string channelName);
+void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
 void	tl_send_461(struct s_server *ts, unsigned short sd, std::string command);
 void	tl_send_462(struct s_server *ts, unsigned short sd);
+void	tl_send_471(struct s_server *ts, unsigned short sd, std::string channelName);
+void	tl_send_473(struct s_server *ts, unsigned short sd, std::string channelName);
+void	tl_send_475(struct s_server *ts, unsigned short sd, std::string channelName);
+void	tl_send_476(struct s_server *ts, unsigned short sd, std::string channelName);
 void	tl_send_482(struct s_server *ts, unsigned short sd, std::string channelName);
 void	tl_send_501(struct s_server *ts, unsigned short sd);
 void	ok_send_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description);

@@ -6,7 +6,7 @@
 /*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:23:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 14:13:34 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/27 12:07:39 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,45 @@ void	tl_send_324(struct s_server *ts, unsigned short sd, Channel *channel)
 
 }
 
+//RPL_NOTOPIC (331)
+void	rpl_notopic_331(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "331 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":No topic is set";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//RPL_TOPIC (332)
+void	rpl_topic_332(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "332 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":" + ts->channels[channelName]->getTopic();
+	send_reply(ts, sd, NULL, reply);
+}
+
+//RPL_INVITING (341)
+void	rpl_inviting_341(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "341 ";
+	reply += client + " ";
+	reply += nick + " ";
+	reply += channelName;
+	send_reply(ts, sd, NULL, reply);
+}
+
 // "<client> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
 //RPL_WHOREPLY (352)
 void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick)
@@ -107,6 +146,40 @@ void	ok_send_352(struct s_server *ts, std::string client, std::string channelNam
 	send_reply(ts, ts->nicks[client]->getSD(), NULL, reply);
 }
 
+//RPL_NAMREPLY (353)
+void	rpl_namreply_353(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "353 ";
+	reply += client + " ";
+	reply += "= ";
+	reply += channelName + " ";
+	reply += ":";
+	for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
+	{
+		if (ts->channels[channelName]->isOperator(it->second->getSD()))
+			reply += "@";
+		reply += it->second->getNick() + " ";
+	}
+	reply.resize(reply.size() - 1);
+	send_reply(ts, sd, NULL, reply);
+}
+
+//RPL_ENDOFNAMES (366)
+void	rpl_endofnames_366(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "366 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":End of /NAMES list";
+	send_reply(ts, sd, NULL, reply);
+}
+
 //ERR_UNKNOWNERROR (400), Modern Documentation
 void	tl_send_400(struct s_server *ts, unsigned short sd, std::string command, std::string info)
 {
@@ -117,6 +190,19 @@ void	tl_send_400(struct s_server *ts, unsigned short sd, std::string command, st
 	reply += client + " ";
 	reply += command + " ";
 	reply += ":" + info;
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_NOSUCHNICK (401) 
+void	err_nosuchnick_401(struct s_server *ts, unsigned short sd, std::string nick)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "401 ";
+	reply += client + " ";
+	reply += nick + " ";
+	reply += ":No such nickname";
 	send_reply(ts, sd, NULL, reply);
 }
 
@@ -133,6 +219,30 @@ void	tl_send_403(struct s_server *ts, unsigned short sd, std::string channelName
 	send_reply(ts, sd, NULL, reply);
 }
 
+//ERR_NORECIPIENT (411)
+void	err_norecipient_411(struct s_server *ts, unsigned short sd, std::string command)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "411 ";
+	reply += client + " ";
+	reply += ":No recipient given (";
+	reply += command + ")";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_NOTEXTTOSEND (412)
+void	err_notexttosend_412(struct s_server *ts, unsigned short sd)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "412 ";
+	reply += client + " ";
+	reply += ":No text to send";
+	send_reply(ts, sd, NULL, reply);
+}
 
 //ERR_UNKNOWNCOMMAND (421)
 void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command)
@@ -212,6 +322,20 @@ void	tl_send_442(struct s_server *ts, unsigned short sd, std::string channelName
 	send_reply(ts, sd, NULL, reply);
 }
 
+//ERR_USERONCHANNEL (443) 
+void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "443 ";
+	reply += client + " ";
+	reply += nick + " ";
+	reply += channelName + " ";
+	reply += ":is already on channel";
+	send_reply(ts, sd, NULL, reply);
+}
+
 //ERR_NEEDMOREPARAMS (461)
 void	tl_send_461(struct s_server *ts, unsigned short sd, std::string command)
 {
@@ -234,6 +358,58 @@ void	tl_send_462(struct s_server *ts, unsigned short sd)
 	reply = "462 ";
 	reply += client + " ";
 	reply += ":You may not reregister";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_CHANNELISFULL (471)
+void	tl_send_471(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "471 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":Cannot join channel (+l)";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_INVITEONLYCHAN (473)
+void	tl_send_473(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "473 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":Cannot join channel (+i)";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_BADCHANNELKEY (475)
+void	tl_send_475(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "475 ";
+	reply += client + " ";
+	reply += channelName + " ";
+	reply += ":Cannot join channel (+k)";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_BADCHANMASK (476)
+void	tl_send_476(struct s_server *ts, unsigned short sd, std::string channelName)
+{
+	std::string	reply;
+	//std::string client;
+	//client = getClient(ts, sd);
+	reply = "476 ";
+	//reply += client + " ";
+	reply += channelName + " ";
+	reply += ":Bad Channel Mask";
 	send_reply(ts, sd, NULL, reply);
 }
 
