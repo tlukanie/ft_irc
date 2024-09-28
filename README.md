@@ -291,7 +291,7 @@
   <li><s>Clean code - naming numeric replies</s></li>
   <li><s>Const variables from getters</s></li>
   <li><s>Logger/debugger used everywhere in the code</s></li>
-  <li>Clean code - command files</li>
+  <li><s>Clean code - command files</s></li>
 </ol>
 
 <h4>Plan for 29.09.24 (9:30 - 11:30 && 13:30 - 15:30 Prague time)</h4>
