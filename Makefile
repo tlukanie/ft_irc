@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
+#    By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/25 12:37:37 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/28 16:17:00 by tlukanie         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,23 @@ SRCS	=	srcs/ircserv.cpp \
 			srcs/classes/Message.cpp \
 			srcs/classes/User.cpp \
 			srcs/commands/irc_mode.cpp \
+			srcs/commands/irc_cap.cpp \
+			srcs/commands/irc_pass.cpp \
+			srcs/commands/irc_nick.cpp \
+			srcs/commands/irc_user.cpp \
+			srcs/commands/irc_ping.cpp \
+			srcs/commands/irc_pong.cpp \
+			srcs/commands/irc_quit.cpp \
+			srcs/commands/irc_join.cpp \
+			srcs/commands/irc_part.cpp \
+			srcs/commands/irc_topic.cpp \
+			srcs/commands/irc_invite.cpp \
+			srcs/commands/irc_kick.cpp \
+			srcs/commands/irc_away.cpp \
+			srcs/commands/irc_privmsg.cpp \
+			srcs/commands/irc_notice.cpp \
+			srcs/commands/irc_who.cpp \
+			srcs/commands/irc_whois.cpp \
 			srcs/utils/colours.cpp \
 			srcs/utils/debugger.cpp \
 			srcs/utils/numeric_replies.cpp \

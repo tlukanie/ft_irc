@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
+/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 11:54:52 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 16:16:50 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,26 @@ typedef struct s_server {
 	t_debugger													debugger;
 }	t_server;
 
+//COMMANDS
 void	irc_mode(Message* msg, struct s_server *ts);
+void	irc_cap(Message* msg, struct s_server *ts);
+void	irc_pass(Message* msg, struct s_server *ts);
+void	irc_nick(Message* msg, struct s_server *ts);
+void	irc_user(Message* msg, struct s_server *ts);
+void	irc_ping(Message* msg, struct s_server *ts);
+void	irc_pong(Message* msg, struct s_server *ts);
+void	irc_quit(Message* msg, struct s_server *ts);
+/* CHANNEL OPERATIONS */
+void	irc_join(Message* msg, struct s_server *ts);
+void	irc_part(Message* msg, struct s_server *ts);
+void	irc_topic(Message* msg, struct s_server *ts);
+void	irc_invite(Message* msg, struct s_server *ts);
+void	irc_kick(Message* msg, struct s_server *ts);
+void	irc_away(Message* msg, struct s_server *ts);
+void	irc_privmsg(Message* msg, struct s_server *ts);
+void	irc_notice(Message* msg, struct s_server *ts);
+void	irc_who(Message* msg, struct s_server *ts);
+void	irc_whois(Message* msg, struct s_server *ts);
 
 # include <iostream>
 # include <sstream>
@@ -250,6 +269,7 @@ void	err_notonchannel_442(struct s_server *ts, unsigned short sd, std::string ch
 void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
 void	err_needmoreparams_461(struct s_server *ts, unsigned short sd, std::string command);
 void	err_alreadyregistered_462(struct s_server *ts, unsigned short sd);
+void	err_passwdmismatch_464(struct s_server *ts, unsigned short sd);
 void	err_channelisfull_471(struct s_server *ts, unsigned short sd, std::string channelName);
 void	err_inviteonlychan_473(struct s_server *ts, unsigned short sd, std::string channelName);
 void	err_badchannelkey_475(struct s_server *ts, unsigned short sd, std::string channelName);

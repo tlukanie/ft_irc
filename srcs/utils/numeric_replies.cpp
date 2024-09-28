@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numeric_replies.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
+/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:23:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 11:54:52 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 15:36:36 by tlukanie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,6 +358,18 @@ void	err_alreadyregistered_462(struct s_server *ts, unsigned short sd)
 	reply = "462 ";
 	reply += client + " ";
 	reply += ":You may not reregister";
+	send_reply(ts, sd, NULL, reply);
+}
+
+//ERR_PASSWDMISMATCH (464)
+void	err_passwdmismatch_464(struct s_server *ts, unsigned short sd)
+{
+	std::string	reply;
+	std::string client;
+	client = getClient(ts, sd);
+	reply = "464 ";
+	reply += client + " ";
+	reply += ":Password incorrect";
 	send_reply(ts, sd, NULL, reply);
 }
 
