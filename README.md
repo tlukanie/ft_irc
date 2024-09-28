@@ -292,18 +292,23 @@
   <li><s>Const variables from getters</s></li>
   <li><s>Logger/debugger used everywhere in the code</s></li>
   <li><s>Clean code - command files</s></li>
+  <li><s>Updated makefile</s></li>
 </ol>
 
 <h4>Plan for 29.09.24 (9:30 - 11:30 && 13:30 - 15:30 Prague time)</h4>
 <ol>
   <li>Make a plan for the next week:</li>
-  <li>Proper command testing</li>
+  <li>Client - start</li>
   <ul>
-    <li>☐ irc_</li>
-    <li>☐ irc_</li>
+    <li>Makefile</li>
+    <li>Modes (testing/interactive/bot)</li>
+    <li>Config for client with how to connect to server</li>
+    <li>Use select in client as well</li>
+    <li>Automated logging-in sequence</li>
+    <li>Test cases for individual commands</li>
+    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
   </ul>
 </ol>
-
 
 <h4>Plan for 30.09.24 (???)</h4>
 <ol>
@@ -331,8 +336,6 @@
 
 <h4>Plan for the next week</h4>
 <ol>
-  <li>Proper command testing</li>
-  <li>Error codes</li>
   <li>...</li>
   <li>Logger/debugger outputs to a file (option to append timestamp to filename)</li>
   <li>Create a second client. (bot)</li>

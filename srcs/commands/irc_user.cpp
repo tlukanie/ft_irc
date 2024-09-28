@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_user.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:51:19 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:52:03 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:32 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 
 // ERR_NEEDMOREPARAMS (461)
 // ERR_ALREADYREGISTERED (462)
-void    irc_user(Message* msg, struct s_server *ts)
+void	irc_user(Message* msg, struct s_server *ts)
 {
 	if (!(ts->users[msg->getSD()]->getAuthFlags() & PASSWORD))
 		return ;

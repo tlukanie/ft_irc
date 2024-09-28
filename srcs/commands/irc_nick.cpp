@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_nick.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:48:33 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:49:35 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:09 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 
 //   :dan-!d@localhost NICK Mamoped
 //                             ; dan- changed his nickname to Mamoped.
-void    irc_nick(Message* msg, struct s_server *ts)
+void	irc_nick(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 	std::string	oldnick;

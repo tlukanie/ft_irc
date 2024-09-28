@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_quit.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:55:41 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:56:11 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:25 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 // QUIT
 // :dan-!d@localhost QUIT :Quit: Bye for now!
 // https://modern.ircdocs.horse/#quit-message
-void    irc_quit(Message* msg, struct s_server *ts)
+void	irc_quit(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 

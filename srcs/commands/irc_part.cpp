@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_part.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:58:59 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:59:29 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:15 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // PART
 //https://modern.ircdocs.horse/#part-message
-void    irc_part(Message* msg, struct s_server *ts)
+void	irc_part(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 

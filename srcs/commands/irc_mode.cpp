@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:21 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 13:00:34 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:05 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 
 //   :irc.example.com 324 dan #foobar +nrt
 //   :irc.example.com 329 dan #foobar 1620807422
-void irc_mode(Message* msg, struct s_server *ts)
+void	irc_mode(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 16:16:50 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:22:36 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ typedef struct s_server {
 }	t_server;
 
 //COMMANDS
-void	irc_mode(Message* msg, struct s_server *ts);
 void	irc_cap(Message* msg, struct s_server *ts);
 void	irc_pass(Message* msg, struct s_server *ts);
 void	irc_nick(Message* msg, struct s_server *ts);
@@ -109,6 +108,7 @@ void	irc_quit(Message* msg, struct s_server *ts);
 /* CHANNEL OPERATIONS */
 void	irc_join(Message* msg, struct s_server *ts);
 void	irc_part(Message* msg, struct s_server *ts);
+void	irc_mode(Message* msg, struct s_server *ts);
 void	irc_topic(Message* msg, struct s_server *ts);
 void	irc_invite(Message* msg, struct s_server *ts);
 void	irc_kick(Message* msg, struct s_server *ts);

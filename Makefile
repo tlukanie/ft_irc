@@ -3,42 +3,44 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/28 16:17:00 by tlukanie         ###   ########.fr        #
+#    Updated: 2024/09/28 15:55:29 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	ircserv
-SRCS	=	srcs/ircserv.cpp \
-			srcs/classes/Channel.cpp \
-			srcs/classes/Message.cpp \
-			srcs/classes/User.cpp \
-			srcs/commands/irc_mode.cpp \
-			srcs/commands/irc_cap.cpp \
-			srcs/commands/irc_pass.cpp \
-			srcs/commands/irc_nick.cpp \
-			srcs/commands/irc_user.cpp \
-			srcs/commands/irc_ping.cpp \
-			srcs/commands/irc_pong.cpp \
-			srcs/commands/irc_quit.cpp \
-			srcs/commands/irc_join.cpp \
-			srcs/commands/irc_part.cpp \
-			srcs/commands/irc_topic.cpp \
-			srcs/commands/irc_invite.cpp \
-			srcs/commands/irc_kick.cpp \
-			srcs/commands/irc_away.cpp \
-			srcs/commands/irc_privmsg.cpp \
-			srcs/commands/irc_notice.cpp \
-			srcs/commands/irc_who.cpp \
-			srcs/commands/irc_whois.cpp \
-			srcs/utils/colours.cpp \
-			srcs/utils/debugger.cpp \
-			srcs/utils/numeric_replies.cpp \
-			srcs/utils/utils.cpp
-OBJ_DIR	=	objs/
-OBJS	=	$(SRCS:%.cpp=%.o)
+SRCDIR	=	srcs/
+#VPATH	=	srcs:srcs/classes:srcs/commands:srcs/utils
+SRCS	=	ircserv.cpp \
+			classes/Channel.cpp \
+			classes/Message.cpp \
+			classes/User.cpp \
+			commands/irc_away.cpp \
+			commands/irc_cap.cpp \
+			commands/irc_invite.cpp \
+			commands/irc_join.cpp \
+			commands/irc_kick.cpp \
+			commands/irc_mode.cpp \
+			commands/irc_nick.cpp \
+			commands/irc_notice.cpp \
+			commands/irc_part.cpp \
+			commands/irc_pass.cpp \
+			commands/irc_ping.cpp \
+			commands/irc_pong.cpp \
+			commands/irc_privmsg.cpp \
+			commands/irc_quit.cpp \
+			commands/irc_topic.cpp \
+			commands/irc_user.cpp \
+			commands/irc_who.cpp \
+			commands/irc_whois.cpp \
+			utils/colours.cpp \
+			utils/debugger.cpp \
+			utils/numeric_replies.cpp \
+			utils/utils.cpp
+OBJDIR	=	objs/
+OBJS	=	$(SRCS:%.cpp=$(OBJDIR)%.o)
 CLIENT	=	client
 C_SRCS	=	TestingClient1.cpp
 C_OBJS	=	TestingClient1.o
@@ -58,19 +60,22 @@ $(NAME): $(OBJS)
 $(CLIENT): $(C_OBJS)
 	$(CPP) $(FLAGS) $(C_OBJS) -o $(CLIENT)
 
-%.o: %.cpp $(HEADERS)
+$(OBJDIR)%.o: $(SRCDIR)%.cpp $(HEADERS)
+	@mkdir -p $(@D)
 	$(CPP) $(FLAGS) -c $< -o $@
 
+%.o: %.cpp $(HEADERS)
+	$(CPP) $(FLAGS) -c $< -o $@
 # objs/%.o: srcs/%.cpp | objdir
 # 	$(CPP) $(FLAGS) -c $< -o $@
 
 objdir:
-	mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJDIR)
 
 clean:
 	rm -f $(OBJS)
 	rm -f $(C_OBJS)
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJDIR)
 
 fclean: clean
 	rm -f $(NAME)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_ping.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:53:02 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:53:30 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:18 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 // ERR_NEEDMOREPARAMS (461)
 // ERR_NOORIGIN (409)
-void    irc_ping(Message* msg, struct s_server *ts)
+void	irc_ping(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 

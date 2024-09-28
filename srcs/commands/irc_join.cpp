@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_join.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:57:22 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:58:05 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:22:59 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // JOIN
 // https://modern.ircdocs.horse/#join-message
-void    irc_join(Message* msg, struct s_server *ts)
+void	irc_join(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 

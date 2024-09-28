@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_pass.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:45:53 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:46:44 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 15:23:13 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 // PASS a
 // https://modern.ircdocs.horse/#pass-message
 // Numeric replies:
-void    irc_pass(Message* msg, struct s_server *ts)
+void	irc_pass(Message* msg, struct s_server *ts)
 {
 	std::string reply;
 
