@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/21 10:58:34 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 13:03:00 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,49 +14,49 @@
 
 Channel::Channel(void)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Default constructor of the Channel class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Default constructor of the Channel class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	this->_channelName = "noname";
 }
 
 Channel::Channel(const Channel& copy)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Copy constructor of the Channel class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Copy constructor of the Channel class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	*this = copy;
 }
 
 Channel &Channel::operator = (const Channel &src)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Assigment operator of the Channel class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Assigment operator of the Channel class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	(void)src;
 	return (*this);
 }
 
 Channel::~Channel(void)
 {
-	if (DEEPDEBUG)
-	{
-		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Destructor of the Channel class called.";
-		ft_uncolorize();
-		std::cout << std::endl;
-	}
+	// if (DEEPDEBUG)
+	// {
+	// 	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// 	// std::cout << "Destructor of the Channel class called.";
+	// 	// ft_uncolorize();
+	// 	// std::cout << std::endl;
+	// }
 }
 
 Channel::Channel(std::string channelName, unsigned short sd)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Overloaded constructor of the Channel class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Overloaded constructor of the Channel class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	this->_channelName = channelName;
 	this->_topic = "";
 	this->_key = "";	//password
@@ -65,27 +65,27 @@ Channel::Channel(std::string channelName, unsigned short sd)
 	this->_usersInChannel[sd] = true;
 }
 
-std::string	Channel::getChannelName(void)
+std::string const	&Channel::getChannelName(void)
 {
 	return (this->_channelName);
 }
 
-std::string	Channel::getTopic(void)
+std::string const	&Channel::getTopic(void)
 {
 	return (this->_topic);
 }
 
-void	Channel::setTopic(std::string topic)
+void	Channel::setTopic(std::string const &topic)
 {
 	this->_topic = topic;
 }
 
-std::string	Channel::getKey(void)
+std::string const	&Channel::getKey(void)
 {
 	return (this->_key);
 }
 
-void	Channel::setKey(std::string key)
+void	Channel::setKey(std::string const &key)
 {
 	this->_key = key;
 }
@@ -167,7 +167,7 @@ int	Channel::removeUser(unsigned short sd)
 // # define CHANNEL_TOPIC	2	// +t
 // # define CHANNEL_KEY	4	// +k
 // # define CHANNEL_LIMIT	8	// +l
-std::string	Channel::print(bool colour)
+std::string const	Channel::print(bool colour)
 {
 	std::string	info;
 	std::string	clr;

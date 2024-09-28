@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numeric_replies.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 15:23:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/27 12:07:39 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 11:54:52 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../../includes/ircserv.hpp"
 
 //RPL_WELCOME (001)
-void	tl_send_001(struct s_server *ts, unsigned short sd)
+void	rpl_welcome_001(struct s_server *ts, unsigned short sd)
 {
 	std::string	reply;
 	std::string client;
@@ -31,7 +31,7 @@ void	tl_send_001(struct s_server *ts, unsigned short sd)
 }
 
 //RPL_ENDOFWHO (315)
-void	ok_send_315(struct s_server *ts, std::string client, std::string mask)
+void	rpl_endofwho_315(struct s_server *ts, std::string client, std::string mask)
 {
 	std::string	reply;
 	reply = "315 ";
@@ -42,7 +42,7 @@ void	ok_send_315(struct s_server *ts, std::string client, std::string mask)
 }
 
 //RPL_CHANNELMODEIS (324)
-void	tl_send_324(struct s_server *ts, unsigned short sd, Channel *channel)
+void	rpl_channelmodes_324(struct s_server *ts, unsigned short sd, Channel *channel)
 {
 	std::string	reply;
 	std::string client;
@@ -113,7 +113,7 @@ void	rpl_inviting_341(struct s_server *ts, unsigned short sd, std::string nick, 
 
 // "<client> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
 //RPL_WHOREPLY (352)
-void	ok_send_352(struct s_server *ts, std::string client, std::string channelName, std::string nick)
+void	rpl_whoreply_352(struct s_server *ts, std::string client, std::string channelName, std::string nick)
 {
 	std::string	reply;
 	std::string channel = channelName;
@@ -181,7 +181,7 @@ void	rpl_endofnames_366(struct s_server *ts, unsigned short sd, std::string chan
 }
 
 //ERR_UNKNOWNERROR (400), Modern Documentation
-void	tl_send_400(struct s_server *ts, unsigned short sd, std::string command, std::string info)
+void	err_unknownerror_400(struct s_server *ts, unsigned short sd, std::string command, std::string info)
 {
 	std::string	reply;
 	std::string client;
@@ -207,7 +207,7 @@ void	err_nosuchnick_401(struct s_server *ts, unsigned short sd, std::string nick
 }
 
 //ERR_NOSUCHCHANNEL (403)
-void	tl_send_403(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_nosuchchannel_403(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -245,7 +245,7 @@ void	err_notexttosend_412(struct s_server *ts, unsigned short sd)
 }
 
 //ERR_UNKNOWNCOMMAND (421)
-void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command)
+void	err_unknowncommand_421(struct s_server *ts, unsigned short sd, std::string command)
 {
 	std::string	reply;
 	std::string client;
@@ -258,7 +258,7 @@ void	ok_send_421(struct s_server *ts, unsigned short sd, std::string command)
 }
 
 //ERR_NONICKNAMEGIVEN (431)
-void	ok_send_431(struct s_server *ts, unsigned short sd)
+void	err_nonicknamegiven_431(struct s_server *ts, unsigned short sd)
 {
 	std::string	reply;
 	std::string client;
@@ -270,7 +270,7 @@ void	ok_send_431(struct s_server *ts, unsigned short sd)
 }
 
 //ERR_ERRONEUSNICKNAME (432)
-void	ok_send_432(struct s_server *ts, unsigned short sd, std::string nick)
+void	err_erroneusnickname_432(struct s_server *ts, unsigned short sd, std::string nick)
 {
 	std::string	reply;
 	std::string client;
@@ -283,7 +283,7 @@ void	ok_send_432(struct s_server *ts, unsigned short sd, std::string nick)
 }
 
 //ERR_NICKNAMEINUSE (433)
-void	ok_send_433(struct s_server *ts, unsigned short sd, std::string nick)
+void	err_nicknameinuse_433(struct s_server *ts, unsigned short sd, std::string nick)
 {
 	std::string	reply;
 	std::string client;
@@ -296,7 +296,7 @@ void	ok_send_433(struct s_server *ts, unsigned short sd, std::string nick)
 }
 
 //ERR_USERNOTINCHANNEL (441)
-void	tl_send_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName)
+void	err_usernotinchannel_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -310,7 +310,7 @@ void	tl_send_441(struct s_server *ts, unsigned short sd, std::string nick, std::
 }
 
 //ERR_NOTONCHANNEL (442)
-void	tl_send_442(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_notonchannel_442(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -337,7 +337,7 @@ void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string n
 }
 
 //ERR_NEEDMOREPARAMS (461)
-void	tl_send_461(struct s_server *ts, unsigned short sd, std::string command)
+void	err_needmoreparams_461(struct s_server *ts, unsigned short sd, std::string command)
 {
 	std::string	reply;
 	std::string client;
@@ -350,7 +350,7 @@ void	tl_send_461(struct s_server *ts, unsigned short sd, std::string command)
 }
 
 //ERR_ALREADYREGISTERED (462)
-void	tl_send_462(struct s_server *ts, unsigned short sd)
+void	err_alreadyregistered_462(struct s_server *ts, unsigned short sd)
 {
 	std::string	reply;
 	std::string client;
@@ -362,7 +362,7 @@ void	tl_send_462(struct s_server *ts, unsigned short sd)
 }
 
 //ERR_CHANNELISFULL (471)
-void	tl_send_471(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_channelisfull_471(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -375,7 +375,7 @@ void	tl_send_471(struct s_server *ts, unsigned short sd, std::string channelName
 }
 
 //ERR_INVITEONLYCHAN (473)
-void	tl_send_473(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_inviteonlychan_473(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -388,7 +388,7 @@ void	tl_send_473(struct s_server *ts, unsigned short sd, std::string channelName
 }
 
 //ERR_BADCHANNELKEY (475)
-void	tl_send_475(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_badchannelkey_475(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -401,7 +401,7 @@ void	tl_send_475(struct s_server *ts, unsigned short sd, std::string channelName
 }
 
 //ERR_BADCHANMASK (476)
-void	tl_send_476(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_badchanmask_476(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	//std::string client;
@@ -414,7 +414,7 @@ void	tl_send_476(struct s_server *ts, unsigned short sd, std::string channelName
 }
 
 //ERR_CHANOPRIVSNEEDED (482)
-void	tl_send_482(struct s_server *ts, unsigned short sd, std::string channelName)
+void	err_chanopsprivsneeded_482(struct s_server *ts, unsigned short sd, std::string channelName)
 {
 	std::string	reply;
 	std::string client;
@@ -427,7 +427,7 @@ void	tl_send_482(struct s_server *ts, unsigned short sd, std::string channelName
 }
 
 //ERR_UMODEUNKNOWNFLAG (501)
-void	tl_send_501(struct s_server *ts, unsigned short sd)
+void	err_unknownmodeflag_501(struct s_server *ts, unsigned short sd)
 {
 	std::string	reply;
 	std::string client;
@@ -439,7 +439,7 @@ void	tl_send_501(struct s_server *ts, unsigned short sd)
 }
 
 //ERR_INVALIDMODEPARAM (696)
-void	ok_send_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description)
+void	err_invalidmodeparam_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description)
 {
 	std::string	reply;
 	std::string client;

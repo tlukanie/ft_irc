@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/01 13:37:36 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 09:48:11 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 12:38:28 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,5 +235,5 @@ std::string	getClient(struct s_server *ts, unsigned short sd)
 	if (ts->users[sd]->getNick().size())
 		return (ts->users[sd]->getNick());
 	else
-		return (ts->users[sd]->getIP());
+		return (ts->users[sd]->getIP() + ":" + ok_itostr(ts->users[sd]->getPort()));
 }

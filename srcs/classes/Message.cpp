@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/11 12:10:20 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 13:05:21 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,28 @@
 
 Message::Message(void)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Default constructor of the Message class called.";
-	ft_uncolorize();
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Default constructor of the Message class called.";
+	// ft_uncolorize();
 	this->_sd = 0;
-	std::cout << std::endl;
+	// std::cout << std::endl;
 }
 
 Message::Message(const Message& copy)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Copy constructor of the Message class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Copy constructor of the Message class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	*this = copy;
 }
 
 Message &Message::operator = (const Message &src)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Assigment operator of the Message class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Assigment operator of the Message class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	(void)src;
 	return (*this);
 }
@@ -164,17 +164,17 @@ unsigned short	Message::getSD(void)
 	return (this->_sd);
 }
 
-std::string		Message::getMessage(void)
+std::string const	&Message::getMessage(void)
 {
 	return (this->_msg);
 }
 
-std::string		Message::getCommand(void)
+std::string const	&Message::getCommand(void)
 {
 	return (this->_command);
 }
 
-std::vector<std::string>	Message::getParams(void)
+std::vector<std::string> const &Message::getParams(void)
 {
 	return (this->_params);
 }

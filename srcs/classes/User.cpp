@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 09:31:53 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 13:04:56 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 User::User(void)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Default constructor of the User class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Default constructor of the User class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	this->_sd = 0;
 	this->_port = 0;
 	this->_ip = "";
@@ -30,49 +30,49 @@ User::User(void)
 
 User::User(const User& copy)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Copy constructor of the User class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Copy constructor of the User class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	*this = copy;
 }
 
 User &User::operator = (const User &src)
 {
-	ft_colorize(reinterpret_cast<uintptr_t>(this));
-	std::cout << "Assigment operator of the User class called.";
-	ft_uncolorize();
-	std::cout << std::endl;
+	// ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// std::cout << "Assigment operator of the User class called.";
+	// ft_uncolorize();
+	// std::cout << std::endl;
 	(void)src;
 	return (*this);
 }
 
 User::~User(void)
 {
-	if (DEEPDEBUG)
-	{
-		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Destructor of the User class called.";
-		ft_uncolorize();
-		std::cout << std::endl;
-	}
+	// if (DEEPDEBUG)
+	// {
+	// 	ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// 	std::cout << "Destructor of the User class called.";
+	// 	ft_uncolorize();
+	// 	std::cout << std::endl;
+	// }
 }
 
 User::User(unsigned short sd, unsigned short port, std::string ip)
 {
-	if (DEEPDEBUG)
-	{
-		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "Overriden constructor of the User class called.";
-		ft_uncolorize();
-		std::cout << std::endl;
-		ft_colorize(reinterpret_cast<uintptr_t>(this));
-		std::cout << "SD: " << sd;
-		std::cout << ", port: " << port;
-		std::cout << ", ip: " << ip;
-		ft_uncolorize();
-		std::cout << std::endl;
-	}
+	// if (DEEPDEBUG)
+	// {
+	// 	ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// 	std::cout << "Overriden constructor of the User class called.";
+	// 	ft_uncolorize();
+	// 	std::cout << std::endl;
+	// 	ft_colorize(reinterpret_cast<uintptr_t>(this));
+	// 	std::cout << "SD: " << sd;
+	// 	std::cout << ", port: " << port;
+	// 	std::cout << ", ip: " << ip;
+	// 	ft_uncolorize();
+	// 	std::cout << std::endl;
+	// }
 	this->_freedom = false;
 	this->_sd = sd;
 	this->_port = port;
@@ -115,69 +115,67 @@ std::vector<uint8_t>	&User::getDataOut(void)
 }
 
 
-std::string	User::getIP(void)
+std::string const	&User::getIP(void)
 {
 	return (this->_ip);
 }
 
-std::string	User::getNick(void)
+std::string const	&User::getNick(void)
 {
 	return (this->_nick);
 }
 
-void	User::setNick(std::string nick)
+void	User::setNick(std::string const &nick)
 {
-	std::cout << "Changing nick: " << this->_nick << " to " << nick << "." << std::endl;
 	this->_nick = nick;
-	std::cout << "Nick is now: " << this->_nick << "." << std::endl;
 }
 
-std::string	User::getUserName(void)
+std::string const	&User::getUserName(void)
 {
 	return (this->_username);
 }
 
-void	User::setUserName(std::string username)
+void	User::setUserName(std::string const &username)
 {
 	this->_username = username;
 }
 
-std::string	User::getHostName(void)
+std::string const	&User::getHostName(void)
 {
 	return (this->_hostname);
 }
 
-void	User::setHostName(std::string hostname)
+void	User::setHostName(std::string const &hostname)
 {
 	this->_hostname = hostname;
 }
 
-std::string	User::getServerName(void)
+std::string const	&User::getServerName(void)
 {
 	return (this->_servername);
 }
 
-void	User::setServerName(std::string servername)
+void	User::setServerName(std::string const &servername)
 {
 	this->_servername = servername;
 }
 
-std::string	User::getRealName(void)
+std::string const	&User::getRealName(void)
 {
 	return (this->_realname);
 }
 
-void	User::setRealName(std::string realname)
+void	User::setRealName(std::string const &realname)
 {
 	this->_realname = realname;
 }
 
-std::string	User::getAwayMessage(void)
+std::string const	&User::getAwayMessage(void)
 {
 	return (this->_awaymessage);
 }
 
-void	User::setAwayMessage(std::string awaymessage)
+void	User::setAwayMessage(std::string const &awaymessage)
 {
 	this->_awaymessage = awaymessage;
 }
@@ -250,7 +248,7 @@ void	User::unsetReadingFlag(void)
 // std::string		_realname;
 // std::string		_awaymessage;
 
-std::string	User::print(bool colour)
+std::string	const User::print(bool colour)
 {
 	std::string	info;
 	std::string	clr;
@@ -273,6 +271,6 @@ std::string	User::print(bool colour)
 	info += "Real name: " + clr + this->_realname + end + "\n";
 	info += "Away message: " + clr + this->_awaymessage + end + "\n";
 	info += "Buffer In : " + ok_display_real_buffer(colour, this->_dataIn) + "\n";
-	info += "Buffer Out: " + ok_display_real_buffer(colour, this->_dataOut);
+	info += "Buffer Out: " + ok_display_real_buffer(colour, this->_dataOut) + "\n";
 	return (info);
 }

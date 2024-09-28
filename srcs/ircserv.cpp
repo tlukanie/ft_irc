@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:33 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/27 12:10:06 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 13:08:48 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void signal_handler(int signal_num)
 // CAP LS
 void irc_cap(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "CAP COMMAND not supported" NO_COLOUR << std::endl; 
 	(void)msg;
 	(void)ts;
 }
@@ -38,28 +37,16 @@ void irc_cap(Message* msg, struct s_server *ts)
 void irc_pass(Message* msg, struct s_server *ts)
 {
 	std::string reply;
-	std::cout << MAGENTA_COLOUR "PASS COMMAND not fully supported" NO_COLOUR << std::endl; 
 
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += "PASS :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	// ERR_ALREADYREGISTERED (462)
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		// reply = "462 ";
-		// if (!ts->users[msg->getSD()]->getNick().size())
-		// 	reply += ts->users[msg->getSD()]->getNick() + " ";
-		// else
-		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += ":You may not reregister";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_462(ts, msg->getSD());
+		err_alreadyregistered_462(ts, msg->getSD());
 		return ;
 	}
 	if (msg->getParams()[0] == ts->password)
@@ -106,62 +93,33 @@ void irc_nick(Message* msg, struct s_server *ts)
 	std::string	reply;
 	std::string	oldnick;
 
-	std::cout << MAGENTA_COLOUR "NICK COMMAND is now fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlags() & PASSWORD))
 		return ;
-	// std::cout << MAGENTA_COLOUR "User " << msg->getSD()
-	// << " setting nick " << newnick << NO_COLOUR << std::endl;
 	if (ts->users[msg->getSD()]->getNick().size())
 		oldnick = ts->users[msg->getSD()]->getNick();
 	//check if parameter
 	if (!msg->getParams().size())
 	{
-		// reply = "431 ";
-		// if (oldnick.size())
-		// 	reply += oldnick + " ";
-		// else
-		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += ":No nickname given";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		ok_send_431(ts, msg->getSD());
+		err_nonicknamegiven_431(ts, msg->getSD());
 		return ;
 	}
 	std::string	newnick = msg->getParams()[0];
 	if (!isValidNick(newnick))
 	{
-		// reply = "432 ";
-		// if (oldnick.size())
-		// 	reply += oldnick + " ";
-		// else
-		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += newnick + " :Erroneus nickname";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		ok_send_432(ts, msg->getSD(), newnick);
+		err_erroneusnickname_432(ts, msg->getSD(), newnick);
 		return ;
 	}
 	if (ts->nicks.find(newnick) != ts->nicks.end())
 	{
-		// reply = "433 ";
-		// if (oldnick.size())
-		// 	reply += oldnick + " ";
-		// else
-		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += newnick + " :Nickname is already in use";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		ok_send_433(ts, msg->getSD(), newnick);
+		err_nicknameinuse_433(ts, msg->getSD(), newnick);
 		return ;
 	}
-	//setting the first (and only?) parameter as a nick in the map of users
-	//accessed by the socket descriptor gained from the message class
-
 	ts->users[msg->getSD()]->setNick(newnick);
 	if (oldnick.size())
 	{
 		ts->nicks.erase(ts->nicks.find(oldnick));
 	}
-	
 	ts->nicks.insert(std::pair<std::string, User*>(newnick, ts->users[msg->getSD()]));
-	// ts.users.insert(std::pair<int, User*>(ts.new_socket, new User(ts.new_socket, ntohs(ts.address.sin_port), inet_ntoa(ts.address.sin_addr))));
 	if (ts->users[msg->getSD()]->getNick().size())
 	{
 		//send to all?
@@ -169,28 +127,20 @@ void irc_nick(Message* msg, struct s_server *ts)
 		reply = ":" + oldnick + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
 		reply += " NICK :" +  ts->users[msg->getSD()]->getNick();
 		send_reply(ts, msg->getSD(), NULL, reply);
-		// if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-		// { 
-		// 	std::cerr << "send failed" << std::endl;
-		// } 
-		// else
-		// {
-		// 	std::cout << "Reply message sent successfully" << std::endl;
-		// }
 	}
 	if (!oldnick.size())
 	{
 		ts->users[msg->getSD()]->addAuthFlag(NICK);
 		if (ts->users[msg->getSD()]->getAuthFlag())
 		{
-			// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_001(ts, msg->getSD());
+			rpl_welcome_001(ts, msg->getSD());
 		}
 	}
-
-	std::cout << MAGENTA_COLOUR "User " << msg->getSD()
-	<< " got nick " << ts->users[msg->getSD()]->getNick() << NO_COLOUR << std::endl;
+	if (!oldnick.size())
+	{
+		oldnick = ts->users[msg->getSD()]->getIP() + ":" + ok_itostr(ts->users[msg->getSD()]->getPort());
+	}
+	ok_debugger(&(ts->debugger), INFO, "[" + ok_itostr(msg->getSD()) + "] User: " + oldnick + " got nick " + ts->users[msg->getSD()]->getNick() + ".", "", MYDEBUG);
 }
 
 // USER net net localhost :net
@@ -209,30 +159,17 @@ void irc_nick(Message* msg, struct s_server *ts)
 // ERR_ALREADYREGISTERED (462)
 void irc_user(Message* msg, struct s_server *ts)
 {
-	std::string	reply;
-	std::cout << MAGENTA_COLOUR "USER COMMAND is now fully supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlags() & PASSWORD))
 		return ;
 	// we need to check that there are 4 parameters?
 	if (msg->getParams().size() != 4 || !msg->getParams()[0].size())
 	{
-		// reply = "461 ";
-		// if (!ts->users[msg->getSD()]->getNick().size())
-		// 	reply += ts->users[msg->getSD()]->getNick() + " ";
-		// else
-		// 	reply += ts->users[msg->getSD()]->getIP() + " ";
-		// reply += "USER :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		// reply = "462 ";
-		// reply += ts->users[msg->getSD()]->getNick();
-		// reply += " :You may not register again";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_462(ts, msg->getSD());
+		err_alreadyregistered_462(ts, msg->getSD());
 		return ;
 	}
 	ts->users[msg->getSD()]->setUserName(msg->getParams()[0]);
@@ -243,20 +180,8 @@ void irc_user(Message* msg, struct s_server *ts)
 	ts->users[msg->getSD()]->addAuthFlag(USER);
 	if (ts->users[msg->getSD()]->getAuthFlag())
 	{
-		// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_001(ts, msg->getSD());
+		rpl_welcome_001(ts, msg->getSD());
 	}
-	// reply = "001 " +  ts->users[msg->getSD()]->getNick() + " :Hello there";
-	// send_reply(ts, msg->getSD(), NULL, reply);
-	// // if(send(msg->getSD(), reply.c_str(), reply.length(), 0) != (ssize_t)reply.length())
-	// { 
-	// 	std::cerr << "send failed" << std::endl;
-	// } 
-	// else
-	// {
-	// 	std::cout << "Reply message sent successfully" << std::endl;
-	// }
 }
 
 // PING
@@ -270,18 +195,12 @@ void irc_ping(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
 
-
-	std::cout << MAGENTA_COLOUR "PING COMMAND is almost supported" NO_COLOUR << std::endl; 
 	//this check may not be needed
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "PING :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	reply = "PONG " +  ts->users[msg->getSD()]->getNick() + " :" + msg->getParams()[0];
@@ -292,35 +211,31 @@ void irc_ping(Message* msg, struct s_server *ts)
 // https://modern.ircdocs.horse/#pong-message
 void irc_pong(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "PONG COMMAND not supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 }
 
+// Error
+// https://modern.ircdocs.horse/#error-message
 // QUIT
 // :dan-!d@localhost QUIT :Quit: Bye for now!
 // https://modern.ircdocs.horse/#quit-message
 void irc_quit(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "QUIT COMMAND not yet supported" NO_COLOUR << std::endl; 
+	std::string	reply;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	std::string	reason;
 	reason = "Quit: ";
 	if (msg->getParams().size())
 		reason += msg->getParams()[0];
-	std::string	reply;
 	reply = "ERROR :Quitting channel";
 	send_reply(ts, msg->getSD(), NULL, reply);
-	remove_user_from_server(ts, ts->users[msg->getSD()], reason);
-	//user leave all the channels they are in
 	//send quitting message to all uers that share the channels
+	//user leave all the channels they are in
+	remove_user_from_server(ts, ts->users[msg->getSD()], reason);
 }
-
-
-
-// Error
-// https://modern.ircdocs.horse/#error-message
 
 /* CHANNEL OPERATIONS */
 
@@ -329,16 +244,12 @@ void irc_quit(Message* msg, struct s_server *ts)
 void irc_join(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
-	std::cout << MAGENTA_COLOUR "JOIN COMMAND now fully supported" NO_COLOUR << std::endl;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "JOIN :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	//special case
@@ -350,7 +261,6 @@ void irc_join(Message* msg, struct s_server *ts)
 			std::multimap<std::string, Channel*>::iterator temp;
 			temp = it++;
 			reply += "PART " + temp->second->getChannelName() + " :leaving";
-			
 			//send reply to channel
 			send_reply_channel(ts, temp->second->getChannelName(), ts->users[msg->getSD()], reply);
 			remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[temp->second->getChannelName()]);
@@ -366,11 +276,7 @@ void irc_join(Message* msg, struct s_server *ts)
 		//check if the channel name valid
 		if (channelNames[i].size() < 2 || (channelNames[i][0] != '#' && channelNames[i][0] != '&'))
 		{
-			// reply = "476 ";
-			// reply += channelNames[i] + " ";
-			// reply += ":Bad Channel Mask";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_476(ts, msg->getSD(), channelNames[i]);
+			err_badchanmask_476(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
 		//if the channel does not exist
@@ -383,10 +289,7 @@ void irc_join(Message* msg, struct s_server *ts)
 			}
 			catch(const std::exception& e)
 			{
-				std::cout << REDBG_COLOUR "Channel " NO_COLOUR << std::endl;
-				std::cout << RED_COLOUR << channelNames[i] << NO_COLOUR << std::endl;
-				std::cout << REDBG_COLOUR " could not be created, because: " NO_COLOUR << std::endl;
-				std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+				ok_debugger(&(ts->debugger), ERROR, "Could not create channel: " + channelNames[i] + ", because: ", e.what(), MYDEBUG);
 				return ;
 			}
 		}
@@ -395,75 +298,34 @@ void irc_join(Message* msg, struct s_server *ts)
 			//check if user can join the channel
 			if (ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_INVITE)
 			{
-				// reply = "473 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += channelNames[i] + " ";
-				// reply += ":Cannot join channel (+i)";
-				// send_reply(ts, msg->getSD(), NULL, reply);
-				tl_send_473(ts, msg->getSD(), channelNames[i]);
+				err_inviteonlychan_473(ts, msg->getSD(), channelNames[i]);
 				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelNames[i]]->getUsers() >= ts->channels[channelNames[i]]->getChannelLimit())
 			{
-				// reply = "471 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += channelNames[i] + " ";
-				// reply += ":Cannot join channel (+l)";
-				// send_reply(ts, msg->getSD(), NULL, reply);
-				tl_send_471(ts, msg->getSD(), channelNames[i]);
+				err_channelisfull_471(ts, msg->getSD(), channelNames[i]);
 				continue ;
 			}
 			if ((ts->channels[channelNames[i]]->getModeFlags() & CHANNEL_KEY))
 			{
 				if (keys.size() <= i || keys[i] != ts->channels[channelNames[i]]->getKey())
 				{
-					// reply = "475 ";
-					// reply += ts->users[msg->getSD()]->getNick() + " ";
-					// reply += channelNames[i] + " ";
-					// reply += ":Cannot join channel (+k)";
-					// send_reply(ts, msg->getSD(), NULL, reply);
-					tl_send_475(ts, msg->getSD(), channelNames[i]);
+					err_badchannelkey_475(ts, msg->getSD(), channelNames[i]);
 					continue ;
 				}
 			}
-			ok_debugger(&(ts->debugger), DEBUG, "This channel already exists: ", channelNames[i], MYDEBUG);
 		}
-			
 		add_user_to_channel(ts, ts->users[msg->getSD()], ts->channels[channelNames[i]]);
 		//send everyone join message
+		ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(msg->getSD()) + "] Joining channel:", channelNames[i], MYDEBUG);
 		reply = "JOIN :" + channelNames[i];
 		send_reply_channel(ts, channelNames[i], ts->users[msg->getSD()], reply);
 		//332
 		if (ts->channels[channelNames[i]]->getTopic().size())
 		{
-			// reply = "332 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += channelNames[i] + " ";
-			// reply += ":" + ts->channels[channelNames[i]]->getTopic();
-			// send_reply(ts, msg->getSD(), NULL, reply);
 			rpl_topic_332(ts, msg->getSD(), channelNames[i]);
 		}
-		//353
-		// reply = "353 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "= ";
-		// reply += channelNames[i] + " ";
-		// reply += ":";
-		// for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelNames[i]); it != ts->channel2user.upper_bound(channelNames[i]); it++)
-		// {
-		// 	if (ts->channels[channelNames[i]]->isOperator(it->second->getSD()))
-		// 		reply += "@";
-		// 	reply += it->second->getNick() + " ";
-		// }
-		// reply.resize(reply.size() - 1);
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		rpl_namreply_353(ts, msg->getSD(), channelNames[i]);
-		// 366
-		// reply = "366 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelNames[i] + " ";
-		// reply += ":End of /NAMES list";
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		rpl_endofnames_366(ts, msg->getSD(), channelNames[i]);
 	}
 }
@@ -473,23 +335,16 @@ void irc_join(Message* msg, struct s_server *ts)
 void irc_part(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
-	
-	std::cout << MAGENTA_COLOUR "PART COMMAND not fully supported" NO_COLOUR << std::endl;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "PART :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
-	//check if the channel name valid
-	//check if user can join the channel
 	std::vector<std::string>	channelNames = ok_split(msg->getParams()[0], ',');
-	std::string	reason;
+	std::string					reason;
 	if (msg->getParams().size() > 1)
 		reason = msg->getParams()[1];
 	for (size_t i = 0; i < channelNames.size(); i++)
@@ -497,27 +352,17 @@ void irc_part(Message* msg, struct s_server *ts)
 		//if the channel does not exist
 		if (ts->channels.find(channelNames[i]) == ts->channels.end())
 		{
-			// reply = "403 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += channelNames[i] + " ";
-			// reply += ":No such channel";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_403(ts, msg->getSD(), channelNames[i]);
+			err_nosuchchannel_403(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
 		if (!(ts->channels[channelNames[i]]->hasUser(msg->getSD())))
 		{
-			// reply = "442 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += channelNames[i] + " ";
-			// reply += ":You are not on that channel";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_442(ts, msg->getSD(), channelNames[i]);
+			err_notonchannel_442(ts, msg->getSD(), channelNames[i]);
 			continue ;
 		}
-		ok_debugger(&(ts->debugger), DEBUG, "Leaving channel: ", channelNames[i], MYDEBUG);
-		reply += "PART " + channelNames[i] + " :" + (reason.size() ? reason : std::string(ts->users[msg->getSD()]->getNick() + " leaving channel " + channelNames[i]));
-		
+		ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(msg->getSD()) + "] Leaving channel:", channelNames[i], MYDEBUG);
+		reply += "PART " + channelNames[i] + " :";
+		reply += (reason.size() ? reason : std::string(ts->users[msg->getSD()]->getNick() + " leaving channel " + channelNames[i]));
 		//send reply to channel
 		send_reply_channel(ts, channelNames[i], ts->users[msg->getSD()], reply);
 		remove_user_from_channel(ts, ts->users[msg->getSD()], ts->channels[channelNames[i]]);
@@ -531,18 +376,14 @@ void irc_part(Message* msg, struct s_server *ts)
 
 void irc_topic(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "TOPIC COMMAND now fully supported" NO_COLOUR << std::endl;
 	std::string	reply;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	//send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text, int flags)
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "TOPIC :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string channelName = msg->getParams()[0];
@@ -552,43 +393,23 @@ void irc_topic(Message* msg, struct s_server *ts)
 
 	if (!isChannel(ts, channelName))
 	{
-		// reply = "403 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":No such channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_403(ts, msg->getSD(), channelName);
+		err_nosuchchannel_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		// reply = "442 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not on that channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_442(ts, msg->getSD(), channelName);
+		err_notonchannel_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if (msg->getParams().size() == 1)
 	{
 		if (ts->channels[channelName]->getTopic().size())
 		{
-			// reply = "332 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += channelName + " ";
-			// reply += ":" + ts->channels[channelName]->getTopic();
-			// send_reply(ts, msg->getSD(), NULL, reply);
 			rpl_topic_332(ts, msg->getSD(), channelName);
 			return ;
 		}
 		else
 		{
-			// reply = "331 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += channelName + " ";
-			// reply += ":No topic is set";
-			// send_reply(ts, msg->getSD(), NULL, reply);
 			rpl_notopic_331(ts, msg->getSD(), channelName);
 			return ;
 		}
@@ -597,12 +418,7 @@ void irc_topic(Message* msg, struct s_server *ts)
 	//482
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_TOPIC) && !ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		// reply = "482 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not channel operator";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_482(ts, msg->getSD(), channelName);
+		err_chanopsprivsneeded_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	reply = "TOPIC " + channelName + " :" + topic;
@@ -622,18 +438,14 @@ void irc_topic(Message* msg, struct s_server *ts)
 
 void irc_invite(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "INVITE COMMAND now fully supported" NO_COLOUR << std::endl;
+	std::string reply;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
-	std::string reply;
 	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "INVITE :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string nick = msg->getParams()[0];
@@ -641,75 +453,39 @@ void irc_invite(Message* msg, struct s_server *ts)
 	//401
 	if (ts->nicks.find(nick) == ts->nicks.end())
 	{
-		// reply = "401 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += nick + " ";
-		// reply += ":No such nickname";
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		err_nosuchnick_401(ts, msg->getSD(), nick);
 		return ;
 	}
 	//403
 	if (!isChannel(ts, channelName))
 	{
-		// reply = "403 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":No such channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_403(ts, msg->getSD(), channelName);
+		err_nosuchchannel_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//442
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		// reply = "442 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not on that channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_442(ts, msg->getSD(), channelName);
+		err_notonchannel_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//443
 	if (ts->channels[channelName]->hasUser(ts->nicks[nick]->getSD()))
 	{
-		// reply = "443 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += nick + " ";
-		// reply += channelName + " ";
-		// reply += ":is already on channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		err_useronchannel_443(ts, msg->getSD(), nick, channelName);
 		return ;
 	}
 	//482
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_INVITE) && !ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		// reply = "482 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not channel operator";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_482(ts, msg->getSD(), channelName);
+		err_chanopsprivsneeded_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	if ((ts->channels[channelName]->getModeFlags() & CHANNEL_LIMIT) && ts->channels[channelName]->getUsers() >= ts->channels[channelName]->getChannelLimit())
 	{
-		// reply = "471 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":The channel is full";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_471(ts, msg->getSD(), channelName);
+		err_channelisfull_471(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//341
-	// reply = "341 ";
-	// reply += ts->users[msg->getSD()]->getNick() + " ";
-	// reply += nick + " ";
-	// reply += channelName;
-	// send_reply(ts, msg->getSD(), NULL, reply);
 	rpl_inviting_341(ts, msg->getSD(), nick, channelName);
 	//invite message
 	reply = "INVITE ";
@@ -730,17 +506,13 @@ void irc_invite(Message* msg, struct s_server *ts)
 void irc_kick(Message* msg, struct s_server *ts)
 {
 	std::string reply;
-	std::cout << MAGENTA_COLOUR "KICK COMMAND not fully supported" NO_COLOUR << std::endl;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	// if user exists and if user not in channel, join user to channel
 	if (msg->getParams().size() < 2)
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "KICK :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string					channelName = msg->getParams()[0];
@@ -749,34 +521,19 @@ void irc_kick(Message* msg, struct s_server *ts)
 	//403
 	if (!isChannel(ts, channelName))
 	{
-		// reply = "403 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":No such channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_403(ts, msg->getSD(), channelName);
+		err_nosuchchannel_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//442
 	if (!(ts->channels[channelName]->hasUser(msg->getSD())))
 	{
-		// reply = "442 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not on that channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_442(ts, msg->getSD(), channelName);
+		err_notonchannel_442(ts, msg->getSD(), channelName);
 		return ;
 	}
 	//482
 	if (!ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		// reply = "482 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not channel operator";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_482(ts, msg->getSD(), channelName);
+		err_chanopsprivsneeded_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	for (size_t i = 0; i < nicks.size(); i++)
@@ -784,24 +541,13 @@ void irc_kick(Message* msg, struct s_server *ts)
 		//401
 		if (ts->nicks.find(nicks[i]) == ts->nicks.end())
 		{
-			// reply = "401 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += nicks[i] + " ";
-			// reply += ":No such nickname";
-			// send_reply(ts, msg->getSD(), NULL, reply);
 			err_nosuchnick_401(ts, msg->getSD(), nicks[i]);
 			continue ;
 		}
 		//441
 		if (!(ts->channels[channelName]->hasUser(ts->nicks[nicks[i]]->getSD())))
 		{
-			// reply = "441 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += nicks[i] + " ";
-			// reply += channelName + " ";
-			// reply += ":They are not on that channel";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_441(ts, msg->getSD(), nicks[i], channelName);
+			err_usernotinchannel_441(ts, msg->getSD(), nicks[i], channelName);
 			continue ;
 		}
 		reply = "KICK " + channelName + " " + nicks[i];
@@ -812,12 +558,11 @@ void irc_kick(Message* msg, struct s_server *ts)
 	}
 }
 
-
 //AWAY
 //https://modern.ircdocs.horse/#away-message
 void irc_away(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "AWAY COMMAND not really supported" NO_COLOUR << std::endl;
+	//not supported yet
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
@@ -834,7 +579,6 @@ void irc_away(Message* msg, struct s_server *ts)
 	}
 }
 
-
 //PRIVMSG
 //https://modern.ircdocs.horse/#privmsg-message
 //:user123!net@127.0.0.1 PRIVMSG #aaa :hello there
@@ -843,24 +587,16 @@ void irc_away(Message* msg, struct s_server *ts)
 void irc_privmsg(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
-	std::cout << MAGENTA_COLOUR "PRIVMSG COMMAND not fully supported" NO_COLOUR << std::endl;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "411 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += ":No recipient given PRIVMSG";
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		err_norecipient_411(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	if (msg->getParams().size() < 2)
 	{
-		// reply = "412 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += ":No text to send";
-		// send_reply(ts, msg->getSD(), NULL, reply);
 		err_notexttosend_412(ts, msg->getSD());
 		return ;
 	}
@@ -872,11 +608,6 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 		reply = "PRIVMSG " + targets[i] + " :" + text;
 		if (!targets[i].size())
 		{
-			//411
-			// reply = "411 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += ":No recipient given PRIVMSG";
-			// send_reply(ts, msg->getSD(), NULL, reply);
 			err_norecipient_411(ts, msg->getSD(), msg->getCommand());
 			continue ;
 		}
@@ -885,12 +616,7 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 			//403
 			if (ts->channels.find(targets[i]) == ts->channels.end())
 			{
-				// reply = "403 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += targets[i] + " ";
-				// reply += ":No such channel";
-				// send_reply(ts, msg->getSD(), NULL, reply);
-				tl_send_403(ts, msg->getSD(), targets[i]);
+				err_nosuchchannel_403(ts, msg->getSD(), targets[i]);
 				continue ;
 			}
 			send_reply_channel(ts, targets[i], ts->users[msg->getSD()], reply);
@@ -900,11 +626,6 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 			//401
 			if (ts->nicks.find(targets[i]) == ts->nicks.end())
 			{
-				// reply = "401 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += targets[i] + " ";
-				// reply += ":No such nickname";
-				// send_reply(ts, msg->getSD(), NULL, reply);
 				err_nosuchnick_401(ts, msg->getSD(), targets[i]);
 				continue ;
 			}
@@ -913,51 +634,13 @@ void irc_privmsg(Message* msg, struct s_server *ts)
 	}
 }
 
-
-
-
-
-
-
-
-
-// 	//message to channel vs message to user
-// 	if (msg->getParams()[0][0] == '#' || msg->getParams()[0][0] == '&')
-// 	{
-		
-// 		std::string channelName = msg->getParams()[0];
-// 		//reply channel
-// 		//check if channel exists
-// 		if (!isChannel(ts, channelName))
-// 		{
-// 			ok_debugger(&(ts->debugger), WARNING, "Cannot message non-existing channel:", channelName, MYDEBUG);
-// 			return ;
-// 		}
-// 		//send reply to all other users in the channel
-// 		for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(channelName); it != ts->channel2user.upper_bound(channelName); it++)
-// 		{
-// 			if (it->second->getNick() != ts->users[msg->getSD()]->getNick())
-// 			{
-				
-// 				std::string	text;
-// 				text = "PRIVMSG " + channelName + " :" + msg->getParams()[1];
-// 				send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], text);
-// 			}
-// 		}
-// 	}
-// 	else
-// 	{
-// 		//reply user
-// 	}
-// }
-
 //NOTICE
 //https://modern.ircdocs.horse/#notice-message
 
 void irc_notice(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
-	std::cout << MAGENTA_COLOUR "NOTICE COMMAND now fully supported" NO_COLOUR << std::endl;
+
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
@@ -1002,23 +685,15 @@ void irc_notice(Message* msg, struct s_server *ts)
 	}
 }
 
-
-
 //WHO
 // https://modern.ircdocs.horse/#who-message
 void irc_who(Message* msg, struct s_server *ts)
 {
-	std::string	reply;
-	std::cout << MAGENTA_COLOUR "WHO COMMAND not supported" NO_COLOUR << std::endl; 
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "WHO :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	std::string	mask = msg->getParams()[0];
@@ -1028,7 +703,7 @@ void irc_who(Message* msg, struct s_server *ts)
 		{
 			for (std::multimap<std::string, User*>::iterator it = ts->channel2user.lower_bound(mask); it != ts->channel2user.upper_bound(mask); it++)
 			{
-				ok_send_352(ts, ts->users[msg->getSD()]->getNick(), mask, it->second->getNick());
+				rpl_whoreply_352(ts, ts->users[msg->getSD()]->getNick(), mask, it->second->getNick());
 			}
 		}
 	}
@@ -1036,22 +711,20 @@ void irc_who(Message* msg, struct s_server *ts)
 	{
 		if (isNick(ts, mask))
 		{
-			ok_send_352(ts, ts->users[msg->getSD()]->getNick(), "", mask);
+			rpl_whoreply_352(ts, ts->users[msg->getSD()]->getNick(), "", mask);
 		}
 	}
-	ok_send_315(ts, ts->users[msg->getSD()]->getNick(), mask);
+	rpl_endofwho_315(ts, ts->users[msg->getSD()]->getNick(), mask);
 }
-
 
 //WHOIS == DEBUG
 void irc_whois(Message* msg, struct s_server *ts)
 {
-	std::cout << MAGENTA_COLOUR "WHOIS COMMAND is secret DEBUG" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		std::cerr << "NOT enough parameters" << std::endl;
+		//461??
 		//add reply error
 		return ;
 	}
@@ -1059,21 +732,18 @@ void irc_whois(Message* msg, struct s_server *ts)
 	{
 		std::string channelName = msg->getParams()[0];
 		if (ts->channels.find(channelName) != ts->channels.end())
-			std::cout << ts->channels[channelName]->print(true) << std::endl;
+			ts->debugger.log += ts->channels[channelName]->print(ts->debugger.colour);
 	}
 	else
 	{
 		std::string nick = msg->getParams()[0];
 		if (ts->nicks.find(nick) != ts->nicks.end())
-			std::cout << ts->nicks[nick]->print(true) << std::endl;
+			ts->debugger.log += ts->nicks[nick]->print(ts->debugger.colour);
 	}
-
 	//if not a channel
 		//no such nick 401
 	//if channel
 		//402
-
-
 }
 
 
@@ -1195,8 +865,6 @@ void	server_loop(t_server *ts)
 				{ 
 					//Somebody disconnected , get his details and print 
 					// getpeername(ts->sd, (struct sockaddr*)&ts->address, (socklen_t*)&ts->addrlen); 
-					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
-					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
 					remove_user_from_server(ts, user_ptr, "Quit: Connection closed by client");
 					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed recv): ", ok_itostr(ts->sd), MYDEBUG);
@@ -1216,9 +884,8 @@ void	server_loop(t_server *ts)
 						user_ptr->getDataIn().push_back(ts->buffer[i]);
 						buff.push_back(ts->buffer[i]);
 					}
-					std::cout << "BUFFER SIZE: " << user_ptr->getDataIn().size() << std::endl;
-					// ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
-					ok_debugger(&(ts->debugger), DEBUG, "Buffer:", "[" + ok_itostr(ts->sd) + "]" + ok_display_real_buffer(&(ts->debugger), user_ptr->getDataIn()), MYDEBUG);
+					// ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(ts->sd) + "] Buffer:", ok_display_buffer(&(ts->debugger), buff), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(ts->sd) + "] Buffer:", ok_display_real_buffer(&(ts->debugger), user_ptr->getDataIn()), MYDEBUG);
 					//while CRLF in data
 					// get position of the crlf
 					// if data overflow flag
@@ -1245,12 +912,9 @@ void	server_loop(t_server *ts)
 						msg.assign(user_ptr->getDataIn().begin(), user_ptr->getDataIn().begin() + pos - 2);
 						if (DEEPDEBUG)
 						{
-							ok_debugger(&(ts->debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
-							// std::cout << REDBG_COLOUR "MESSAGE EXTRACTED" NO_COLOUR << std::endl;
-							// std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
+							ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(ts->sd) + "] Message extracted:", msg, MYDEBUG);
 						}
 						user_ptr->getDataIn().erase(user_ptr->getDataIn().begin(), user_ptr->getDataIn().begin() + pos);
-
 						// try construct message
 						// if success
 						//   add to multimap
@@ -1263,10 +927,7 @@ void	server_loop(t_server *ts)
 						}
 						catch(const std::exception& e)
 						{
-							std::cout << REDBG_COLOUR "MESSAGE" NO_COLOUR << std::endl;
-							std::cout << RED_COLOUR << msg << NO_COLOUR << std::endl;
-							std::cout << REDBG_COLOUR "NOT VALID, BECAUSE" NO_COLOUR << std::endl;
-							std::cout << RED_COLOUR << e.what() << NO_COLOUR << std::endl;
+							ok_debugger(&(ts->debugger), ERROR, "Message: " + msg + " is not valid, because: ", e.what(), MYDEBUG);
 						}
 					}
 
@@ -1280,7 +941,7 @@ void	server_loop(t_server *ts)
 					if (user_ptr->getDataIn().size() > BUFFER_SIZE)
 					{
 						if (DEEPDEBUG)
-							std::cout << RED_COLOUR "DATA IS OVERFLOWING" NO_COLOUR << std::endl;
+							ok_debugger(&(ts->debugger), ERROR, "[" + ok_itostr(user_ptr->getSD()) + "]Data is overflowing", "", MYDEBUG);
 						user_ptr->setOverflowFlag();
 						if (*(user_ptr->getDataIn().rbegin()) == '\r')
 						{
@@ -1298,13 +959,11 @@ void	server_loop(t_server *ts)
 			{
 				//send replies
 				std::string	outbuff(user_ptr->getDataOut().begin(), user_ptr->getDataOut().end());
-				ok_debugger(&(ts->debugger), DEBUG, "Sending:", "[" + ok_itostr(ts->sd) + "]" + ok_display_send_buffer(ts->debugger.colour, user_ptr->getDataOut()), MYDEBUG);
+				ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(ts->sd) + "] Sending:", ok_display_send_buffer(ts->debugger.colour, user_ptr->getDataOut()), MYDEBUG);
 				if ((ts->valsent = send(ts->sd , outbuff.c_str(), outbuff.size(), MSG_NOSIGNAL)) <= 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
 					// getpeername(ts->sd, (struct sockaddr*)&ts->address, (socklen_t*)&ts->addrlen); 
-					// std::cout << "Host disconnected , ip is : " << inet_ntoa(ts->address.sin_addr)
-					// 	<< " , port : " << ntohs(ts->address.sin_port) << std::endl; 
 					//Close the socket and mark as 0 in list for reuse
 					remove_user_from_server(ts, user_ptr, "Quit: Connection closed by client");
 					ok_debugger(&(ts->debugger), DEBUG, "Closing connection on sd (failed send): ", ok_itostr(ts->sd), MYDEBUG);
@@ -1356,17 +1015,15 @@ void	server_loop(t_server *ts)
 				//	execute
 				if (ts->commands.find(msg_ptr->getCommand()) != ts->commands.end())
 				{
-					ok_debugger(&(ts->debugger), DEBUG, "Executing command:", "[" + ok_itostr(msg_ptr->getSD()) + "]" + ok_display_message(&(ts->debugger), msg_ptr->getMessage()), MYDEBUG);
+					ok_debugger(&(ts->debugger), DEBUG, "[" + ok_itostr(msg_ptr->getSD()) + "] Executing command:", ok_display_message(&(ts->debugger), msg_ptr->getMessage()), MYDEBUG);
 					//maybe run in try and catch block
 					ts->commands[msg_ptr->getCommand()](msg_ptr, ts);
 				}
 				else
 				{
-					ok_send_421(ts, msg_ptr->getSD(), msg_ptr->getCommand());
-					// std::cout << RED_COLOUR "Command: " REDBG_COLOUR << msg_ptr->getCommand() << NO_COLOUR RED_COLOUR " not found." NO_COLOUR << std::endl;
+					err_unknowncommand_421(ts, msg_ptr->getSD(), msg_ptr->getCommand());
 					//strike count of invalid messages
 				}
-				// std::cout << "deleting message " << msg_ptr->getCommand() << std::endl;
 				delete msg_ptr;
 				temp_it = iter++;
 				ts->messages.erase(temp_it);
@@ -1405,10 +1062,7 @@ void	clean_server(t_server *ts)
 	{
 		if (DEEPDEBUG)
 		{
-			std::cout << MAGENTA_COLOUR "Removing connection on sd: " << it->first
-			<< ". IP: " << it->second->getIP()
-			<< ", port: " << it->second->getPort()
-			<< NO_COLOUR << std::endl;
+			ok_debugger(&(ts->debugger), INFO, "Removing connection on sd: " + ok_itostr(it->first) + ". IP: " + it->second->getIP() + ", port: " + ok_itostr(it->second->getPort()), "", MYDEBUG);
 		}
 		delete it->second;
 		std::map<int, User *>::iterator temp = it;
@@ -1419,8 +1073,7 @@ void	clean_server(t_server *ts)
 	{
 		if (DEEPDEBUG)
 		{
-			std::cout << MAGENTA_COLOUR "Removing message on sd: " << it->first
-			<< NO_COLOUR << std::endl;
+			ok_debugger(&(ts->debugger), INFO, "Removing message on sd: " + ok_itostr(it->first), "", MYDEBUG);
 		}
 		delete it->second;
 		std::multimap<int, Message*>::iterator temp = it;
@@ -1431,8 +1084,7 @@ void	clean_server(t_server *ts)
 	{
 		if (DEEPDEBUG)
 		{
-			std::cout << MAGENTA_COLOUR "Removing channel: " << it->first
-			<< NO_COLOUR << std::endl;
+			ok_debugger(&(ts->debugger), INFO, "Removing channel: " + it->first, "", MYDEBUG);
 		}
 		delete it->second;
 		std::map<std::string, Channel *>::iterator temp = it;
@@ -1692,7 +1344,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "disabled")
 				ts->debugger.debuglvl = DISABLED;
 			else
-				std::cout << "Invalid DEBUG_LVL: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_LVL: " << value << std::endl;
 		}
 		else if (key == "DEBUG_FD")
 		{
@@ -1701,7 +1353,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "2")
 				ts->debugger.fd = 2;
 			else
-				std::cout << "Invalid DEBUG_FD: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_FD: " << value << std::endl;
 		}
 		else if (key == "DEBUG_DATE")
 		{
@@ -1710,7 +1362,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "1")
 				ts->debugger.date = true;
 			else
-				std::cout << "Invalid DEBUG_DATE: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_DATE: " << value << std::endl;
 		}
 		else if (key == "DEBUG_TIME")
 		{
@@ -1719,7 +1371,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "1")
 				ts->debugger.time = true;
 			else
-				std::cout << "Invalid DEBUG_TIME: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_TIME: " << value << std::endl;
 		}
 		else if (key == "DEBUG_UTIME")
 		{
@@ -1728,7 +1380,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "1")
 				ts->debugger.utime = true;
 			else
-				std::cout << "Invalid DEBUG_UTIME: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_UTIME: " << value << std::endl;
 		}
 		else if (key == "DEBUG_UPRECISION")
 		{
@@ -1747,7 +1399,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "6")
 				ts->debugger.precision = 6;
 			else
-				std::cout << "Invalid DEBUG_UPRECISION: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_UPRECISION: " << value << std::endl;
 		}
 		else if (key == "DEBUG_COLOUR")
 		{
@@ -1756,7 +1408,7 @@ static int ft_read_config(t_server *ts)
 			else if (value == "1")
 				ts->debugger.colour = true;
 			else
-				std::cout << "Invalid DEBUG_COLOUR: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_COLOUR: " << value << std::endl;
 		}
 		else if (key == "DEBUG_EXTRA")
 		{
@@ -1765,10 +1417,10 @@ static int ft_read_config(t_server *ts)
 			else if (value == "1")
 				ts->debugger.extra = true;
 			else
-				std::cout << "Invalid DEBUG_EXTRA: " << value << std::endl;
+				std::cerr << "Invalid DEBUG_EXTRA: " << value << std::endl;
 		}
 		else
-				std::cout << "Unknown key: " << key << std::endl;
+				std::cerr << "Unknown key: " << key << std::endl;
 	}
 	if (!ts->port)
 		return (1);

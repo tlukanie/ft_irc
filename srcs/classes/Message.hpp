@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/25 12:05:21 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/28 13:03:50 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,18 +53,15 @@
 class Message
 {
 	public:
-		Message(void);
-		Message(const Message& copy);
-		Message &operator	= (const Message &src);
 		~Message(void);
 	
 		Message(unsigned short sd, std::string msg);
 		
 		// getters and setters? for mode
-		unsigned short				getSD(void);
-		std::string					getMessage(void);
-		std::string					getCommand(void);
-		std::vector<std::string>	getParams(void);
+		unsigned short					getSD(void);
+		std::string const				&getMessage(void);
+		std::string const				&getCommand(void);
+		std::vector<std::string> const	&getParams(void);
 		
 		//methods
 		//extract message
@@ -78,6 +75,9 @@ class Message
 		// };
 
 	private:
+		Message(void);
+		Message(const Message& copy);
+		Message &operator	= (const Message &src);
 		// ??? number of users?
 		//static int	users;
 		// socket descriptor

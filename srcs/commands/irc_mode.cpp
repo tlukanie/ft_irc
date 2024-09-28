@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   irc_mode.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:21 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 13:48:40 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/28 13:00:34 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,11 @@
 void irc_mode(Message* msg, struct s_server *ts)
 {
 	std::string	reply;
-	std::cout << MAGENTA_COLOUR "MODE COMMAND not really supported" NO_COLOUR << std::endl;
 	if (!(ts->users[msg->getSD()]->getAuthFlag()))
 		return ;
 	if (!msg->getParams().size())
 	{
-		// reply = "461 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "MODE :Not enough parameters";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_461(ts, msg->getSD(), msg->getCommand());
+		err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 		return ;
 	}
 	Channel *channel;
@@ -54,37 +49,14 @@ void irc_mode(Message* msg, struct s_server *ts)
 	//403
 	if (!isChannel(ts, channelName))
 	{
-		// reply = "403 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":No such channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_403(ts, msg->getSD(), channelName);
+		err_nosuchchannel_403(ts, msg->getSD(), channelName);
 		return ;
 	}
 	channel = ts->channels[channelName];
 	if (msg->getParams().size() < 2)
 	{
 		//324
-		// reply = "324 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// if (channel->getModeFlags())
-		// 	reply += "+";
-		// if (channel->getModeFlags() & CHANNEL_INVITE)
-		// 	reply += "i";
-		// if (channel->getModeFlags() & CHANNEL_TOPIC)
-		// 	reply += "t";
-		// if (channel->getModeFlags() & CHANNEL_LIMIT)
-		// 	reply += "l";
-		// if (channel->getModeFlags() & CHANNEL_KEY)
-		// 	reply += "k";
-		// if (channel->getModeFlags() & CHANNEL_LIMIT)
-		// 	reply += " " + ok_itostr(channel->getChannelLimit());
-		// if (channel->getModeFlags() & CHANNEL_KEY)
-		// 	reply += " fake_key";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_324(ts, msg->getSD(), channel);
+		rpl_channelmodes_324(ts, msg->getSD(), channel);
 		//329 (not yet)
 		return ;
 	}
@@ -95,42 +67,24 @@ void irc_mode(Message* msg, struct s_server *ts)
 	//501
 	if (modestring.size() < 2 || (modestring[0] != '+' && modestring[0] != '-'))
 	{
-		// reply = "501 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += ":Unknown MODE flag";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_501(ts, msg->getSD());
+		err_unknownmodeflag_501(ts, msg->getSD());
 		return ;
 	}
 	//442
 	if (!(channel->hasUser(msg->getSD())))
 	{
-		// reply = "442 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not on that channel";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_442(ts, msg->getSD(), channelName);
+		err_notonchannel_442(ts, msg->getSD(), channelName);
 	}
 	//482
 	if (!ts->channels[channelName]->isOperator(msg->getSD()))
 	{
-		// reply = "482 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += channelName + " ";
-		// reply += ":You are not channel operator";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_482(ts, msg->getSD(), channelName);
+		err_chanopsprivsneeded_482(ts, msg->getSD(), channelName);
 		return ;
 	}
 	// 400 incorrect string
 	if (ok_containsDuplicate(modestring))
 	{
-		// reply = "400 ";
-		// reply += ts->users[msg->getSD()]->getNick() + " ";
-		// reply += "MODE :Duplicate in the modestring";
-		// send_reply(ts, msg->getSD(), NULL, reply);
-		tl_send_400(ts, msg->getSD(), msg->getCommand(), "Duplicate in the modestring");
+		err_unknownerror_400(ts, msg->getSD(), msg->getCommand(), "Duplicate in the modestring");
 		return ;
 	}
 	//USER MODE not handled
@@ -193,23 +147,12 @@ void irc_mode(Message* msg, struct s_server *ts)
 			{
 				if (msg->getParams().size() < n + 1 || !msg->getParams()[n].size())
 				{
-					// reply = "461 ";
-					// reply += ts->users[msg->getSD()]->getNick() + " ";
-					// reply += "MODE :Not enough parameters";
-					// send_reply(ts, msg->getSD(), NULL, reply);
-					tl_send_461(ts, msg->getSD(), msg->getCommand());
+					err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 					break ;
 				}
 				if (!isValidKey(msg->getParams()[n]))
 				{
-					// reply = "696 ";
-					// reply += ts->users[msg->getSD()]->getNick() + " ";
-					// reply += channelName + " ";
-					// reply += "k ";
-					// reply += msg->getParams()[n] + " ";
-					// reply += ":Invalid key";
-					// send_reply(ts, msg->getSD(), NULL, reply);
-					ok_send_696(ts, msg->getSD(), channelName, "k", msg->getParams()[n], "Invalid key");
+					err_invalidmodeparam_696(ts, msg->getSD(), channelName, "k", msg->getParams()[n], "Invalid key");
 					break ;
 				}
 				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " locked by key:", msg->getParams()[n], MYDEBUG);
@@ -237,24 +180,13 @@ void irc_mode(Message* msg, struct s_server *ts)
 			{
 				if (msg->getParams().size() < n + 1 || !msg->getParams()[n].size())
 				{
-					// reply = "461 ";
-					// reply += ts->users[msg->getSD()]->getNick() + " ";
-					// reply += "MODE :Not enough parameters";
-					// send_reply(ts, msg->getSD(), NULL, reply);
-					tl_send_461(ts, msg->getSD(), msg->getCommand());
+					err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 					break ;
 				}
 				int	limit = ok_strtoi<int>(msg->getParams()[n++]);
 				if (limit < 2 || limit > 64)
 				{
-					// reply = "696 ";
-					// reply += ts->users[msg->getSD()]->getNick() + " ";
-					// reply += channelName + " ";
-					// reply += "l ";
-					// reply += msg->getParams()[n - 1] + " ";
-					// reply += ":the limit has to be between 2 - 64 users per channel";
-					// send_reply(ts, msg->getSD(), NULL, reply);
-					ok_send_696(ts, msg->getSD(), channelName, "l", msg->getParams()[n-1], "the limit has to be between 2 - 64 users per channel");
+					err_invalidmodeparam_696(ts, msg->getSD(), channelName, "l", msg->getParams()[n-1], "the limit has to be between 2 - 64 users per channel");
 					break ;
 				}
 				ok_debugger(&(ts->debugger), DEBUG, "Channel: " + channelName + " limited to " + ok_itostr(limit) + " users.", "", MYDEBUG);
@@ -280,23 +212,13 @@ void irc_mode(Message* msg, struct s_server *ts)
 		{
 			if (msg->getParams().size() < n + 1)
 			{
-				// reply = "461 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += "MODE :Not enough parameters";
-				// send_reply(ts, msg->getSD(), NULL, reply);
-				tl_send_461(ts, msg->getSD(), msg->getCommand());
+				err_needmoreparams_461(ts, msg->getSD(), msg->getCommand());
 				break ;
 			}
 			std::string nick = msg->getParams()[n++];
 			if (!isInChannel(ts, channelName, nick))
 			{
-				// reply = "441 ";
-				// reply += ts->users[msg->getSD()]->getNick() + " ";
-				// reply += nick + " ";
-				// reply += channelName + " ";
-				// reply += ":They are not on that channel";
-				// send_reply(ts, msg->getSD(), NULL, reply);
-				tl_send_441(ts, msg->getSD(), nick, channelName);
+				err_usernotinchannel_441(ts, msg->getSD(), nick, channelName);
 				continue ;
 			}
 			if (plus)
@@ -320,11 +242,7 @@ void irc_mode(Message* msg, struct s_server *ts)
 		}
 		else
 		{
-			// reply = "501 ";
-			// reply += ts->users[msg->getSD()]->getNick() + " ";
-			// reply += ":Unknown MODE flag";
-			// send_reply(ts, msg->getSD(), NULL, reply);
-			tl_send_501(ts, msg->getSD());
+			err_unknownmodeflag_501(ts, msg->getSD());
 			break ;
 		}
 	}

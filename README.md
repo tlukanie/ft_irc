@@ -286,29 +286,17 @@
   <li><s>Clean code - numeric replies</s></li>
 </ol>
 
-<h4>Plan for 28.09.24 (11:30 - 13:30 && 15:30 - 17:30 Prague time)</h4>
+<h4>Plan for 28.09.24 (11:30 - 13:30 && 14:30 - 16:30 Prague time)</h4>
 <ol>
+  <li><s>Clean code - naming numeric replies</s></li>
+  <li><s>Const variables from getters</s></li>
+  <li><s>Logger/debugger used everywhere in the code</s></li>
   <li>Clean code - command files</li>
-  <li>Const variables from getters</li>
-  <li>Check if all functions are allowed</li>
-  <li>Proper command testing</li>
-  <ul>
-    <li>☐ irc_</li>
-    <li>☐ irc_</li>
-  </ul>
-  <li>Transfer files</li>
-  <li>Proper command testing</li>
-  <ul>
-    <li>☐ irc_</li>
-    <li>☐ irc_</li>
-  </ul>
 </ol>
 
 <h4>Plan for 29.09.24 (9:30 - 11:30 && 13:30 - 15:30 Prague time)</h4>
 <ol>
   <li>Make a plan for the next week:</li>
-  <li>Logger/debugger used everywhere in the code</li>
-  <li>Logger/debugger used everywhere in the code</li>
   <li>Proper command testing</li>
   <ul>
     <li>☐ irc_</li>
@@ -319,7 +307,11 @@
 
 <h4>Plan for 30.09.24 (???)</h4>
 <ol>
-  <li>Logger/debugger used everywhere in the code</li>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
   <li>Proper command testing</li>
   <ul>
     <li>☐ irc_</li>
@@ -343,8 +335,13 @@
   <li>Error codes</li>
   <li>...</li>
   <li>Logger/debugger outputs to a file (option to append timestamp to filename)</li>
-  <li>Logger/debugger used everywhere in the code</li>
   <li>Create a second client. (bot)</li>
+  <li>Check if all functions are allowed</li>
+  <li>Proper command testing</li>
+  <ul>
+    <li>☐ irc_</li>
+    <li>☐ irc_</li>
+  </ul>
 </ol>
 
 <h4>Plan for an unscheduled future</h4>
@@ -362,6 +359,7 @@
   <li>new</li>
   <li>new</li>
   <li>new</li>
+  <li>Transfer files</li>
   <li>☐ test 1</li>
   <li>☑ test 2</li>
   <li>☒ test 3</li>
