@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlukanie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 12:16:33 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 16:16:34 by tlukanie         ###   ########.fr       */
+/*   Updated: 2024/09/29 10:28:29 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -539,171 +539,6 @@ static bool ok_argvcheck(char *argv, t_server *ts)
 // 	DebugLvl	debuglvl;
 // }	t_debugger;
 
-static void ft_init_debugger(s_debugger *debugger)
-{
-	debugger->date = false;
-	debugger->time = true;
-	debugger->utime = true;
-	debugger->precision = 4; // should be 0-6
-	debugger->colour = true;
-	debugger->extra = true;
-	debugger->fd = 1;
-}
-
-// PORT=5555;
-// #IP=10.12.1.3
-// PASSWORD=abc;
-// DEBUG_LVL=debug;			#debug, info, notice, warning, error, disabled
-// DEBUG_FD=2; 
-// #DEBUGFILE="debug.txt"
-// DEBUG_DATE=0;			# show date
-// DEBUG_TIME=1;			# show time
-// DEBUG_UTIME=1;			# show microseconds
-// DEBUG_UPRECISION=4;		# precision of time in microseconds
-// DEBUG_COLOUR=1;			# use ansi escape codes
-// DEBUG_EXTRA=1;			# show file:function:line
-
-static int ft_read_config(t_server *ts)
-{
-	std::ifstream	file(".ft_irc.conf");
-	std::string		line;
-	std::string		key;
-	std::string		value;
-
-	ts->servername = "bestirc";
-	if (file.fail() || !file.is_open())
-		return (1);
-	while (std::getline(file, line))
-	{
-		size_t index = line.find('=');
-		if (index == std::string::npos || index == line.size())
-			continue ;
-		key = line.substr(0, index);
-		size_t end = line.find(';');
-		if (line.size() && line[0] == '#')
-			continue ;
-		if (end == std::string::npos)
-		{
-			continue ;
-		}
-		value = line.substr(index + 1, end - index -1); //+1 to skip '=' and -1 to ignore ';'
-		if (key == "PORT")
-		{
-			if (ok_strtoi<int>(value) < 0 || ok_strtoi<int>(value) > 65535)
-				return (1);
-			ts->port = ok_strtoi<int>(value);
-		}
-		else if (key == "IP")
-		{
-			//not implemented
-		}
-		else if (key == "SERVERNAME")
-		{
-			ts->servername = value;
-		}
-		else if (key == "PASSWORD")
-		{
-			ts->password = value;
-		}
-		else if (key == "DEBUG_LVL")
-		{
-			if (value == "debug")
-				ts->debugger.debuglvl = DEBUG;
-			else if (value == "info")
-				ts->debugger.debuglvl = INFO;
-			else if (value == "notice")
-				ts->debugger.debuglvl = NOTICE;
-			else if (value == "warning")
-				ts->debugger.debuglvl = WARNING;
-			else if (value == "error")
-				ts->debugger.debuglvl = ERROR;
-			else if (value == "disabled")
-				ts->debugger.debuglvl = DISABLED;
-			else
-				std::cerr << "Invalid DEBUG_LVL: " << value << std::endl;
-		}
-		else if (key == "DEBUG_FD")
-		{
-			if (value == "1")
-				ts->debugger.fd = 1;
-			else if (value == "2")
-				ts->debugger.fd = 2;
-			else
-				std::cerr << "Invalid DEBUG_FD: " << value << std::endl;
-		}
-		else if (key == "DEBUG_DATE")
-		{
-			if (value == "0")
-				ts->debugger.date = false;
-			else if (value == "1")
-				ts->debugger.date = true;
-			else
-				std::cerr << "Invalid DEBUG_DATE: " << value << std::endl;
-		}
-		else if (key == "DEBUG_TIME")
-		{
-			if (value == "0")
-				ts->debugger.time = false;
-			else if (value == "1")
-				ts->debugger.time = true;
-			else
-				std::cerr << "Invalid DEBUG_TIME: " << value << std::endl;
-		}
-		else if (key == "DEBUG_UTIME")
-		{
-			if (value == "0")
-				ts->debugger.utime = false;
-			else if (value == "1")
-				ts->debugger.utime = true;
-			else
-				std::cerr << "Invalid DEBUG_UTIME: " << value << std::endl;
-		}
-		else if (key == "DEBUG_UPRECISION")
-		{
-			if (value == "0")
-				ts->debugger.precision = 0;
-			else if (value == "1")
-				ts->debugger.precision = 1;
-			else if (value == "2")
-				ts->debugger.precision = 2;
-			else if (value == "3")
-				ts->debugger.precision = 3;
-			else if (value == "4")
-				ts->debugger.precision = 4;
-			else if (value == "5")
-				ts->debugger.precision = 5;
-			else if (value == "6")
-				ts->debugger.precision = 6;
-			else
-				std::cerr << "Invalid DEBUG_UPRECISION: " << value << std::endl;
-		}
-		else if (key == "DEBUG_COLOUR")
-		{
-			if (value == "0")
-				ts->debugger.colour = false;
-			else if (value == "1")
-				ts->debugger.colour = true;
-			else
-				std::cerr << "Invalid DEBUG_COLOUR: " << value << std::endl;
-		}
-		else if (key == "DEBUG_EXTRA")
-		{
-			if (value == "0")
-				ts->debugger.extra = false;
-			else if (value == "1")
-				ts->debugger.extra = true;
-			else
-				std::cerr << "Invalid DEBUG_EXTRA: " << value << std::endl;
-		}
-		else
-				std::cerr << "Unknown key: " << key << std::endl;
-	}
-	if (!ts->port)
-		return (1);
-	if (ts->password.size() == 0)
-		return (1);
-	return (0);
-}
 
 int	main(int argc , char *argv[]) 
 {
@@ -714,8 +549,8 @@ int	main(int argc , char *argv[])
 	signal(SIGINT, signal_handler); 
 	if (argc < 3 || argc > 4)
 	{
-		ft_init_debugger(&(ts.debugger));
-		if (ft_read_config(&ts))
+		irc_init_debugger(&(ts.debugger));
+		if (ft_read_server_config(&ts))
 			return (ft_usage());
 	}
 	else
@@ -725,7 +560,7 @@ int	main(int argc , char *argv[])
 			return (ft_usage_port());
 		if (!ok_argvcheck(argv[3], &ts))
 			return (ft_usage_debug());
-		ft_init_debugger(&(ts.debugger));
+		irc_init_debugger(&(ts.debugger));
 		ts.password = argv[2];
 	}
 	ok_debugger(&(ts.debugger), NOTICE, std::string("DEBUG LEVEL: ") + ok_itostr(ts.debugger.debuglvl), "", MYDEBUG);
@@ -739,6 +574,7 @@ int	main(int argc , char *argv[])
 		clean_server(&ts);
 		return (1);
 	}
+	std::cerr << "\b\b"; //clean the ^C after  Ctrl+C
 	clean_server(&ts);
 	//try init server
 	// catch

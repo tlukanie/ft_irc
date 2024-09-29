@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ircserv.hpp                                        :+:      :+:    :+:   */
+/*   magic8bot.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 10:30:16 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/29 10:46:21 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef MAGIC8BOT_HPP
+# define MAGIC8BOT_HPP
 # include <stdio.h>
 # include <iostream>
 # include <fstream>
@@ -32,8 +32,6 @@
 # include <algorithm>
 
 # include "enums.hpp"
-# include "../srcs/classes/User.hpp"
-# include "../srcs/classes/Channel.hpp"
 # include "../srcs/classes/Message.hpp"
 
 # define TRUE 1 
@@ -53,9 +51,7 @@
 # define BUFFER_SIZE 512
 # define CRLF "\r\n"
 
-class User;
-class Channel;
-class Message;
+
 
 typedef struct s_debugger {
 	bool						date;
@@ -69,8 +65,9 @@ typedef struct s_debugger {
 	std::string					log; //log to be printed;
 }	t_debugger;
 
-typedef struct s_server {
-	std::string													servername;
+typedef struct s_client {
+	std::string													botname;
+	std::string													serverIP;
 	std::string													password;
 	int															port; //unsigned short
 	int															opt;
@@ -86,37 +83,31 @@ typedef struct s_server {
 	struct sockaddr_in											address;
 	struct timeval												timeout;
 	char														buffer[512]; //irc message is up to 512
-	std::map<int, User*>										users; //map of Users/Users/Clients
-	std::map<std::string, User*>								nicks;
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
-	std::map<std::string, void(*)(Message*, struct s_server*)>	commands; //map of commands and related functions
-	//map nicks to sds?
-	std::map<std::string, Channel*>								channels;
-	std::multimap<std::string, Channel*>						user2channel;
-	std::multimap<std::string, User*>							channel2user;
+	// std::map<std::string, void(*)(Message*, struct s_client*)>	commands; //map of commands and related functions
 	t_debugger													debugger;
-}	t_server;
+}	t_client;
 
-//COMMANDS
-void	irc_cap(Message* msg, struct s_server *ts);
-void	irc_pass(Message* msg, struct s_server *ts);
-void	irc_nick(Message* msg, struct s_server *ts);
-void	irc_user(Message* msg, struct s_server *ts);
-void	irc_ping(Message* msg, struct s_server *ts);
-void	irc_pong(Message* msg, struct s_server *ts);
-void	irc_quit(Message* msg, struct s_server *ts);
-/* CHANNEL OPERATIONS */
-void	irc_join(Message* msg, struct s_server *ts);
-void	irc_part(Message* msg, struct s_server *ts);
-void	irc_mode(Message* msg, struct s_server *ts);
-void	irc_topic(Message* msg, struct s_server *ts);
-void	irc_invite(Message* msg, struct s_server *ts);
-void	irc_kick(Message* msg, struct s_server *ts);
-void	irc_away(Message* msg, struct s_server *ts);
-void	irc_privmsg(Message* msg, struct s_server *ts);
-void	irc_notice(Message* msg, struct s_server *ts);
-void	irc_who(Message* msg, struct s_server *ts);
-void	irc_whois(Message* msg, struct s_server *ts);
+// //COMMANDS
+// void	irc_cap(Message* msg, struct s_server *ts);
+// void	irc_pass(Message* msg, struct s_server *ts);
+// void	irc_nick(Message* msg, struct s_server *ts);
+// void	irc_user(Message* msg, struct s_server *ts);
+// void	irc_ping(Message* msg, struct s_server *ts);
+// void	irc_pong(Message* msg, struct s_server *ts);
+// void	irc_quit(Message* msg, struct s_server *ts);
+// /* CHANNEL OPERATIONS */
+// void	irc_join(Message* msg, struct s_server *ts);
+// void	irc_part(Message* msg, struct s_server *ts);
+// void	irc_mode(Message* msg, struct s_server *ts);
+// void	irc_topic(Message* msg, struct s_server *ts);
+// void	irc_invite(Message* msg, struct s_server *ts);
+// void	irc_kick(Message* msg, struct s_server *ts);
+// void	irc_away(Message* msg, struct s_server *ts);
+// void	irc_privmsg(Message* msg, struct s_server *ts);
+// void	irc_notice(Message* msg, struct s_server *ts);
+// void	irc_who(Message* msg, struct s_server *ts);
+// void	irc_whois(Message* msg, struct s_server *ts);
 
 # include <iostream>
 # include <sstream>
@@ -227,58 +218,59 @@ template <typename T> std::string	ok_itostr(T num)
 	return (str);
 }
 
-void						irc_init_debugger(s_debugger *debugger);
-int							ft_read_server_config(t_server *ts);
-int							ft_usage(void);
-int							ft_usage_port(void);
-int							ft_usage_debug(void);
-size_t						ok_crlf_finder(std::vector<uint8_t> data);
-bool						isChannel(struct s_server *ts, std::string channelName);
-bool						isNick(struct s_server *ts, std::string nick);
-bool						isInChannel(struct s_server *ts, std::string channelName, std::string nick);
-void						send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text);
-void						send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text);
-int							remove_user_from_channel(struct s_server *ts, User *user, Channel *channel);
-int							remove_user_from_server(struct s_server *ts, User *user, std::string reason);
-int							add_user_to_channel(struct s_server *ts, User *user, Channel *channel);
-bool						isValidNick(std::string	nick);
-bool						isValidKey(std::string	key);
-std::vector<std::string>	ok_split(std::string str, char c);
-bool						ok_containsDuplicate(const std::string &text);
-std::string					getClient(struct s_server *ts, unsigned short sd);
+int		irc_read_client_config(t_client *tc);
+void	irc_init_debugger(s_debugger *debugger);
+
+// int							ft_usage(void);
+// int							ft_usage_port(void);
+// int							ft_usage_debug(void);
+// size_t						ok_crlf_finder(std::vector<uint8_t> data);
+// // bool						isChannel(struct s_server *ts, std::string channelName);
+// // bool						isNick(struct s_server *ts, std::string nick);
+// // bool						isInChannel(struct s_server *ts, std::string channelName, std::string nick);
+// // void						send_reply(struct s_server *ts, unsigned short sd, User *Sender, std::string text);
+// // void						send_reply_channel(struct s_server *ts, std::string channelName, User *Sender, std::string text);
+// // int							remove_user_from_channel(struct s_server *ts, User *user, Channel *channel);
+// // int							remove_user_from_server(struct s_server *ts, User *user, std::string reason);
+// // int							add_user_to_channel(struct s_server *ts, User *user, Channel *channel);
+// bool						isValidNick(std::string	nick);
+// bool						isValidKey(std::string	key);
+// std::vector<std::string>	ok_split(std::string str, char c);
+// bool						ok_containsDuplicate(const std::string &text);
+// std::string					getClient(struct s_server *ts, unsigned short sd);
 
 
-void	rpl_welcome_001(struct s_server *ts, unsigned short sd);
-void	rpl_endofwho_315(struct s_server *ts, std::string client, std::string mask);
-void	rpl_channelmodes_324(struct s_server *ts, unsigned short sd, Channel *channel);
-void	rpl_notopic_331(struct s_server *ts, unsigned short sd, std::string channelName);
-void	rpl_topic_332(struct s_server *ts, unsigned short sd, std::string channelName);
-void	rpl_inviting_341(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
-void	rpl_whoreply_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
-void	rpl_namreply_353(struct s_server *ts, unsigned short sd, std::string channelName);
-void	rpl_endofnames_366(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_unknownerror_400(struct s_server *ts, unsigned short sd, std::string command, std::string info);
-void	err_nosuchnick_401(struct s_server *ts, unsigned short sd, std::string nick);
-void	err_nosuchchannel_403(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_norecipient_411(struct s_server *ts, unsigned short sd, std::string command);
-void	err_notexttosend_412(struct s_server *ts, unsigned short sd);
-void	err_unknowncommand_421(struct s_server *ts, unsigned short sd, std::string command);
-void	err_nonicknamegiven_431(struct s_server *ts, unsigned short sd);
-void	err_erroneusnickname_432(struct s_server *ts, unsigned short sd, std::string nick);
-void	err_nicknameinuse_433(struct s_server *ts, unsigned short sd, std::string nick);
-void	err_usernotinchannel_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
-void	err_notonchannel_442(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
-void	err_needmoreparams_461(struct s_server *ts, unsigned short sd, std::string command);
-void	err_alreadyregistered_462(struct s_server *ts, unsigned short sd);
-void	err_passwdmismatch_464(struct s_server *ts, unsigned short sd);
-void	err_channelisfull_471(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_inviteonlychan_473(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_badchannelkey_475(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_badchanmask_476(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_chanopsprivsneeded_482(struct s_server *ts, unsigned short sd, std::string channelName);
-void	err_unknownmodeflag_501(struct s_server *ts, unsigned short sd);
-void	err_invalidmodeparam_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description);
+// void	rpl_welcome_001(struct s_server *ts, unsigned short sd);
+// void	rpl_endofwho_315(struct s_server *ts, std::string client, std::string mask);
+// void	rpl_channelmodes_324(struct s_server *ts, unsigned short sd, Channel *channel);
+// void	rpl_notopic_331(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	rpl_topic_332(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	rpl_inviting_341(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
+// void	rpl_whoreply_352(struct s_server *ts, std::string client, std::string channelName, std::string nick);
+// void	rpl_namreply_353(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	rpl_endofnames_366(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_unknownerror_400(struct s_server *ts, unsigned short sd, std::string command, std::string info);
+// void	err_nosuchnick_401(struct s_server *ts, unsigned short sd, std::string nick);
+// void	err_nosuchchannel_403(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_norecipient_411(struct s_server *ts, unsigned short sd, std::string command);
+// void	err_notexttosend_412(struct s_server *ts, unsigned short sd);
+// void	err_unknowncommand_421(struct s_server *ts, unsigned short sd, std::string command);
+// void	err_nonicknamegiven_431(struct s_server *ts, unsigned short sd);
+// void	err_erroneusnickname_432(struct s_server *ts, unsigned short sd, std::string nick);
+// void	err_nicknameinuse_433(struct s_server *ts, unsigned short sd, std::string nick);
+// void	err_usernotinchannel_441(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
+// void	err_notonchannel_442(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_useronchannel_443(struct s_server *ts, unsigned short sd, std::string nick, std::string channelName);
+// void	err_needmoreparams_461(struct s_server *ts, unsigned short sd, std::string command);
+// void	err_alreadyregistered_462(struct s_server *ts, unsigned short sd);
+// void	err_passwdmismatch_464(struct s_server *ts, unsigned short sd);
+// void	err_channelisfull_471(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_inviteonlychan_473(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_badchannelkey_475(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_badchanmask_476(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_chanopsprivsneeded_482(struct s_server *ts, unsigned short sd, std::string channelName);
+// void	err_unknownmodeflag_501(struct s_server *ts, unsigned short sd);
+// void	err_invalidmodeparam_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description);
 
 
 #endif

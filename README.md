@@ -297,20 +297,71 @@
 
 <h4>Plan for 29.09.24 (9:30 - 11:30 && 13:30 - 15:30 Prague time)</h4>
 <ol>
-  <li>Make a plan for the next week:</li>
+  <li><s>Make a plan for the next week:</s></li>
   <li>Client - start</li>
   <ul>
-    <li>Makefile</li>
-    <li>Modes (testing/interactive/bot)</li>
-    <li>Config for client with how to connect to server</li>
+    <li><s>Makefile</s></li>
+    <li><s>Config for client with how to connect to server</s></li>
+    <li><s>Automated logging-in sequence</s></li>
     <li>Use select in client as well</li>
-    <li>Automated logging-in sequence</li>
-    <li>Test cases for individual commands</li>
-    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
+	<li>while loop</li>
+    <li>Modes (testing/interactive/bot)</li>
+	<li>telnet like interactive mode and reading from standard input</li>
   </ul>
 </ol>
 
-<h4>Plan for 30.09.24 (???)</h4>
+<h4>Plan for 30.09.24 (9:30 - 11:30 Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>Test cases for individual commands</li>
+    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
+    <li>...</li>
+  </ul>
+</ol>
+
+<h4>Plan for 01.10.24 (8:30 - 10:30 Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ol>
+
+<h4>Plan for 02.10.24 (9:30 - 11:30 + ? Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ol>
+
+<h4>Plan for 03.10.24 (9:30 - 11:30 Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ol>
+
+<h4>Plan for 04.10.24 (15:30 - 17:30 Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ol>
+
+<h4>Plan for 07.10.24 (9:30 - 11:30 Prague time)</h4>
+<ol>
+  <li>Client - start</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ol>
+
+
+<h4>Plan for (???)</h4>
 <ol>
   <li>Proper command testing</li>
   <ul>
