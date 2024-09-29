@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 16:07:48 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/26 08:56:02 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/29 14:55:00 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,12 +220,12 @@ std::string	ok_display_reply(s_debugger *debugger, std::string reply)
 }
 
 
-std::string	ok_display_buffer(s_debugger *debugger, std::string buff)
+std::string	ok_display_buffer(s_debugger *debugger, std::string const &buff)
 {
 	std::string	str;
 	std::string	ascii_buff;
 
-	for (std::string::iterator it = buff.begin(); it != buff.end(); it++)
+	for (std::string::const_iterator it = buff.begin(); it != buff.end(); it++)
 	{
 		if (std::isprint(*it))
 			ascii_buff += *it;
@@ -247,12 +247,12 @@ std::string	ok_display_buffer(s_debugger *debugger, std::string buff)
 	return (str);
 }
 
-std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> buff)
+std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> const &buff)
 {
 	std::string	str;
 	std::string	ascii_buff;
 
-	for (std::vector<uint8_t>::iterator it = buff.begin(); it != buff.end(); it++)
+	for (std::vector<uint8_t>::const_iterator it = buff.begin(); it != buff.end(); it++)
 	{
 		if (std::isprint(*it))
 			ascii_buff += *it;
@@ -274,12 +274,39 @@ std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> bu
 	return (str);
 }
 
-std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff)
+std::string	ok_display_real_buffer(s_debugger *debugger, std::string const &buff)
 {
 	std::string	str;
 	std::string	ascii_buff;
 
-	for (std::vector<uint8_t>::iterator it = buff.begin(); it != buff.end(); it++)
+	for (std::string::const_iterator it = buff.begin(); it != buff.end(); it++)
+	{
+		if (std::isprint(*it))
+			ascii_buff += *it;
+		else if (*it == '\n')
+			ascii_buff += "␤";
+		else if (*it == '\r')
+			ascii_buff += "␍";
+		else
+			ascii_buff += "�";
+	}
+	if (debugger->colour)
+	{
+		str = "[" BLUE_COLOUR + ascii_buff + NO_COLOUR GREY_COLOUR "]";
+	}
+	else
+	{
+		str += "[" + ascii_buff + "]";
+	}
+	return (str);
+}
+
+std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> const &buff)
+{
+	std::string	str;
+	std::string	ascii_buff;
+
+	for (std::vector<uint8_t>::const_iterator it = buff.begin(); it != buff.end(); it++)
 	{
 		if (std::isprint(*it))
 			ascii_buff += *it;
@@ -301,12 +328,12 @@ std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff)
 	return (str);
 }
 
-std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> buff)
+std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> const &buff)
 {
 	std::string	str;
 	std::string	ascii_buff;
 
-	for (std::vector<uint8_t>::iterator it = buff.begin(); it != buff.end(); it++)
+	for (std::vector<uint8_t>::const_iterator it = buff.begin(); it != buff.end(); it++)
 	{
 		if (std::isprint(*it))
 			ascii_buff += *it;

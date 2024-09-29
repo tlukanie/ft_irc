@@ -302,18 +302,19 @@
   <ul>
     <li><s>Makefile</s></li>
     <li><s>Config for client with how to connect to server</s></li>
-    <li><s>Automated logging-in sequence</s></li>
-    <li>Use select in client as well</li>
-	<li>while loop</li>
-    <li>Modes (testing/interactive/bot)</li>
-	<li>telnet like interactive mode and reading from standard input</li>
+    <li><s>Use select in client as well</s></li>
+	<li><s>while loop</s></li>
+	<li><s>telnet like interactive mode and reading from standard input</s></li>
   </ul>
 </ol>
 
 <h4>Plan for 30.09.24 (9:30 - 11:30 Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>NICK message proper reply</li>
+  <li>Client - continue</li>
   <ul>
+    <li>Modes (testing/interactive/bot)</li>
+    <li>Automated logging-in sequence</li>
     <li>Test cases for individual commands</li>
     <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
     <li>...</li>

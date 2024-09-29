@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 10:24:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 10:51:28 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/29 14:43:33 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	irc_read_client_config(t_client *tc)
 		value = line.substr(index + 1, end - index -1); //+1 to skip '=' and -1 to ignore ';'
 		if (key == "PORT")
 		{
-			if (ok_strtoi<int>(value) < 0 || ok_strtoi<int>(value) > 65535)
+			if (ok_strtoi<int>(value) <= 0 || ok_strtoi<int>(value) > 65535)
 				return (1);
 			tc->port = ok_strtoi<int>(value);
 		}

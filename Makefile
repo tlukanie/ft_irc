@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/29 10:29:36 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/29 14:33:05 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,7 +65,7 @@ $(NAME): $(OBJS)
 $(CLIENT): $(COBJS)
 	$(CPP) $(FLAGS) $(COBJS) -o $(CLIENT)
 
-$(OBJDIR)%.o: $(SRCDIR)%.cpp $(HEADERS)
+$(OBJDIR)%.o: $(SRCDIR)%.cpp $(HEADERS) $(CHEADERS)
 	@mkdir -p $(@D)
 	$(CPP) $(FLAGS) -c $< -o $@
 

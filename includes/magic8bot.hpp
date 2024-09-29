@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 10:46:21 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/29 15:03:52 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,13 @@ typedef struct s_client {
 	std::string													botname;
 	std::string													serverIP;
 	std::string													password;
+	bool														ready;
+	std::string													messageOut;
+	std::string													messageIn;
 	int															port; //unsigned short
 	int															opt;
 	int															addrlen;
-	int															master_socket;
+	int															clientSocket;
 	int															new_socket;
 	int															activity;
 	int															valread;
@@ -83,6 +86,9 @@ typedef struct s_client {
 	struct sockaddr_in											address;
 	struct timeval												timeout;
 	char														buffer[512]; //irc message is up to 512
+	std::vector<uint8_t>										readIn;
+	std::vector<uint8_t>										dataIn;
+	std::vector<uint8_t>										dataOut;
 	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
 	// std::map<std::string, void(*)(Message*, struct s_client*)>	commands; //map of commands and related functions
 	t_debugger													debugger;
@@ -181,10 +187,11 @@ struct s_debugger;
 //change int i to enum
 void		ok_debugger(s_debugger *debugger, DebugLvl globalLevel, std::string message, std::string details, std::string extra);
 std::string	ok_display_reply(s_debugger *debugger, std::string reply);
-std::string	ok_display_buffer(s_debugger *debugger, std::string buff);
-std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> buff);
-std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> buff);
-std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> buff);
+std::string	ok_display_buffer(s_debugger *debugger, std::string const& buff);
+std::string	ok_display_real_buffer(s_debugger *debugger, std::vector<uint8_t> const &buff);
+std::string	ok_display_real_buffer(s_debugger *debugger, std::string const &buff);
+std::string	ok_display_real_buffer(bool colour, std::vector<uint8_t> const &buff);
+std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> const &buff);
 std::string	ok_display_message(s_debugger *debugger, std::string msg);
 
 
