@@ -317,13 +317,13 @@
     <li>Automated logging-in sequence</li>
     <li>Test cases for individual commands</li>
     <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
-    <li>...</li>
+    <li>Fully separate client</li>
   </ul>
 </ol>
 
 <h4>Plan for 01.10.24 (8:30 - 10:30 Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>Client - continue</li>
   <ul>
     <li>...</li>
   </ul>
@@ -331,7 +331,7 @@
 
 <h4>Plan for 02.10.24 (9:30 - 11:30 + ? Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>Client - continue</li>
   <ul>
     <li>...</li>
   </ul>
@@ -339,7 +339,7 @@
 
 <h4>Plan for 03.10.24 (9:30 - 11:30 Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>Client - continue</li>
   <ul>
     <li>...</li>
   </ul>
@@ -347,7 +347,7 @@
 
 <h4>Plan for 04.10.24 (15:30 - 17:30 Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>Client - continue</li>
   <ul>
     <li>...</li>
   </ul>
@@ -355,7 +355,7 @@
 
 <h4>Plan for 07.10.24 (9:30 - 11:30 Prague time)</h4>
 <ol>
-  <li>Client - start</li>
+  <li>Client - continue</li>
   <ul>
     <li>...</li>
   </ul>
