@@ -310,14 +310,14 @@
 
 <h4>Plan for 30.09.24 (9:30 - 11:30 Prague time)</h4>
 <ol>
-  <li>NICK message proper reply</li>
+  <li><s>NICK message proper reply</s></li>
   <li>Client - continue</li>
   <ul>
+    <li>Fully separated client</li>
     <li>Modes (testing/interactive/bot)</li>
     <li>Automated logging-in sequence</li>
     <li>Test cases for individual commands</li>
     <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
-    <li>Fully separate client</li>
   </ul>
 </ol>
 

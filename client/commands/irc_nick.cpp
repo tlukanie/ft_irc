@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 15:48:33 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/09/28 15:23:09 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/30 10:00:16 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,20 +62,35 @@ void	irc_nick(Message* msg, struct s_server *ts)
 		err_nicknameinuse_433(ts, msg->getSD(), newnick);
 		return ;
 	}
+	reply = "NICK :" +  newnick;
+	if (ts->users[msg->getSD()]->getNick().size())
+	{
+		//send to all?
+		//:net!net@127.0.0.1 << need to be not hardcoded
+		//iterate over all users
+		//iterate over all channels the user is in
+		//check if user changing the nick is in any of them
+		for (std::map<int, User*>::iterator it = ts->users.begin(); it != ts->users.end(); it++)
+		{
+			if (it->first == msg->getSD())
+				continue ;
+			for (std::multimap<std::string, Channel*>::iterator iter = ts->user2channel.lower_bound(it->second->getNick()); iter != ts->user2channel.upper_bound(it->second->getNick()); iter++)
+			{
+				if (isInChannel(ts, iter->second->getChannelName(), ts->users[msg->getSD()]->getNick()))
+				{
+					send_reply(ts, it->second->getSD(), ts->users[msg->getSD()], reply);
+					break ;
+				}
+			}
+		}
+	}
+	send_reply(ts, msg->getSD(), ts->users[msg->getSD()], reply);
 	ts->users[msg->getSD()]->setNick(newnick);
 	if (oldnick.size())
 	{
 		ts->nicks.erase(ts->nicks.find(oldnick));
 	}
 	ts->nicks.insert(std::pair<std::string, User*>(newnick, ts->users[msg->getSD()]));
-	if (ts->users[msg->getSD()]->getNick().size())
-	{
-		//send to all?
-		//:net!net@127.0.0.1 << need to be not hardcoded
-		reply = ":" + oldnick + "!" + ts->users[msg->getSD()]->getUserName() + "@" + ts->users[msg->getSD()]->getIP();
-		reply += " NICK :" +  ts->users[msg->getSD()]->getNick();
-		send_reply(ts, msg->getSD(), NULL, reply);
-	}
 	if (!oldnick.size())
 	{
 		ts->users[msg->getSD()]->addAuthFlag(NICK);

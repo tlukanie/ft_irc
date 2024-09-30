@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 15:03:52 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/30 10:08:28 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 # include <algorithm>
 
 # include "enums.hpp"
-# include "../srcs/classes/Message.hpp"
+# include "../client/classes/Message.hpp"
 
 # define TRUE 1 
 # define FALSE 0

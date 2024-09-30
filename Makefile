@@ -6,12 +6,14 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/29 14:33:05 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/30 10:22:16 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	ircserv
-SRCDIR		=	srcs/
+SERVER		=	ircserv
+SRVDIR		=	server/
+CLNTDIR		=	client/
 #VPAT	H	=	srcs:srcs/classes:srcs/commands:srcs/utils
 SRCS		=	ircserv.cpp \
 				classes/Channel.cpp \
@@ -41,51 +43,61 @@ SRCS		=	ircserv.cpp \
 				utils/numeric_replies.cpp \
 				utils/utils.cpp
 OBJDIR		=	objs/
-OBJS		=	$(SRCS:%.cpp=$(OBJDIR)%.o)
-CLIENT		=	magic8bot
+OBJDIRS		=	$(OBJDIR)server/
+OBJDIRC		=	$(OBJDIR)client/
+OBJS		=	$(SRCS:%.cpp=$(OBJDIRS)%.o)
 HEADERS		=	includes/ircserv.hpp \
 				includes/enums.hpp \
-				srcs/classes/Channel.hpp \
-				srcs/classes/Message.hpp \
-				srcs/classes/User.hpp
+				server/classes/Channel.hpp \
+				server/classes/Message.hpp \
+				server/classes/User.hpp
+CLIENT		=	magic8bot
 CSRCS		=	client/magic8bot.cpp \
 				utils/debugger.cpp \
 				utils/irc_init_debugger.cpp \
 				utils/irc_read_client_config.cpp
-COBJS		=	$(CSRCS:%.cpp=$(OBJDIR)%.o)
-CHEADERS	=	includes/magic8bot.hpp
+COBJS		=	$(CSRCS:%.cpp=$(OBJDIRC)%.o)
+CHEADERS	=	includes/magic8bot.hpp \
+				includes/enums.hpp \
+				client/classes/Message.hpp
 CPP			=	c++
 FLAGS		=	-g -Wall -Wextra -Werror -std=c++98
 
-all: $(NAME) $(CLIENT)
+all:			$(SERVER) $(CLIENT)
 
-$(NAME): $(OBJS)
-	$(CPP) $(FLAGS) $(OBJS) -o $(NAME)
+# bonus:			$(CLIENT)
 
-$(CLIENT): $(COBJS)
-	$(CPP) $(FLAGS) $(COBJS) -o $(CLIENT)
+# $(NAME):		$(SERVER)
 
-$(OBJDIR)%.o: $(SRCDIR)%.cpp $(HEADERS) $(CHEADERS)
-	@mkdir -p $(@D)
-	$(CPP) $(FLAGS) -c $< -o $@
+$(SERVER):		$(OBJS)
+				$(CPP) $(FLAGS) $(OBJS) -o $(SERVER)
 
-%.o: %.cpp $(HEADERS)
-	$(CPP) $(FLAGS) -c $< -o $@
+$(CLIENT):		$(COBJS)
+				$(CPP) $(FLAGS) $(COBJS) -o $(CLIENT)
+
+$(OBJDIRS)%.o:	$(SRVDIR)%.cpp $(HEADERS)
+				@mkdir -p $(@D)
+				$(CPP) $(FLAGS) -c $< -o $@
+
+$(OBJDIRC)%.o:	$(CLNTDIR)%.cpp $(CHEADERS)
+				@mkdir -p $(@D)
+				$(CPP) $(FLAGS) -c $< -o $@
+
+# %.o: %.cpp $(HEADERS)
+# 	$(CPP) $(FLAGS) -c $< -o $@
 # objs/%.o: srcs/%.cpp | objdir
 # 	$(CPP) $(FLAGS) -c $< -o $@
 
-objdir:
-	mkdir -p $(OBJDIR)
+# objdir:
+# 	mkdir -p $(OBJDIR)
 
 clean:
-	# rm -f $(OBJS)
-	# rm -f $(COBJS)
-	rm -rf $(OBJDIR)
+				rm -rf $(OBJDIR)
 
 fclean: clean
-	rm -f $(NAME)
-	rm -f $(CLIENT)
+				rm -f $(NAME)
+				rm -f $(CLIENT)
 
-re: fclean all
+re:				fclean all
 
 .PHONY: all, clean, fclean, re, bonus

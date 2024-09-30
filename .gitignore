@@ -37,5 +37,5 @@ objs/
 
 # Executables
 ircserv
-client
+magic8bot
 test/selectCPP/server
