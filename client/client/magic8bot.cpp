@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 15:12:47 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/30 11:14:20 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,18 @@ void signal_handler(int signal_num)
 {
 	if (signal_num == SIGINT)
 		g_client_alive = false;
+}
+
+void	coinFlip(t_client *tc)
+{
+	std::string	result;
+
+	if (rand() % 2)
+		result = "Heads!";
+	else
+		result = "Tails!";
+	tc->messageOut += "PRIVMSG " + tc->channel + " :" + result + CRLF;
+	tc->ready = true;
 }
 
 void	client_read(t_client *tc)
@@ -45,6 +57,9 @@ void	client_read(t_client *tc)
 void	client_write(t_client *tc)
 {
 	int		w;
+
+	if (tc->messageIn == ":user123!net@127.0.0.1 PRIVMSG magic8bot :!flip\r\n")
+		coinFlip(tc);
 	w = write(STDOUT_FILENO, tc->messageIn.c_str(), tc->messageIn.size());
 	(void)w;
 	tc->messageIn.clear();
@@ -157,12 +172,24 @@ void	client_loop(t_client *tc)
 	}
 }
 
-void	init_client(t_client *tc)
+void	init_client(t_client *tc, std::string const &arg, std::string const &arg2)
 {
 	tc->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	// std::cout << "SOCKET: " << tc->clientSocket << std::endl;
 	tc->ready = false;
 	//Defining Server Address
+	tc->mode = MODE_INTERACTIVE;
+	srand(time(0));
+	if (arg == "AUTO")
+	{
+		tc->mode = MODE_AUTOMATED;
+		if (arg2.size())
+			tc->channel = arg2;
+	}
+	else if (arg == "TEST")
+		tc->mode = MODE_TESTING;
+	if (tc->mode == MODE_TESTING)
+		tc->test = arg2.size(); //rewrite
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_port = htons(tc->port);
@@ -172,7 +199,14 @@ void	init_client(t_client *tc)
 	//Connecting to the Server // check for error
 	connect(tc->clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 	//Sending Data to the Server
-	// std::string message = "PASS " + tc->password + CRLF "NICK " + tc->botname + CRLF "USER a b c d" CRLF;
+	if (tc->mode)
+	{
+		tc->messageOut = "PASS " + tc->password + CRLF "NICK " + tc->botname + CRLF "USER a b c d" CRLF;
+		std::cout << "HELLLLLOOOO" << tc->mode << arg << arg2 << std::endl;
+		if (tc->channel.size())
+			tc->messageOut +=  "JOIN " + tc->channel + CRLF;
+		tc->ready = true;
+	}
 	// send(tc->clientSocket, message.c_str(), message.size(), MSG_NOSIGNAL);
 	// ok_debugger(&(tc->debugger), INFO, "Message is:", message, MYDEBUG);
 	// // std::cout << tc->debugger.log;
@@ -264,7 +298,7 @@ void	clean_client(t_client *tc)
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	t_client	tc;
 
@@ -272,10 +306,18 @@ int main()
 	irc_init_debugger(&(tc.debugger));
 	if (irc_read_client_config(&tc))
 		return (1);
-
+	std::string	arg;
+	std::string	arg2;
+	(void)argc;
+	if (argv[1])
+	{
+		arg = argv[1];
+		if (argv[2])
+			arg2 = argv[2];
+	}
 	try
 	{
-		init_client(&tc);
+		init_client(&tc, arg, arg2);
 	}
 	catch (const std::exception &e)
 	{

@@ -6,11 +6,10 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/30 10:22:16 by okraus           ###   ########.fr        #
+#    Updated: 2024/09/30 10:31:25 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		=	ircserv
 SERVER		=	ircserv
 SRVDIR		=	server/
 CLNTDIR		=	client/
@@ -62,12 +61,11 @@ CHEADERS	=	includes/magic8bot.hpp \
 				client/classes/Message.hpp
 CPP			=	c++
 FLAGS		=	-g -Wall -Wextra -Werror -std=c++98
+NAME		=	$(SERVER) $(CLIENT)
 
-all:			$(SERVER) $(CLIENT)
+all:			$(NAME)
 
-# bonus:			$(CLIENT)
-
-# $(NAME):		$(SERVER)
+bonus:			$(CLIENT)
 
 $(SERVER):		$(OBJS)
 				$(CPP) $(FLAGS) $(OBJS) -o $(SERVER)

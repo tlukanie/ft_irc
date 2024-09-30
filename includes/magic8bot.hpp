@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/30 10:08:28 by okraus           ###   ########.fr       */
+/*   Updated: 2024/09/30 11:08:18 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # define MAGIC8BOT_HPP
 # include <stdio.h>
 # include <iostream>
+#include <cstdlib> 
 # include <fstream>
 # include <sstream>
 # include <cstring>
@@ -51,7 +52,9 @@
 # define BUFFER_SIZE 512
 # define CRLF "\r\n"
 
-
+# define MODE_INTERACTIVE 0
+# define MODE_AUTOMATED 1
+# define MODE_TESTING 2
 
 typedef struct s_debugger {
 	bool						date;
@@ -69,7 +72,10 @@ typedef struct s_client {
 	std::string													botname;
 	std::string													serverIP;
 	std::string													password;
+	std::string													channel;
 	bool														ready;
+	int															mode;
+	int															test;
 	std::string													messageOut;
 	std::string													messageIn;
 	int															port; //unsigned short
