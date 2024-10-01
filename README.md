@@ -323,10 +323,8 @@
 <ol>
   <li>Client - continue</li>
   <ul>
-    <li>Automated logging-in sequence from file</li>
-    <li>Handle messages</li>
-    <li>Test cases for individual commands</li>
-    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
+    <li><s>Handle messages</s></li>
+	<li><s>Actions map</s></li>
   </ul>
 </ol>
 
@@ -334,6 +332,10 @@
 <ol>
   <li>Client - continue</li>
   <ul>
+    <li>Advanced message handling</li>
+    <li>Test cases for individual commands</li>
+    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
+    <li>Automated logging-in sequence from file</li>
     <li>...</li>
   </ul>
 </ol>

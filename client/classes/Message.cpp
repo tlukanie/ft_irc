@@ -6,39 +6,11 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/28 13:05:21 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/01 09:24:38 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Message.hpp"
-
-Message::Message(void)
-{
-	// ft_colorize(reinterpret_cast<uintptr_t>(this));
-	// std::cout << "Default constructor of the Message class called.";
-	// ft_uncolorize();
-	this->_sd = 0;
-	// std::cout << std::endl;
-}
-
-Message::Message(const Message& copy)
-{
-	// ft_colorize(reinterpret_cast<uintptr_t>(this));
-	// std::cout << "Copy constructor of the Message class called.";
-	// ft_uncolorize();
-	// std::cout << std::endl;
-	*this = copy;
-}
-
-Message &Message::operator = (const Message &src)
-{
-	// ft_colorize(reinterpret_cast<uintptr_t>(this));
-	// std::cout << "Assigment operator of the Message class called.";
-	// ft_uncolorize();
-	// std::cout << std::endl;
-	(void)src;
-	return (*this);
-}
 
 Message::~Message(void)
 {
@@ -53,7 +25,7 @@ Message::~Message(void)
 
 // validate message during construction, if invalid throw exception
 
-Message::Message(unsigned short sd, std::string msg)
+Message::Message(std::string msg)
 {
 	// std::string prefix;
 	// std::string command;
@@ -72,7 +44,6 @@ Message::Message(unsigned short sd, std::string msg)
 	// 	ft_uncolorize();
 	// 	std::cout << std::endl;
 	// }
-	this->_sd = sd;
 	this->_msg = msg;
 	//this->
 	// if (msg.size() < 10)
@@ -157,11 +128,6 @@ Message::Message(unsigned short sd, std::string msg)
 	// 		i++;
 	// 	}
 	// }
-}
-
-unsigned short	Message::getSD(void)
-{
-	return (this->_sd);
 }
 
 std::string const	&Message::getMessage(void)

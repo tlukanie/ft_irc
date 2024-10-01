@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 10:03:17 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/01 09:25:02 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,9 @@ class Message
 	public:
 		~Message(void);
 	
-		Message(unsigned short sd, std::string msg);
+		Message(std::string msg);
 		
 		// getters and setters? for mode
-		unsigned short					getSD(void);
 		std::string const				&getMessage(void);
 		std::string const				&getCommand(void);
 		std::vector<std::string> const	&getParams(void);
@@ -81,7 +80,6 @@ class Message
 		// ??? number of users?
 		//static int	users;
 		// socket descriptor
-		unsigned short				_sd;
 		// more stuff will come here
 		//<message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
 		//prefix string

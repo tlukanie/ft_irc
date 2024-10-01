@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/30 11:14:20 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/01 10:21:02 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,7 @@ void signal_handler(int signal_num)
 		g_client_alive = false;
 }
 
-void	coinFlip(t_client *tc)
-{
-	std::string	result;
 
-	if (rand() % 2)
-		result = "Heads!";
-	else
-		result = "Tails!";
-	tc->messageOut += "PRIVMSG " + tc->channel + " :" + result + CRLF;
-	tc->ready = true;
-}
 
 void	client_read(t_client *tc)
 {
@@ -44,7 +34,6 @@ void	client_read(t_client *tc)
 	{
 		tc->messageOut.erase(tc->messageOut.size() - 1);
 		tc->messageOut += CRLF;
-		
 	}
 	if (r > 0)
 	{
@@ -58,8 +47,6 @@ void	client_write(t_client *tc)
 {
 	int		w;
 
-	if (tc->messageIn == ":user123!net@127.0.0.1 PRIVMSG magic8bot :!flip\r\n")
-		coinFlip(tc);
 	w = write(STDOUT_FILENO, tc->messageIn.c_str(), tc->messageIn.size());
 	(void)w;
 	tc->messageIn.clear();
@@ -67,17 +54,68 @@ void	client_write(t_client *tc)
 
 void	client_recv(t_client *tc)
 {
-	char	buff[512];
 	int		rc;
-	rc = recv(tc->clientSocket, buff, 512, MSG_NOSIGNAL);
-	std::string	message;
-	for (int i = 0; i < rc; i++)
+
+	if ((rc = recv(tc->clientSocket, tc->buffer, 512, MSG_NOSIGNAL)) <= 0) 
+	{ 
+		//end bot?
+	} 
+	//Print the message that came in 
+	else
 	{
-		message += buff[i];
-		tc->messageIn += buff[i];
+		std::string	buff;
+		for (int i = 0; i < rc; i++)
+		{
+			tc->dataIn.push_back(tc->buffer[i]);
+			buff.push_back(tc->buffer[i]);
+		}
+		// ok_debugger(&(ts->debugger), DEBUG, "Buffer:", ok_display_buffer(&(tc->debugger), buff), MYDEBUG);
+		ok_debugger(&(tc->debugger), DEBUG, "Buffer:", ok_display_real_buffer(&(tc->debugger), tc->dataIn), MYDEBUG);
+		size_t	pos;
+		while ((pos = ok_crlf_finder(tc->dataIn)))
+		{
+			if (tc->dataInOverflow)
+			{
+				tc->dataIn.erase(tc->dataIn.begin(), tc->dataIn.begin() + pos);
+				tc->dataInOverflow = false;
+				continue ;
+			}
+			std::string msg;
+			// pos - 2 because CRLF is not needed in the string, it was verified here
+			msg.assign(tc->dataIn.begin(), tc->dataIn.begin() + pos - 2);
+			if (DEEPDEBUG)
+			{
+				ok_debugger(&(tc->debugger), DEBUG, "Message extracted:", msg, MYDEBUG);
+			}
+			tc->dataIn.erase(tc->dataIn.begin(), tc->dataIn.begin() + pos);
+			try
+			{
+				tc->dataInOverflow = false;
+				Message *msg_ptr = new Message(msg);
+				tc->messages.push_back(msg_ptr);
+			}
+			catch(const std::exception& e)
+			{
+				ok_debugger(&(tc->debugger), ERROR, "Message: " + msg + " is not valid, because: ", e.what(), MYDEBUG);
+			}
+		}
+		if (tc->dataIn.size() > BUFFER_SIZE)
+		{
+			if (DEEPDEBUG)
+				ok_debugger(&(tc->debugger), ERROR, "Data is overflowing", "", MYDEBUG);
+			tc->dataInOverflow = true;
+			if (*(tc->dataIn.rbegin()) == '\r')
+			{
+				tc->dataIn.clear();
+				tc->dataIn.push_back('\r');
+			}
+			else
+			{
+				tc->dataIn.clear();
+			}
+		}
 	}
-	if (rc > 0)
-		ok_debugger(&(tc->debugger), NOTICE, "Message was:",  ok_display_buffer(&(tc->debugger), message), MYDEBUG);
+
 }
 
 void	client_send(t_client *tc)
@@ -130,7 +168,7 @@ void	client_loop(t_client *tc)
 		// ok_debugger(&(tc->debugger), DEBUG, "After select", "", MYDEBUG);
 		//check later if allowed
 		if (tc->activity < 0) 
-		{ 
+		{
 			ok_debugger(&(tc->debugger), ERROR, "Select error", ok_itostr(errno), MYDEBUG);
 			continue ;
 		}
@@ -149,7 +187,40 @@ void	client_loop(t_client *tc)
 
 		//iterate over messages
 		{
-			
+			// SEND TO WRITING FDS
+			// SEND WITH YELLOW COLOUR
+				// for (std::multimap<int, Message*>::iterator it = ts->messages.begin(); it != ts->messages.end(); /*iterating in the loop */)
+				// {
+			std::vector<Message*>::iterator iter;
+			std::vector<Message*>::iterator temp_it;
+			iter = tc->messages.begin();
+			while (iter != tc->messages.end())
+			{
+				iter++;
+			}
+			iter = tc->messages.begin();
+			while (iter != tc->messages.end())
+			{
+				Message * msg_ptr = *iter;
+
+				// find if the command is in commands
+				//	execute
+				if (tc->commands.find(msg_ptr->getCommand()) != tc->commands.end())
+				{
+					ok_debugger(&(tc->debugger), DEBUG, "Executing command:", ok_display_message(&(tc->debugger), msg_ptr->getCommand()), MYDEBUG);
+					//maybe run in try and catch block
+					tc->commands[msg_ptr->getCommand()](msg_ptr, tc);
+				}
+				else
+				{
+					ok_debugger(&(tc->debugger), WARNING, "Unknown command:", ok_display_message(&(tc->debugger), msg_ptr->getCommand()), MYDEBUG);
+					//err_unknowncommand_421(tc, msg_ptr->getSD(), msg_ptr->getCommand());
+					//strike count of invalid messages
+				}
+				delete msg_ptr;
+				iter++;
+			}
+			tc->messages.clear();
 		}
 		//print debugs
 		if (FD_ISSET(tc->debugger.fd , &writefds))
@@ -177,6 +248,7 @@ void	init_client(t_client *tc, std::string const &arg, std::string const &arg2)
 	tc->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	// std::cout << "SOCKET: " << tc->clientSocket << std::endl;
 	tc->ready = false;
+	tc->dataInOverflow = false;
 	//Defining Server Address
 	tc->mode = MODE_INTERACTIVE;
 	srand(time(0));
@@ -207,71 +279,29 @@ void	init_client(t_client *tc, std::string const &arg, std::string const &arg2)
 			tc->messageOut +=  "JOIN " + tc->channel + CRLF;
 		tc->ready = true;
 	}
-	// send(tc->clientSocket, message.c_str(), message.size(), MSG_NOSIGNAL);
-	// ok_debugger(&(tc->debugger), INFO, "Message is:", message, MYDEBUG);
-	// // std::cout << tc->debugger.log;
-	// //Closing the Client Socket
-	// char	buff[512];
-	// int		rc;
-	// rc = recv(tc->clientSocket, buff, 512, MSG_NOSIGNAL);
-	// message.clear();
-	// for (int i = 0; i < rc; i++)
-	// 	message += buff[i];
-	// ok_debugger(&(tc->debugger), NOTICE, "Buffer was:", message, MYDEBUG);
-	// // std::cout << tc->debugger.log;
-	// tc->opt = TRUE;
-	// //create a master socket 
-	// if( (tc->master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
-	// {
-	// 	ok_debugger(&(tc->debugger), ERROR, "Socket failed", ok_itostr(errno), MYDEBUG);
-	// 	//exit(EXIT_FAILURE);
-	// 	throw (std::runtime_error("Socket failed")); 
-	// } 
-	
-	// //client startc by listening for new users
-	// tc->state = READING_LOOP;
 
-	// //wait for an activity on one of the socketc , timeout is not NULL
-	// // so it is non blocking
-	// //timeout set for 15 s 0 ms
-	// tc->timeout.tv_sec = 15;
-	// tc->timeout.tv_usec = 0;
+	//add actions
+	tc->actions["!flip"] = bot_flip;
 
-	// //set master socket to allow multiple users , 
-	// //this is just a good habit, it will work without this 
-	// if( setcockopt(tc->master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&tc->opt, 
-	// 	sizeof(tc->opt)) < 0 ) 
-	// { 
-	// 	ok_debugger(&(tc->debugger), ERROR, "Setcockopt failed", ok_itostr(errno), MYDEBUG);
-	// 	//exit(EXIT_FAILURE);
-	// 	throw (std::runtime_error("Setcockopt failed")); 
-	// } 
-	
-	// //type of socket created 
-	// tc->address.sin_family = AF_INET; 
-	// tc->address.sin_addr.s_addr = INADDR_ANY; //is it localhost or any IP address on the machine?
-	// tc->address.sin_port = htons(tc->port); 
-		
-	// //bind the socket to localhost port 8888 
-	// if (bind(tc->master_socket, (struct sockaddr *)&tc->address, sizeof(tc->address))<0) 
-	// { 
-	// 	ok_debugger(&(tc->debugger), ERROR, "Bind failed", ok_itostr(errno), MYDEBUG);
-	// 	//exit(EXIT_FAILURE);
-	// 	throw (std::runtime_error("Bind failed")); 
-	// }
-	// ok_debugger(&(tc->debugger), INFO, std::string("Listening on port: ") + ok_itostr(tc->port), "", MYDEBUG);
-	// //try to specify maximum of 3 pending users for the master socket 
-	// if (listen(tc->master_socket, 3) < 0) 
-	// { 
-	// 	ok_debugger(&(tc->debugger), ERROR, "Listen failed", ok_itostr(errno), MYDEBUG);
-	// 	//exit(EXIT_FAILURE);
-	// 	throw (std::runtime_error("Listen failed")); 
-	// } 
-		
-	// //accept the incoming connection 
-	// tc->addrlen = sizeof(tc->address); 
-	// ok_debugger(&(tc->debugger), INFO, "Waiting for users ...", "", MYDEBUG);
-
+	//add commands
+	// tc->commands["CAP"] = irc_cap;
+	// tc->commands["PASS"] = irc_pass;
+	// tc->commands["NICK"] = irc_nick;
+	// tc->commands["USER"] = irc_user;
+	// tc->commands["PING"] = irc_ping;
+	// tc->commands["PONG"] = irc_pong;
+	// tc->commands["MODE"] = irc_mode;
+	// tc->commands["JOIN"] = irc_join;
+	// tc->commands["PART"] = irc_part;
+	tc->commands["PRIVMSG"] = irc_privmsg;
+	// tc->commands["NOTICE"] = irc_notice;
+	// tc->commands["TOPIC"] = irc_topic;
+	// tc->commands["INVITE"] = irc_invite;
+	// tc->commands["KICK"] = irc_kick;
+	// tc->commands["AWAY"] = irc_away;
+	// tc->commands["WHO"] = irc_who;
+	// tc->commands["WHOIS"] = irc_whois; //debug
+	// tc->commands["QUIT"] = irc_quit;
 
 	//main client loop
 	client_loop(tc);
@@ -286,6 +316,14 @@ void	clean_client(t_client *tc)
 		ok_debugger(&(tc->debugger), WARNING, "Client loop terminating...", "", MYDEBUG);
 	if (tc->clientSocket > 0)
 		close(tc->clientSocket);
+	for (std::vector<Message*>::iterator it = tc->messages.begin(); it != tc->messages.end(); it++)
+	{
+		if (DEEPDEBUG)
+		{
+			ok_debugger(&(tc->debugger), INFO, "Removing message: " + (*it)->getMessage(), "", MYDEBUG);
+		}
+		delete *it;
+	}
 	ssize_t	wb;
 	wb = write(tc->debugger.fd, tc->debugger.log.c_str(), tc->debugger.log.size());
 	if (wb < 0)
@@ -296,6 +334,7 @@ void	clean_client(t_client *tc)
 	{
 		tc->debugger.log.erase(0,wb);
 	}
+
 }
 
 int main(int argc, char *argv[])

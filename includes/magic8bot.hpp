@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/30 11:08:18 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/01 10:21:57 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,37 +68,46 @@ typedef struct s_debugger {
 	std::string					log; //log to be printed;
 }	t_debugger;
 
+typedef std::map<std::string, void(*)(struct s_client*, std::string target)> t_actionmap;
+typedef std::map<std::string, void(*)(Message*, struct s_client*)> t_commandmap;
+
 typedef struct s_client {
-	std::string													botname;
-	std::string													serverIP;
-	std::string													password;
-	std::string													channel;
-	bool														ready;
-	int															mode;
-	int															test;
-	std::string													messageOut;
-	std::string													messageIn;
-	int															port; //unsigned short
-	int															opt;
-	int															addrlen;
-	int															clientSocket;
-	int															new_socket;
-	int															activity;
-	int															valread;
-	int															valsent;
-	int															sd;
-	int															max_sd;
-	int															state;
-	struct sockaddr_in											address;
-	struct timeval												timeout;
-	char														buffer[512]; //irc message is up to 512
-	std::vector<uint8_t>										readIn;
-	std::vector<uint8_t>										dataIn;
-	std::vector<uint8_t>										dataOut;
-	std::multimap<int, Message*>								messages; //multimap of messages collected in one loop
-	// std::map<std::string, void(*)(Message*, struct s_client*)>	commands; //map of commands and related functions
-	t_debugger													debugger;
+	std::string				botname;
+	std::string				serverIP;
+	std::string				password;
+	std::string				channel;
+	bool					ready;
+	int						mode;
+	int						test;
+	std::string				messageOut;
+	std::string				messageIn;
+	int						port; //unsigned short
+	int						opt;
+	int						addrlen;
+	int						clientSocket;
+	int						new_socket;
+	int						activity;
+	int						valread;
+	int						valsent;
+	int						sd;
+	int						max_sd;
+	int						state;
+	struct sockaddr_in		address;
+	struct timeval			timeout;
+	char					buffer[512]; //irc message is up to 512
+	std::vector<uint8_t>	readIn;
+	bool					dataInOverflow;
+	std::vector<uint8_t>	dataIn;
+	std::vector<uint8_t>	dataOut;
+	std::vector<Message*>	messages; //multimap of messages collected in one loop
+	t_actionmap				actions; //map of action functionss bot can perform
+	t_commandmap			commands; //map of commands and numerics functions
+	t_debugger				debugger;
 }	t_client;
+
+//	ACTIONS
+
+void	bot_flip(t_client *tc, std::string target);
 
 // //COMMANDS
 // void	irc_cap(Message* msg, struct s_server *ts);
@@ -116,7 +125,7 @@ typedef struct s_client {
 // void	irc_invite(Message* msg, struct s_server *ts);
 // void	irc_kick(Message* msg, struct s_server *ts);
 // void	irc_away(Message* msg, struct s_server *ts);
-// void	irc_privmsg(Message* msg, struct s_server *ts);
+void	irc_privmsg(Message* msg, struct s_client *tc);
 // void	irc_notice(Message* msg, struct s_server *ts);
 // void	irc_who(Message* msg, struct s_server *ts);
 // void	irc_whois(Message* msg, struct s_server *ts);
@@ -237,7 +246,7 @@ void	irc_init_debugger(s_debugger *debugger);
 // int							ft_usage(void);
 // int							ft_usage_port(void);
 // int							ft_usage_debug(void);
-// size_t						ok_crlf_finder(std::vector<uint8_t> data);
+size_t						ok_crlf_finder(std::vector<uint8_t> data);
 // // bool						isChannel(struct s_server *ts, std::string channelName);
 // // bool						isNick(struct s_server *ts, std::string nick);
 // // bool						isInChannel(struct s_server *ts, std::string channelName, std::string nick);

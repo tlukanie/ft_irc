@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/09/30 10:31:25 by okraus           ###   ########.fr        #
+#    Updated: 2024/10/01 10:21:11 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,9 +52,13 @@ HEADERS		=	includes/ircserv.hpp \
 				server/classes/User.hpp
 CLIENT		=	magic8bot
 CSRCS		=	client/magic8bot.cpp \
+				actions/bot_flip.cpp \
+				classes/Message.cpp \
+				commands/irc_privmsg.cpp \
 				utils/debugger.cpp \
 				utils/irc_init_debugger.cpp \
-				utils/irc_read_client_config.cpp
+				utils/irc_read_client_config.cpp \
+				utils/utils.cpp
 COBJS		=	$(CSRCS:%.cpp=$(OBJDIRC)%.o)
 CHEADERS	=	includes/magic8bot.hpp \
 				includes/enums.hpp \
