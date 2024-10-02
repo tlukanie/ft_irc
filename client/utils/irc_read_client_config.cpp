@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 10:24:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/09/29 14:43:33 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 14:43:12 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	irc_read_client_config(t_client *tc)
 	std::string		key;
 	std::string		value;
 
+	tc->mode = MODE_INTERACTIVE;
 	tc->botname = "magic8bot";
 	if (file.fail() || !file.is_open())
 		return (1);
@@ -68,6 +69,25 @@ int	irc_read_client_config(t_client *tc)
 		else if (key == "PASSWORD")
 		{
 			tc->password = value;
+		}
+		else if (key == "MODE")
+		{
+			if (value == "INTERACTIVE")
+				tc->mode = MODE_INTERACTIVE;
+			else if (value == "AUTO")
+				tc->mode = MODE_AUTOMATED;
+			else if (value == "TEST")
+				tc->mode = MODE_TESTING;
+			else
+				std::cerr << "Invalid MODE: " << value << std::endl;
+		}
+		else if (key == "CHANNEL")
+		{
+			tc->channel = "#" + value;
+		}
+		else if (key == "TEST")
+		{
+			tc->test = value.size(); //needs to be updated
 		}
 		else if (key == "DEBUG_LVL")
 		{

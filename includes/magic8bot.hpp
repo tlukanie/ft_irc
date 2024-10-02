@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 10:57:54 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 15:19:06 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 # include <algorithm>
 
 # include "enums.hpp"
+# include "../client/classes/CardDeck.hpp"
 # include "../client/classes/Message.hpp"
 
 # define TRUE 1 

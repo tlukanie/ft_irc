@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 11:24:44 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 14:43:04 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,25 +243,14 @@ void	client_loop(t_client *tc)
 	}
 }
 
-void	init_client(t_client *tc, std::string const &arg, std::string const &arg2)
+void	init_client(t_client *tc)
 {
 	tc->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	// std::cout << "SOCKET: " << tc->clientSocket << std::endl;
 	tc->ready = false;
 	tc->dataInOverflow = false;
 	//Defining Server Address
-	tc->mode = MODE_INTERACTIVE;
 	srand(time(0));
-	if (arg == "AUTO")
-	{
-		tc->mode = MODE_AUTOMATED;
-		if (arg2.size())
-			tc->channel = arg2;
-	}
-	else if (arg == "TEST")
-		tc->mode = MODE_TESTING;
-	if (tc->mode == MODE_TESTING)
-		tc->test = arg2.size(); //rewrite
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_port = htons(tc->port);
@@ -273,8 +262,7 @@ void	init_client(t_client *tc, std::string const &arg, std::string const &arg2)
 	//Sending Data to the Server
 	if (tc->mode)
 	{
-		tc->messageOut = "PASS " + tc->password + CRLF "NICK " + tc->botname + CRLF "USER a b c d" CRLF;
-		std::cout << "HELLLLLOOOO" << tc->mode << arg << arg2 << std::endl;
+		tc->messageOut = "PASS " + tc->password + CRLF "NICK " + tc->botname + CRLF "USER bot 0 * magic" CRLF;
 		if (tc->channel.size())
 			tc->messageOut +=  "JOIN " + tc->channel + CRLF;
 		tc->ready = true;
@@ -348,7 +336,7 @@ void	clean_client(t_client *tc)
 
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	t_client	tc;
 
@@ -358,16 +346,9 @@ int main(int argc, char *argv[])
 		return (1);
 	std::string	arg;
 	std::string	arg2;
-	(void)argc;
-	if (argv[1])
-	{
-		arg = argv[1];
-		if (argv[2])
-			arg2 = argv[2];
-	}
 	try
 	{
-		init_client(&tc, arg, arg2);
+		init_client(&tc);
 	}
 	catch (const std::exception &e)
 	{

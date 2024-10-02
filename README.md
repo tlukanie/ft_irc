@@ -337,8 +337,8 @@
 	<li><s>rps</s></li>
 	<li><s>roll D n</s></li>
 	<li><s>pick a card</s></li>
-	<li>pick n cards</li>
-    <li>Automated logging-in sequence from file</li>
+    <li><s>Automated logging-in sequence from file</s></li>
+	<li><s>Blackjack - classes</s></li>
     <li>...</li>
   </ul>
 </ol>
@@ -347,8 +347,11 @@
 <ol>
   <li>Client - continue</li>
   <ul>
+    <li>Blackjack part 2</li>
 	<li>Replies</li>
 	<li>Date and time?</li>
+	<li>pick n cards</li>
+	<li>21 MEX - dice game</li>
 	<li>Give operator priviledges</li>
     <li>Test cases for individual commands</li>
     <li>...</li>
