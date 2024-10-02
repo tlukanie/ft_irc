@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/01 10:21:57 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 10:57:54 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ typedef struct s_debugger {
 	std::string					log; //log to be printed;
 }	t_debugger;
 
-typedef std::map<std::string, void(*)(struct s_client*, std::string target)> t_actionmap;
+typedef std::map<std::string, void(*)(struct s_client*, std::string target, std::vector<std::string> params)> t_actionmap;
 typedef std::map<std::string, void(*)(Message*, struct s_client*)> t_commandmap;
 
 typedef struct s_client {
@@ -97,6 +97,7 @@ typedef struct s_client {
 	char					buffer[512]; //irc message is up to 512
 	std::vector<uint8_t>	readIn;
 	bool					dataInOverflow;
+	std::vector<std::string>	cards;
 	std::vector<uint8_t>	dataIn;
 	std::vector<uint8_t>	dataOut;
 	std::vector<Message*>	messages; //multimap of messages collected in one loop
@@ -107,7 +108,11 @@ typedef struct s_client {
 
 //	ACTIONS
 
-void	bot_flip(t_client *tc, std::string target);
+void	bot_card(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_flip(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_rps(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_roll(t_client *tc, std::string target, std::vector<std::string> params);
+
 
 // //COMMANDS
 // void	irc_cap(Message* msg, struct s_server *ts);
@@ -247,6 +252,7 @@ void	irc_init_debugger(s_debugger *debugger);
 // int							ft_usage_port(void);
 // int							ft_usage_debug(void);
 size_t						ok_crlf_finder(std::vector<uint8_t> data);
+bool						ok_isChannelName(std::string const &target);
 // // bool						isChannel(struct s_server *ts, std::string channelName);
 // // bool						isNick(struct s_server *ts, std::string nick);
 // // bool						isInChannel(struct s_server *ts, std::string channelName, std::string nick);

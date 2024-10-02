@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 18:11:08 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/01 09:24:38 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 09:54:30 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,20 @@ Message::Message(std::string msg)
 			msg.erase(0, 1);
 		while (msg.size() && msg[0] == ' ')
 			msg.erase(0, 1);
+		// <nick>[!<user>@<host>]
+		size_t	exclamation = this->_prefix.find('!');
+		if (exclamation == std::string::npos)
+			this->_nick = this->_prefix;
+		else
+		{
+			this->_nick.assign(this->_prefix, 0, exclamation);
+			size_t	at = this->_prefix.find('@');
+			if (at != std::string::npos)
+			{
+				this->_user.assign(this->_prefix, exclamation + 1, at - 1 - exclamation);
+				this->_host.assign(this->_prefix, at + 1, this->_prefix.size() - at);
+			}
+		}
 	}
 	// std::cout << "passed the prefix" << std::endl;
 	if (msg.size() > 1)
@@ -133,6 +147,26 @@ Message::Message(std::string msg)
 std::string const	&Message::getMessage(void)
 {
 	return (this->_msg);
+}
+
+std::string const	&Message::getPrefix(void)
+{
+	return (this->_prefix);
+}
+
+std::string const	&Message::getNick(void)
+{
+	return (this->_nick);
+}
+
+std::string const	&Message::getUser(void)
+{
+	return (this->_user);
+}
+
+std::string const	&Message::getHost(void)
+{
+	return (this->_host);
 }
 
 std::string const	&Message::getCommand(void)

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/01 13:37:36 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/01 09:26:36 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 09:58:54 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,13 @@
 // 		<< REDBG_COLOUR "--debug-lvl=n; n has to be integer between 0 and 4" NO_COLOUR << std::endl;
 // 	return (2);
 // }
+
+bool	ok_isChannelName(std::string const &target)
+{
+	if (target.size() > 1 && (target[0] == '#' || target[0] == '&'))
+		return (true);
+	return (false);
+}
 
 size_t	ok_crlf_finder(std::vector<uint8_t> data)
 {

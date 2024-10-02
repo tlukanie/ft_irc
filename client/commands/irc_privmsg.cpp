@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 16:11:13 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/10/01 10:28:34 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 10:12:30 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,40 @@ void	irc_privmsg(Message* msg, struct s_client *tc)
 	std::string	target = msg->getParams()[0];
 	//if target is not channel (it is bot itself),
 	//target from prefix
+	if (target == tc->botname)
+	{
+		if (msg->getNick().size())
+			target = msg->getNick();
+		else
+			return ;
+	}
 	std::string	text = msg->getParams()[1];
 	//split text by spaces
-
-	if (tc->actions.find(text) != tc->actions.end())
+	std::vector<std::string>	params;
+	std::string					param;
+	std::string					action;
+	while (text.size())
 	{
-		ok_debugger(&(tc->debugger), DEBUG, "Executing action:", text, MYDEBUG);
+		param.assign(text, 0, text.find(' '));
+		while (text.size() && text[0] != ' ')
+			text.erase(0, 1);
+		while (text.size() && text[0] == ' ')
+			text.erase(0, 1);
+		if (action.size())
+			params.push_back(param);
+		else
+			action = param;
+		param.clear();
+	}
+	if (tc->actions.find(action) != tc->actions.end())
+	{
+		ok_debugger(&(tc->debugger), DEBUG, "Executing action:", action, MYDEBUG);
 		//maybe run in try and catch block
-		tc->actions[text](tc, target);
+		tc->actions[action](tc, target, params);
 	}
 	else
 	{
-		ok_debugger(&(tc->debugger), INFO, "Unknown command:", text, MYDEBUG);
+		ok_debugger(&(tc->debugger), INFO, "Unknown action:", action, MYDEBUG);
 		//err_unknowncommand_421(tc, msg_ptr->getSD(), msg_ptr->getCommand());
 		//strike count of invalid messages
 	}

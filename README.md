@@ -328,13 +328,16 @@
   </ul>
 </ol>
 
-<h4>Plan for 02.10.24 (9:30 - 11:30 + ? Prague time)</h4>
+<h4>Plan for 02.10.24 (9:30 - 11:30 + 14:30-16:30 Prague time)</h4>
 <ol>
   <li>Client - continue</li>
   <ul>
-    <li>Advanced message handling</li>
-    <li>Test cases for individual commands</li>
-    <li>Replies, rollDn, pick n cards, flip a coin, rps</li>
+    <li><s>Advanced message handling</s></li>
+    <li><s>flip a coin</s></li>
+	<li><s>rps</s></li>
+	<li><s>roll D n</s></li>
+	<li><s>pick a card</s></li>
+	<li>pick n cards</li>
     <li>Automated logging-in sequence from file</li>
     <li>...</li>
   </ul>
@@ -344,6 +347,10 @@
 <ol>
   <li>Client - continue</li>
   <ul>
+	<li>Replies</li>
+	<li>Date and time?</li>
+	<li>Give operator priviledges</li>
+    <li>Test cases for individual commands</li>
     <li>...</li>
   </ul>
 </ol>

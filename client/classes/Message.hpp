@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 16:52:42 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/01 09:25:02 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/02 09:48:01 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ class Message
 		
 		// getters and setters? for mode
 		std::string const				&getMessage(void);
+		std::string const				&getPrefix(void);
+		std::string const				&getNick(void);
+		std::string const				&getUser(void);
+		std::string const				&getHost(void);
 		std::string const				&getCommand(void);
 		std::vector<std::string> const	&getParams(void);
 		
@@ -82,9 +86,13 @@ class Message
 		// socket descriptor
 		// more stuff will come here
 		//<message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
-		//prefix string
 		std::string					_msg;
+		//prefix string
+		// <nick>[!<user>@<host>]
 		std::string					_prefix;
+		std::string					_nick;
+		std::string					_user;
+		std::string					_host;
 		//command string
 		std::string					_command;
 		//vector of params strings
