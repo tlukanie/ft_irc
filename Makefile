@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/10/02 15:35:28 by okraus           ###   ########.fr        #
+#    Updated: 2024/10/03 11:36:23 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,10 +52,17 @@ HEADERS		=	includes/ircserv.hpp \
 				server/classes/User.hpp
 CLIENT		=	magic8bot
 CSRCS		=	client/magic8bot.cpp \
+				actions/bot_blackjack.cpp \
 				actions/bot_card.cpp \
+				actions/bot_date.cpp \
 				actions/bot_flip.cpp \
+				actions/bot_hit.cpp \
+				actions/bot_q.cpp \
 				actions/bot_roll.cpp \
 				actions/bot_rps.cpp \
+				actions/bot_stand.cpp \
+				actions/bot_time.cpp \
+				actions/bot_utime.cpp \
 				classes/BlackJack.cpp \
 				classes/CardDeck.cpp \
 				classes/CardPlayer.cpp \

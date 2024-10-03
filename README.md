@@ -347,13 +347,9 @@
 <ol>
   <li>Client - continue</li>
   <ul>
-    <li>Blackjack part 2</li>
+    <li><s>Blackjack part 2</s></li>
+	<li><s>Date and time?</s></li>
 	<li>Replies</li>
-	<li>Date and time?</li>
-	<li>pick n cards</li>
-	<li>21 MEX - dice game</li>
-	<li>Give operator priviledges</li>
-    <li>Test cases for individual commands</li>
     <li>...</li>
   </ul>
 </ol>
@@ -362,7 +358,9 @@
 <ol>
   <li>Client - continue</li>
   <ul>
-    <li>...</li>
+    <li>Blackjack part 3</li>
+	<li>Give operator priviledges</li>
+    <li>Join multiple channels at loginz</li>
   </ul>
 </ol>
 
@@ -370,6 +368,9 @@
 <ol>
   <li>Client - continue</li>
   <ul>
+    <li>Test cases for individual commands</li>
+	<li>pick n cards</li>
+	<li>21 MEX - dice game</li>
     <li>...</li>
   </ul>
 </ol>

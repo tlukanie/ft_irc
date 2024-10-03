@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 14:43:04 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/03 11:38:21 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,9 +143,12 @@ void	client_loop(t_client *tc)
 		//clear the socket set 
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds); 
-		//add master socket to set 
-		FD_SET(STDIN_FILENO, &readfds);
-		FD_SET(STDOUT_FILENO, &writefds);
+		//add master socket to set
+		if (tc->mode == MODE_INTERACTIVE)
+		{
+			FD_SET(STDIN_FILENO, &readfds);
+			FD_SET(STDOUT_FILENO, &writefds);
+		}
 		if (!tc->ready)
 		{
 			FD_SET(tc->clientSocket, &readfds);
@@ -276,11 +279,30 @@ void	init_client(t_client *tc)
 	{
 		tc->cards.push_back(deck[i]);
 	}
+	std::string	answers[20] = {
+		"It is certain.", "Reply hazy, try again.", "Don't count on it.",
+		"It is decidedly so.", "Ask again later.", "My reply is no.",
+		"Without a doubt.", "Better not tell you now.", "My sources say no.",
+		"Yes definitely.", "Cannot predict now.", "Outlook not so good.",
+		"You may rely on it.", "Concentrate and ask again.", "Very doubtful.",
+		"As I see it, yes.", "Most likely.", "Outlook good.", "Yes.",
+		"Signs point to yes."};
+	for (int i = 0; i < 20; i++)
+	{
+		tc->answers.push_back(answers[i]);
+	}
 	//add actions
+	tc->actions["!blackjack"] = bot_blackjack;
 	tc->actions["!card"] = bot_card;
+	tc->actions["!date"] = bot_date;
 	tc->actions["!flip"] = bot_flip;
+	tc->actions["!hit"] = bot_hit;
+	tc->actions["!q"] = bot_q;
 	tc->actions["!rps"] = bot_rps;
 	tc->actions["!roll"] = bot_roll;
+	tc->actions["!stand"] = bot_stand;
+	tc->actions["!time"] = bot_time;
+	tc->actions["!utime"] = bot_utime;
 
 	//add commands
 	// tc->commands["CAP"] = irc_cap;

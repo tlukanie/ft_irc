@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 16:11:41 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/03 10:15:19 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 // # include <ctime>
 // # include <cstring>
 
-# include "../../includes/magic8bot.hpp"
+
 # include "CardDeck.hpp"
 # include "CardPlayer.hpp"
 
@@ -38,8 +38,9 @@ class BlackJack
 		BlackJack(void);
 
 		void			addPlayer(std::string const &nick);
+		// remove player?
 		void			drawCard(std::string const &nick);
-		void			stand(std::string const &nick);
+		int				stand(std::string const &nick);
 		std::string 	showHand(std::string const &nick);
 		std::string		announceWinner(void);
 		void			newGame(void);
@@ -50,6 +51,7 @@ class BlackJack
 
 		CardDeck							_deck;
 		std::map<std::string, CardPlayer*>	_players;
+		int									_activePlayers;
 };
 
 #endif

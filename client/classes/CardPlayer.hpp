@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 15:44:58 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/03 09:53:35 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 // # include <ctime>
 // # include <cstring>
 
-# include "../../includes/magic8bot.hpp"
 # include "CardDeck.hpp"
 
 # ifndef DEEPDEBUG

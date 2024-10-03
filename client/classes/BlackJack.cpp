@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 16:12:18 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/03 10:17:32 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 BlackJack::BlackJack(void)
 {
 	this->_deck.refill();
+	this->_activePlayers = 0;
 }
 
 BlackJack::~BlackJack(void)
@@ -26,6 +27,9 @@ BlackJack::~BlackJack(void)
 void	BlackJack::addPlayer(std::string const &nick)
 {
 	this->_players[nick] = new CardPlayer(nick);
+	this->_players[nick]->drawCard(this->_deck);
+	this->_players[nick]->drawCard(this->_deck);
+	this->_activePlayers++;
 }
 
 void	BlackJack::drawCard(std::string const &nick)
@@ -33,9 +37,10 @@ void	BlackJack::drawCard(std::string const &nick)
 	this->_players[nick]->drawCard(this->_deck);
 }
 
-void	BlackJack::stand(std::string const &nick)
+int	BlackJack::stand(std::string const &nick)
 {
 	this->_players[nick]->stand();
+	return (--(this->_activePlayers));
 }
 
 std::string BlackJack::showHand(std::string const &nick)
@@ -50,7 +55,7 @@ std::string BlackJack::showHand(std::string const &nick)
 	for (std::set<int>::iterator it = playerHand.begin(); it != playerHand.end(); it++)
 	{
 		if (*it >= 0 && *it < 52)
-			hand += deck[*it];
+			hand += deck[*it] + " ";
 	}
 	//mayne add current score to the hand
 	return (hand);
@@ -61,6 +66,7 @@ std::string	BlackJack::announceWinner(void)
 	//if all players standing, calculate scores and announce winner, show hands
 	std::string	winnerStatement;
 
+	winnerStatement = "Someone probably won";
 	return (winnerStatement);
 }
 

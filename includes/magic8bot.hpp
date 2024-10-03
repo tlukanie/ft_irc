@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 15:19:06 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/03 11:31:56 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 # define MAGIC8BOT_HPP
 # include <stdio.h>
 # include <iostream>
-#include <cstdlib> 
+# include <iomanip>
+# include <cstdlib>
+# include <ctime> 
 # include <fstream>
 # include <sstream>
 # include <cstring>
@@ -35,6 +37,7 @@
 # include "enums.hpp"
 # include "../client/classes/CardDeck.hpp"
 # include "../client/classes/Message.hpp"
+# include "../client/classes/BlackJack.hpp"
 
 # define TRUE 1 
 # define FALSE 0
@@ -77,6 +80,7 @@ typedef struct s_client {
 	std::string				serverIP;
 	std::string				password;
 	std::string				channel;
+	BlackJack				bj;
 	bool					ready;
 	int						mode;
 	int						test;
@@ -98,6 +102,7 @@ typedef struct s_client {
 	char					buffer[512]; //irc message is up to 512
 	std::vector<uint8_t>	readIn;
 	bool					dataInOverflow;
+	std::vector<std::string>	answers;
 	std::vector<std::string>	cards;
 	std::vector<uint8_t>	dataIn;
 	std::vector<uint8_t>	dataOut;
@@ -109,10 +114,17 @@ typedef struct s_client {
 
 //	ACTIONS
 
+void	bot_blackjack(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_card(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_date(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_flip(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_hit(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_q(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_rps(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_roll(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_stand(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_time(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_utime(t_client *tc, std::string target, std::vector<std::string> params);
 
 
 // //COMMANDS
