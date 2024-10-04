@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/03 11:38:21 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/04 15:10:55 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,6 +251,7 @@ void	init_client(t_client *tc)
 	tc->clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	// std::cout << "SOCKET: " << tc->clientSocket << std::endl;
 	tc->ready = false;
+	tc->channelBJ = "#blackjack";
 	tc->dataInOverflow = false;
 	//Defining Server Address
 	srand(time(0));
@@ -268,6 +269,7 @@ void	init_client(t_client *tc)
 		tc->messageOut = "PASS " + tc->password + CRLF "NICK " + tc->botname + CRLF "USER bot 0 * magic" CRLF;
 		if (tc->channel.size())
 			tc->messageOut +=  "JOIN " + tc->channel + CRLF;
+		tc->messageOut +=  "JOIN " + tc->channelBJ + CRLF;
 		tc->ready = true;
 	}
 
@@ -297,6 +299,7 @@ void	init_client(t_client *tc)
 	tc->actions["!date"] = bot_date;
 	tc->actions["!flip"] = bot_flip;
 	tc->actions["!hit"] = bot_hit;
+	tc->actions["!initbj"] = bot_initbj;
 	tc->actions["!q"] = bot_q;
 	tc->actions["!rps"] = bot_rps;
 	tc->actions["!roll"] = bot_roll;
@@ -305,6 +308,7 @@ void	init_client(t_client *tc)
 	tc->actions["!utime"] = bot_utime;
 
 	//add commands
+	tc->commands["352"] = irc_352;
 	// tc->commands["CAP"] = irc_cap;
 	// tc->commands["PASS"] = irc_pass;
 	// tc->commands["NICK"] = irc_nick;

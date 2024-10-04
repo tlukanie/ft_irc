@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/10/03 11:36:23 by okraus           ###   ########.fr        #
+#    Updated: 2024/10/04 15:09:37 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,6 +57,7 @@ CSRCS		=	client/magic8bot.cpp \
 				actions/bot_date.cpp \
 				actions/bot_flip.cpp \
 				actions/bot_hit.cpp \
+				actions/bot_initbj.cpp \
 				actions/bot_q.cpp \
 				actions/bot_roll.cpp \
 				actions/bot_rps.cpp \
@@ -67,6 +68,7 @@ CSRCS		=	client/magic8bot.cpp \
 				classes/CardDeck.cpp \
 				classes/CardPlayer.cpp \
 				classes/Message.cpp \
+				commands/irc_352.cpp \
 				commands/irc_privmsg.cpp \
 				utils/debugger.cpp \
 				utils/irc_init_debugger.cpp \

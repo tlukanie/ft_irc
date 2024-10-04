@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/03 10:15:19 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/04 16:08:46 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@
 
 //# include <cstddef>
 # include <iostream>
+# include <sstream>
 # include <map>
+# include <algorithm>
+# include <vector>
 # include <stdint.h>
 // # include <fstream>
 // # include <sstream>
@@ -41,7 +44,9 @@ class BlackJack
 		// remove player?
 		void			drawCard(std::string const &nick);
 		int				stand(std::string const &nick);
+		bool			isStanding(std::string const &nick);
 		std::string 	showHand(std::string const &nick);
+		std::string 	showHandSorted(std::string const &nick);
 		std::string		announceWinner(void);
 		void			newGame(void);
 
@@ -53,5 +58,7 @@ class BlackJack
 		std::map<std::string, CardPlayer*>	_players;
 		int									_activePlayers;
 };
+
+# include "../../includes/templates.tpp"
 
 #endif

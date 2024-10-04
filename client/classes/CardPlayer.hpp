@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 17:08:41 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/03 09:53:35 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/04 15:45:29 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 //# include <cstddef>
 # include <iostream>
 # include <set>
+# include <vector>
 # include <stdint.h>
 // # include <fstream>
 // # include <sstream>
@@ -36,8 +37,9 @@ class CardPlayer
 		CardPlayer(std::string const &name);
 		
 		void				drawCard(CardDeck &deck);
+		int					getHandScore(void);
 		void				emptyHand(void);
-		std::set<int> const	&showHand(void);
+		std::vector<int> const	&showHand(void);
 		std::string const	&getName(void);
 		bool				isStanding(void);
 		void				stand(void);
@@ -47,7 +49,7 @@ class CardPlayer
 		CardPlayer(const CardPlayer& copy);
 		CardPlayer &operator	= (const CardPlayer &src);
 
-		std::set<int>	_cards;
+		std::vector<int>	_cards;
 		std::string		_name;
 		bool			_stand;
 };

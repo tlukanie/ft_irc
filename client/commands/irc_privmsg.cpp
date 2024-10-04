@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 16:11:13 by tlukanie          #+#    #+#             */
-/*   Updated: 2024/10/02 10:12:30 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/04 14:43:51 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	irc_privmsg(Message* msg, struct s_client *tc)
 	std::string	target = msg->getParams()[0];
 	//if target is not channel (it is bot itself),
 	//target from prefix
-	if (target == tc->botname)
+	if (target == tc->botname || target == tc->channelBJ)
 	{
 		if (msg->getNick().size())
 			target = msg->getNick();

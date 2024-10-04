@@ -349,7 +349,7 @@
   <ul>
     <li><s>Blackjack part 2</s></li>
 	<li><s>Date and time?</s></li>
-	<li>Replies</li>
+	<li><s>Replies</s></li>
     <li>...</li>
   </ul>
 </ol>
@@ -358,19 +358,22 @@
 <ol>
   <li>Client - continue</li>
   <ul>
-    <li>Blackjack part 3</li>
-	<li>Give operator priviledges</li>
-    <li>Join multiple channels at loginz</li>
+    <li><s>Blackjack part 3</s></li>
+	<li><s>Use who list?</s></li>
+	<li><s>get nick and target for action</s></li>
+    <li><s>Join blackjack channel at login</s></li>
   </ul>
 </ol>
 
 <h4>Plan for 07.10.24 (9:30 - 11:30 Prague time)</h4>
 <ol>
+  <li>Plan for the week</li>
   <li>Client - continue</li>
   <ul>
+    <li>Blackjack part 4</li>
+	<li>Give operator priviledges</li>
+    <li>Join multiple channels at login?</li>
     <li>Test cases for individual commands</li>
-	<li>pick n cards</li>
-	<li>21 MEX - dice game</li>
     <li>...</li>
   </ul>
 </ol>

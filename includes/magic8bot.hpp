@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/03 11:31:56 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/04 16:08:36 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # define MAGIC8BOT_HPP
 # include <stdio.h>
 # include <iostream>
+# include <sstream>
 # include <iomanip>
 # include <cstdlib>
 # include <ctime> 
@@ -80,6 +81,8 @@ typedef struct s_client {
 	std::string				serverIP;
 	std::string				password;
 	std::string				channel;
+	std::string				channelBJ;
+	std::vector<std::string>	bjPlayers;
 	BlackJack				bj;
 	bool					ready;
 	int						mode;
@@ -119,6 +122,7 @@ void	bot_card(t_client *tc, std::string target, std::vector<std::string> params)
 void	bot_date(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_flip(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_hit(t_client *tc, std::string target, std::vector<std::string> params);
+void	bot_initbj(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_q(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_rps(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_roll(t_client *tc, std::string target, std::vector<std::string> params);
@@ -126,7 +130,8 @@ void	bot_stand(t_client *tc, std::string target, std::vector<std::string> params
 void	bot_time(t_client *tc, std::string target, std::vector<std::string> params);
 void	bot_utime(t_client *tc, std::string target, std::vector<std::string> params);
 
-
+//NUMERICS
+void	irc_352(Message* msg, struct s_client *tc);
 // //COMMANDS
 // void	irc_cap(Message* msg, struct s_server *ts);
 // void	irc_pass(Message* msg, struct s_server *ts);
@@ -228,8 +233,7 @@ std::string	ok_display_send_buffer(bool colour, std::vector<uint8_t> const &buff
 std::string	ok_display_message(s_debugger *debugger, std::string msg);
 
 
-# include <iostream>
-# include <sstream>
+
 
 
 # define LOWER "abcdefghijklmnopqrstuvwxyz"
@@ -238,25 +242,7 @@ std::string	ok_display_message(s_debugger *debugger, std::string msg);
 # define SPECIAL "[]{}^`|_\\"
 # define KEY "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
 
-template <typename T> T	ok_strtoi(std::string str)
-{
-	std::stringstream	temp;
-	T					num;
 
-	temp << str;
-	temp >> num;
-	return (num);
-}
-
-template <typename T> std::string	ok_itostr(T num)
-{
-	std::stringstream	temp;
-	std::string			str;
-
-	temp << num;
-	temp >> str;
-	return (str);
-}
 
 int		irc_read_client_config(t_client *tc);
 void	irc_init_debugger(s_debugger *debugger);
@@ -313,5 +299,6 @@ bool						ok_isChannelName(std::string const &target);
 // void	err_unknownmodeflag_501(struct s_server *ts, unsigned short sd);
 // void	err_invalidmodeparam_696(struct s_server *ts, unsigned short sd, std::string target, std::string modeChar, std::string parameter, std::string description);
 
+# include "templates.tpp"
 
 #endif
