@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 10:57:32 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/07 16:41:44 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/07 17:07:26 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void	bot_stand(t_client *tc, std::string target, std::vector<std::string> params)
 {
+	int			stand;
 	std::string	reply;
 	if (!(tc->bj.getStatus() & BJ_INPROGRESS))
 	{
@@ -33,14 +34,14 @@ void	bot_stand(t_client *tc, std::string target, std::vector<std::string> params
 	std::string	suits[4] = {"spades", "hearts", "diamonds", "clubs"};
 	std::string	values[13] = {"ace", "two", "three", "four", "five", "six", "seven", "eight",
 								"nine", "ten", "jack", "queen", "king"};
-
-	if (!tc->bj.stand(target))
+	stand = tc->bj.stand(target);
+	if (!stand)
 	{
 		bj_end(tc);
 	}
 	else
 	{
-		reply = "you are standing, waiting for other players";
+		reply = "you are standing, waiting for " + ok_itostr(stand) + " other players";
 		tc->messageOut += "NOTICE " + target + " :" + reply + CRLF;
 		reply = target + " stands.";
 		for (std::vector<std::string>::iterator it = tc->bjPlayers.begin(); it != tc->bjPlayers.end(); it++)
