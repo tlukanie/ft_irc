@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/04 16:21:17 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/07 16:26:57 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ BlackJack::BlackJack(void)
 {
 	this->_deck.refill();
 	this->_activePlayers = 0;
+	this->_status = BJ_NOGAME;
 }
 
 BlackJack::~BlackJack(void)
@@ -103,7 +104,6 @@ std::string	BlackJack::announceWinner(void)
 		if (it->second->getHandScore() > bestScore)
 			bestScore = it->second->getHandScore();
 	}
-
 	//print names of those with it
 	for (std::map<std::string, CardPlayer*>::iterator it = this->_players.begin(); it != this->_players.end(); it++)
 	{
@@ -111,6 +111,7 @@ std::string	BlackJack::announceWinner(void)
 			winnerStatement += it->first + " ";
 	}
 	winnerStatement += "won the game of blackjack!";
+	this->_status = BJ_NOGAME;
 	return (winnerStatement);
 }
 
@@ -122,4 +123,16 @@ void	BlackJack::newGame(void)
 		delete it->second;
 	}
 	this->_players.clear();
+	this->_endtime = std::time(NULL) + BJ_GAMELENGTH;
+	this->_status = BJ_INPROGRESS;
+}
+
+int	BlackJack::getStatus(void)
+{
+	return (this->_status);
+}
+
+std::time_t	BlackJack::getEndTime(void)
+{
+	return (this->_endtime);
 }

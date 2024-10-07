@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 10:57:32 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/04 16:13:11 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/07 16:39:43 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,13 @@ void	bot_hit(t_client *tc, std::string target, std::vector<std::string> params)
 	std::string	reply;
 	// need to check if player already standing or game not in progress
 	(void)params;
-
+	if (!(tc->bj.getStatus() & BJ_INPROGRESS))
+	{
+		reply = "no game in progress at the moment, type '!blackjack' to start a new game";
+		tc->messageOut += "NOTICE " + target + " :" + reply + CRLF;
+		tc->ready = true;
+		return ;
+	}
 	if (tc->bj.isStanding(target))
 	{
 		reply = "you are already standing.";

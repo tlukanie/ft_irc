@@ -6,7 +6,7 @@
 #    By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/30 10:33:19 by okraus            #+#    #+#              #
-#    Updated: 2024/10/04 15:09:37 by okraus           ###   ########.fr        #
+#    Updated: 2024/10/07 16:42:11 by okraus           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -68,8 +68,10 @@ CSRCS		=	client/magic8bot.cpp \
 				classes/CardDeck.cpp \
 				classes/CardPlayer.cpp \
 				classes/Message.cpp \
+				commands/irc_315.cpp \
 				commands/irc_352.cpp \
 				commands/irc_privmsg.cpp \
+				utils/bj_end.cpp \
 				utils/debugger.cpp \
 				utils/irc_init_debugger.cpp \
 				utils/irc_read_client_config.cpp \

@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 13:35:07 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/04 15:10:55 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/07 16:29:21 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,8 +164,9 @@ void	client_loop(t_client *tc)
 			if(tc->debugger.fd > tc->max_sd)
 				tc->max_sd = tc->debugger.fd;
 		}
-		
-		tc->timeout.tv_sec = 15;
+		if ((tc->bj.getStatus() & BJ_INPROGRESS) && std::time(NULL) > tc->bj.getEndTime())
+			bj_end(tc);
+		tc->timeout.tv_sec = 5;
 		tc->timeout.tv_usec = 0;
 		tc->activity = select(tc->max_sd + 1, &readfds , &writefds , NULL , &tc->timeout);
 		// ok_debugger(&(tc->debugger), DEBUG, "After select", "", MYDEBUG);
@@ -308,6 +309,7 @@ void	init_client(t_client *tc)
 	tc->actions["!utime"] = bot_utime;
 
 	//add commands
+	tc->commands["315"] = irc_315;
 	tc->commands["352"] = irc_352;
 	// tc->commands["CAP"] = irc_cap;
 	// tc->commands["PASS"] = irc_pass;

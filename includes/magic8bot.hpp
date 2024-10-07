@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 14:38:22 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/04 16:08:36 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/07 16:31:30 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <sstream>
 # include <iomanip>
 # include <cstdlib>
-# include <ctime> 
+# include <ctime>
 # include <fstream>
 # include <sstream>
 # include <cstring>
@@ -60,6 +60,8 @@
 # define MODE_INTERACTIVE 0
 # define MODE_AUTOMATED 1
 # define MODE_TESTING 2
+
+
 
 typedef struct s_debugger {
 	bool						date;
@@ -131,6 +133,7 @@ void	bot_time(t_client *tc, std::string target, std::vector<std::string> params)
 void	bot_utime(t_client *tc, std::string target, std::vector<std::string> params);
 
 //NUMERICS
+void	irc_315(Message* msg, struct s_client *tc);
 void	irc_352(Message* msg, struct s_client *tc);
 // //COMMANDS
 // void	irc_cap(Message* msg, struct s_server *ts);
@@ -243,7 +246,7 @@ std::string	ok_display_message(s_debugger *debugger, std::string msg);
 # define KEY "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
 
 
-
+void	bj_end(t_client *tc);
 int		irc_read_client_config(t_client *tc);
 void	irc_init_debugger(s_debugger *debugger);
 
