@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 10:57:32 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/07 16:08:55 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/08 11:23:08 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@ void	bot_blackjack(t_client *tc, std::string target, std::vector<std::string> pa
 	(void)target;
 	std::string	reply;
 
+	if ((tc->bj.getStatus() & BJ_INPROGRESS))
+	{
+		reply = "game in progress, cannot start new one";
+		tc->messageOut += "NOTICE " + target + " :" + reply + CRLF;
+		tc->ready = true;
+		return ;
+	}
 	tc->bjPlayers.clear();
 	tc->messageOut += "WHO " + tc->channelBJ + CRLF;
 	tc->ready = true;

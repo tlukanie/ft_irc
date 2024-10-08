@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/07 16:26:57 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/08 11:39:37 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,8 +123,10 @@ void	BlackJack::newGame(void)
 		delete it->second;
 	}
 	this->_players.clear();
+	this->_activePlayers = 0;
 	this->_endtime = std::time(NULL) + BJ_GAMELENGTH;
 	this->_status = BJ_INPROGRESS;
+	
 }
 
 int	BlackJack::getStatus(void)
