@@ -6,7 +6,7 @@
 /*   By: okraus <okraus@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:57 by okraus            #+#    #+#             */
-/*   Updated: 2024/10/02 16:16:09 by okraus           ###   ########.fr       */
+/*   Updated: 2024/10/18 13:24:23 by okraus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ int	CardDeck::drawCard(void)
 	pos = rand() % this->_deck.size();
 	card = this->_deck[pos];
 	this->_deck.erase(this->_deck.begin() + pos);
+	std::cout << "Deck size: " << this->_deck.size() << std::endl;
 	return (card);
 }
 
@@ -49,6 +50,7 @@ int	CardDeck::getDeckSize(void)
 
 void	CardDeck::refill(void)
 {
+	this->_deck.clear();
 	for (unsigned char i = 0; i < this->_size; i++)
 		this->_deck.push_back(i);
 }
